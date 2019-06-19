@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<Inter_Mesh_Settings>
+	<Mesh_Params>
+		<Mesh_Rows>20</Mesh_Rows>
+		<Mesh_Columns>20</Mesh_Columns>
+		<Mesh_Width>1000</Mesh_Width>
+		<Mesh_Height>700</Mesh_Height>
+	</Mesh_Params>
+	<Vertex_Params>
+		<Vertex_Radius>6</Vertex_Radius>
+		<Vertex_Density>1</Vertex_Density>
+		<Vertex_Bounce>0.3</Vertex_Bounce>
+		<Vertex_Friction>1</Vertex_Friction>
+	</Vertex_Params>
+	<Joint_Params>
+		<Joint_Frequency>2.2449</Joint_Frequency>
+		<Joint_Damping>4.03061</Joint_Damping>
+	</Joint_Params>
+	<InterAgentJoint_Params>
+		<Joint_Frequency>0.4</Joint_Frequency>
+		<Joint_Damping>0.765306</Joint_Damping>
+		<Max_Joint_Force>20</Max_Joint_Force>
+	</InterAgentJoint_Params>
+	<Background_Params>
+		<Width>50</Width>
+		<Height>50</Height>
+		<Attraction>-3</Attraction>
+		<Repulsion>30</Repulsion>
+		<Scale>8.16327</Scale>
+	</Background_Params>
+</Inter_Mesh_Settings>
