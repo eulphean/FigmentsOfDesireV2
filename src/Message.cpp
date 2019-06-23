@@ -1,15 +1,13 @@
 #include "Message.h"
 
-Message::Message(glm::vec2 loc, ofColor col, float s, string msg) {
+Message::Message(glm::vec2 loc, ofColor col, float s) {
   location = loc;
   color = col;
   size = s;
-  message = msg;
 }
 
 void Message::draw(ofTrueTypeFont font) {
-  if (message == "~") { // Draw bogus circle message.
-    ofPushMatrix();
+  ofPushMatrix();
     ofTranslate(location);
       ofPushStyle();
         ofColor c = ofColor(color, 250);
@@ -17,5 +15,4 @@ void Message::draw(ofTrueTypeFont font) {
         ofDrawCircle(0, 0, size);
       ofPopStyle();
   ofPopMatrix();
-  }
 }

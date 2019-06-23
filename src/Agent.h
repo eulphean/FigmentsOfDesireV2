@@ -24,7 +24,7 @@ enum DesireState {
 // Subsection body that is torn apart from the actual texture and falls on the ground. 
 class Agent {
   public:
-    void setup(ofxBox2d &box2d, AgentProperties softBodyProperties, string fileName);
+    void setup(ofxBox2d &box2d, AgentProperties softBodyProperties);
     void update();
     void draw(bool debug, bool showTexture);
   
@@ -87,8 +87,6 @@ class Agent {
     float maxVelocity;
     
   private:
-    void readFile(string fileName);
-    void assignMessages(ofPoint meshSize);
     void createMesh(AgentProperties softBodyProperties);
     void createSoftBody(ofxBox2d &box2d, AgentProperties softBodyProperties);
     void updateMesh();

@@ -34,5 +34,5 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
 //  filterChain->addFilter(new PoissonBlendFilter("img/grid.jpg", agentProps.meshSize.x, agentProps.meshSize.y, 0.6, 2));
   
   
-  setup(box2d, agentProps, "amay.txt"); // TODO: Actually pass a pointer to all the messages later (for now it's assigned randomly)
+  setup(box2d, agentProps);
 }

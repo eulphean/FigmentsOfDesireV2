@@ -1,14 +1,9 @@
 #include "Agent.h"
 
-void Agent::setup(ofxBox2d &box2d, AgentProperties agentProps, string fileName) {
-  // Prepare the agent's texture.
-  readFile(fileName);
-  assignMessages(agentProps.meshSize);
-  
+void Agent::setup(ofxBox2d &box2d, AgentProperties agentProps) {
   // Initialize the iterator.
-  curMsg = messages.begin(); // Need the message to draw
-  
   createTexture(agentProps.meshSize);
+  curMsg = messages.begin(); // Need the message to draw
   
   // Prepare agent's mesh.
   createMesh(agentProps);
@@ -131,23 +126,6 @@ void Agent::assignIndices(AgentProperties agentProps) {
   }
 }
 
-void Agent::readFile(string fileName) {
-  auto buffer = ofBufferFromFile(fileName);
-  auto lines = ofSplitString(buffer.getText(), "\n");
- 
-  for (auto l: lines) {
-    auto i = l.find(":");
-    if (i > 0) {
-      auto s = l.substr(i+1);
-      textMsgs.push_back(s);
-    } else {
-      auto b = textMsgs.back();
-      b = b + "\n" + l; // Append the line to the last value in the vector.
-      textMsgs[textMsgs.size()-1] = b;
-    }
-  }
-}
-
 ofPoint Agent::getTextureSize() {
   return ofPoint(secondFbo.getWidth(), secondFbo.getHeight());
 }
@@ -169,8 +147,8 @@ void Agent::clean(ofxBox2d &box2d) {
   vertices.clear();
 }
 
-void Agent::assignMessages(ofPoint meshSize) {
-  // Create Bogus message circles.
+void Agent::createTexture(ofPoint meshSize) {
+  // Create spots on the agent's body
   for (int i = 0; i < numBogusMessages; i++) {
     // Pick a random location on the mesh.
     int w = meshSize.x; int h = meshSize.y;
@@ -184,12 +162,10 @@ void Agent::assignMessages(ofPoint meshSize) {
     int size = ofRandom(5, 10);
     
     // Create a message.
-    Message m = Message(glm::vec2(x, y), c, size, "~");
+    Message m = Message(glm::vec2(x, y), c, size);
     messages.push_back(m);
   }
-}
-
-void Agent::createTexture(ofPoint meshSize) {
+  
   // Create 1st fbo and draw all the messages. 
   firstFbo.allocate(meshSize.x*2, meshSize.y*2, GL_RGBA);
   firstFbo.begin();

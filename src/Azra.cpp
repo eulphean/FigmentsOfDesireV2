@@ -30,5 +30,5 @@ Azra::Azra(ofxBox2d &box2d, AgentProperties agentProps) {
 //  filterChain->addFilter(new PoissonBlendFilter("img/tex.jpg", agentProps.meshSize.x, agentProps.meshSize.y, 0.6, 2));
   //filterChain->addFilter(new PerlinNoiseFilter(2.0));
   
-  setup(box2d, agentProps, "azra.txt");
+  setup(box2d, agentProps);
 }

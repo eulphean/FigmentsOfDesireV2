@@ -51,17 +51,15 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
       std::vector<Message>::iterator bMessage = agentB -> curMsg;
       
       // Save the temp message.
-      Message swap = Message(aMessage->location, aMessage->color, aMessage->size, aMessage->message);
+      Message swap = Message(aMessage->location, aMessage->color, aMessage->size);
       
       // Assign A message
       aMessage->color = bMessage->color;
       aMessage->size = bMessage->size;
-      aMessage->message = bMessage->message;
       
       // Assign B message
       bMessage->color = swap.color;
       bMessage->size = swap.size;
-      bMessage->message = swap.message;
       
       // Change the iteretor to point to a unique message now
       aMessage = agentA->messages.begin() + (int) ofRandom(0, agentA -> messages.size() - 1);
