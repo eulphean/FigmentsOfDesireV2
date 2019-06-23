@@ -148,7 +148,7 @@ void Agent::clean(ofxBox2d &box2d) {
 }
 
 void Agent::createTexture(ofPoint meshSize) {
-  // Create spots on the agent's body
+  // Create messages on the agent's body
   for (int i = 0; i < numBogusMessages; i++) {
     // Pick a random location on the mesh.
     int w = meshSize.x; int h = meshSize.y;
