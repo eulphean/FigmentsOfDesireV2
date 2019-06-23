@@ -10,7 +10,7 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
   // Assign a color palette
   palette = { ofColor::fromHex(0x540D6E), ofColor::fromHex(0x982A41), ofColor::fromHex(0xFFEEB9), ofColor::fromHex(0x3BCEAC), ofColor::fromHex(0x0EAD69) };
   
-  this->numBogusMessages = 550;
+  this->numBogusMessages = 150;
   
   // Force weight for body actions. This is heavier, so more weight.
   maxStretchWeight = 1.5;
@@ -30,8 +30,8 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
   
   filterChain = new FilterChain(agentProps.meshSize.x, agentProps.meshSize.y, "Chain");
   filterChain->addFilter(new PerlinPixellationFilter(agentProps.meshSize.x, agentProps.meshSize.y, 15.f));
-  filterChain->addFilter(new LookupFilter(agentProps.meshSize.x, agentProps.meshSize.y, "img/lookup_amatorka.png"));
-  filterChain->addFilter(new PoissonBlendFilter("img/grid.jpg", agentProps.meshSize.x, agentProps.meshSize.y, 0.6, 2));
+//  filterChain->addFilter(new LookupFilter(agentProps.meshSize.x, agentProps.meshSize.y, "img/lookup_amatorka.png"));
+//  filterChain->addFilter(new PoissonBlendFilter("img/grid.jpg", agentProps.meshSize.x, agentProps.meshSize.y, 0.6, 2));
   
   
   setup(box2d, agentProps, "amay.txt"); // TODO: Actually pass a pointer to all the messages later (for now it's assigned randomly)

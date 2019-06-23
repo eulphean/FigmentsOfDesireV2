@@ -1,8 +1,6 @@
 #include "Agent.h"
 
 void Agent::setup(ofxBox2d &box2d, AgentProperties agentProps, string fileName) {
-  font.load("opensansbold.ttf", 25);
-  
   // Prepare the agent's texture.
   readFile(fileName);
   assignMessages(agentProps.meshSize);
@@ -183,7 +181,7 @@ void Agent::assignMessages(ofPoint meshSize) {
     ofColor c = ofColor(palette.at(idx));
     
     // Pick a random size (TOOD: Based off on the length of the message).
-    int size = ofRandom(20, 40);
+    int size = ofRandom(5, 10);
     
     // Create a message.
     Message m = Message(glm::vec2(x, y), c, size, "~");
@@ -198,7 +196,8 @@ void Agent::createTexture(ofPoint meshSize) {
     ofClear(0, 0, 0, 0);
   
     // Assign background.
-    ofColor c = ofColor(palette.at(0), 250);
+    int randIdx = ofRandom(palette.size());
+    ofColor c = ofColor(palette.at(randIdx), 250);
     ofBackground(c);
   
     // Draw assigned messages.
@@ -212,9 +211,9 @@ void Agent::createTexture(ofPoint meshSize) {
   secondFbo.allocate(meshSize.x, meshSize.y, GL_RGBA);
   secondFbo.begin();
     ofClear(0, 0, 0, 0);
-    //filterChain->begin();
+    filterChain->begin();
       firstFbo.getTexture().drawSubsection(0, 0, meshSize.x, meshSize.y, 0, 0);
-    //filterChain->end();
+    filterChain->end();
   secondFbo.end();
 }
 

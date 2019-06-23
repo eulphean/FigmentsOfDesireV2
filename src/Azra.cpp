@@ -8,7 +8,7 @@ Azra::Azra(ofxBox2d &box2d, AgentProperties agentProps) {
   
   palette = { ofColor::fromHex(0xFFBE0B), ofColor::fromHex(0xFB5607), ofColor::fromHex(0xFF006E), ofColor::fromHex(0x8338EC), ofColor::fromHex(0x3A86FF) };
   
-  this->numBogusMessages = 500;
+  this->numBogusMessages = 150;
   
   // Force weights for body actions
   maxStretchWeight = 1.0;
@@ -26,8 +26,8 @@ Azra::Azra(ofxBox2d &box2d, AgentProperties agentProps) {
 
   filterChain = new FilterChain(agentProps.meshSize.x, agentProps.meshSize.y, "Chain");
   filterChain->addFilter(new PerlinPixellationFilter(agentProps.meshSize.x, agentProps.meshSize.y, 15.f));
-  filterChain->addFilter(new LookupFilter(agentProps.meshSize.x, agentProps.meshSize.y, "img/lookup_miss_etikate.png"));
-  filterChain->addFilter(new PoissonBlendFilter("img/tex.jpg", agentProps.meshSize.x, agentProps.meshSize.y, 0.6, 2));
+//  filterChain->addFilter(new LookupFilter(agentProps.meshSize.x, agentProps.meshSize.y, "img/lookup_miss_etikate.png"));
+//  filterChain->addFilter(new PoissonBlendFilter("img/tex.jpg", agentProps.meshSize.x, agentProps.meshSize.y, 0.6, 2));
   //filterChain->addFilter(new PerlinNoiseFilter(2.0));
   
   setup(box2d, agentProps, "azra.txt");
