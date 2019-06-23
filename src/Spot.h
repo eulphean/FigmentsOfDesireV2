@@ -13,5 +13,4 @@ class Message {
     ofColor color;
     float size;
     string message;
-    float angle;
 };

@@ -5,7 +5,6 @@ Message::Message(glm::vec2 loc, ofColor col, float s, string msg) {
   color = col;
   size = s;
   message = msg;
-  angle = ofRandom(-60, 60);
 }
 
 void Message::draw(ofTrueTypeFont font) {
@@ -18,13 +17,5 @@ void Message::draw(ofTrueTypeFont font) {
         ofDrawCircle(0, 0, size);
       ofPopStyle();
   ofPopMatrix();
-  } else { // Draw actual string message.
-    ofPushMatrix();
-      ofTranslate(location);
-      ofPushStyle();
-        ofSetColor(color);
-        font.drawString(message, 0, 0);
-      ofPopStyle();
-    ofPopMatrix();
   }
 }
