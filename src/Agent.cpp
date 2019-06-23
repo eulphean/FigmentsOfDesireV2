@@ -212,9 +212,9 @@ void Agent::createTexture(ofPoint meshSize) {
   secondFbo.allocate(meshSize.x, meshSize.y, GL_RGBA);
   secondFbo.begin();
     ofClear(0, 0, 0, 0);
-    filterChain->begin();
+    //filterChain->begin();
       firstFbo.getTexture().drawSubsection(0, 0, meshSize.x, meshSize.y, 0, 0);
-    filterChain->end();
+    //filterChain->end();
   secondFbo.end();
 }
 
