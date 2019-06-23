@@ -120,7 +120,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
           }
           
           if (agentB->desireState == Attraction) {
-            // Attract B's verticle
+            // Attract B's vertice
              if (!dataB->hasInterAgentJoint) {
               dataB->applyAttraction = true;
               e.b->GetBody()->SetUserData(dataB);
@@ -244,15 +244,6 @@ void ofApp::processOsc() {
     if(m.getAddress() == "/Repel"){
       float val = m.getArgAsFloat(0);
       
-      // Pick a random figment and set applyAttraction to true
-//      Agent *curAgent;
-//      if (ofRandom(1) < 0.5) {
-//        curAgent = agents[0];
-//      } else {
-//        curAgent = agents[1];
-//      }
-//
-//      curAgent->setDesireState(Repulsion);
       for (auto &a: agents) {
         a->setDesireState(Repulsion);
       }

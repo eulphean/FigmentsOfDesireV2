@@ -148,7 +148,7 @@ void Agent::clean(ofxBox2d &box2d) {
 }
 
 void Agent::createTexture(ofPoint meshSize) {
-  // Create messages on the agent's body
+  // Create spots on the agent's body
   for (int i = 0; i < numBogusMessages; i++) {
     // Pick a random location on the mesh.
     int w = meshSize.x; int h = meshSize.y;
@@ -211,7 +211,7 @@ void Agent::handleVertexBehaviors() {
       // Repel this vertex from it's partner's centroid especially
       //auto pos = glm::vec2(partner->getCentroid().x, partner->getCentroid().y);
       auto pos = data->targetPos;
-      v->addRepulsionForce(pos.x, pos.y, vertexRepulsionWeight * 18);
+      v->addRepulsionForce(pos.x, pos.y, vertexRepulsionWeight * 15);
       
       // Reset repulsion parameter on the vertex.
       data->applyRepulsion = false;
@@ -457,7 +457,6 @@ void Agent::updateMesh() {
 
 void Agent::setDesireState(DesireState newState) {
   desireState = newState;
-  
   
   if (desireState == None) {
     applyAttraction = false;

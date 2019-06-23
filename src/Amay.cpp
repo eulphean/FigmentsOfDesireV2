@@ -23,12 +23,12 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
   maxStretchWeight = 1.5;
   stretchWeight = 0;
   
-  vertexRepulsionWeight = 2.5;
+  vertexRepulsionWeight = 1.5;
   repulsionWeight = 0;
   attractionWeight = 1.5; // Can this be changed when the other agent is trying to attack me?
   seekWeight = 0.4; // Probably seek with a single vertex.
   tickleWeight = 2.5;
-  maxVelocity = 20;
+  maxVelocity = 15;
   
   // Post process filters.
   //filter = new PerlinPixellationFilter(agentProps.meshSize.x, agentProps.meshSize.y, 10.f);
