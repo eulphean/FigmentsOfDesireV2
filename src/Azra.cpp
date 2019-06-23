@@ -6,9 +6,16 @@ Azra::Azra(ofxBox2d &box2d, AgentProperties agentProps) {
   agentProps.meshOrigin = p;
   agentProps.vertexRadius = 4.5;
   
-  palette = { ofColor::fromHex(0xFFBE0B), ofColor::fromHex(0xFB5607), ofColor::fromHex(0xFF006E), ofColor::fromHex(0x8338EC), ofColor::fromHex(0x3A86FF) };
+  palette = { ofColor::fromHex(0xFFBE0B),
+              ofColor::fromHex(0xFB5607),
+              ofColor::fromHex(0xFF006E),
+              ofColor::fromHex(0x8338EC),
+              ofColor::fromHex(0x3A86FF),
+              ofColor::fromHex(0xF7FFAB),
+              ofColor::fromHex(0xC0F60B)
+  };
   
-  this->numBogusMessages = 150;
+  this->numBogusMessages = 100;
   
   // Force weights for body actions
   maxStretchWeight = 1.0;

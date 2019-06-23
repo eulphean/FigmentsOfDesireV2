@@ -159,7 +159,7 @@ void Agent::createTexture(ofPoint meshSize) {
     ofColor c = ofColor(palette.at(idx));
     
     // Pick a random size (TOOD: Based off on the length of the message).
-    int size = ofRandom(5, 10);
+    int size = ofRandom(10, 15);
     
     // Create a message.
     Message m = Message(glm::vec2(x, y), c, size);

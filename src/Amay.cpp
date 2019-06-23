@@ -8,9 +8,16 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
   agentProps.vertexRadius = 7; 
   
   // Assign a color palette
-  palette = { ofColor::fromHex(0x540D6E), ofColor::fromHex(0x982A41), ofColor::fromHex(0xFFEEB9), ofColor::fromHex(0x3BCEAC), ofColor::fromHex(0x0EAD69) };
+  palette = { ofColor::fromHex(0x540D6E),
+              ofColor::fromHex(0x982A41),
+              ofColor::fromHex(0xFFEEB9),
+              ofColor::fromHex(0x3BCEAC),
+              ofColor::fromHex(0x0EAD69),
+              ofColor::fromHex(0xFF4A4A),
+              ofColor::fromHex(0x0BF6CD)
+  };
   
-  this->numBogusMessages = 150;
+  this->numBogusMessages = 100;
   
   // Force weight for body actions. This is heavier, so more weight.
   maxStretchWeight = 1.5;
