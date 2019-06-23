@@ -17,7 +17,7 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
               ofColor::fromHex(0x0BF6CD)
   };
   
-  this->numBogusMessages = 100;
+  this->numBogusMessages = 70;
   
   // Force weight for body actions. This is heavier, so more weight.
   maxStretchWeight = 1.5;
