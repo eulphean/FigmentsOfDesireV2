@@ -26,6 +26,12 @@ class ofApp : public ofBaseApp{
     void clearAgents();
     void updateAgentProps();
   
+    // Behavior activating functions.
+    void attract();
+    void repel();
+    void stretch();
+    void enableBonding();
+  
     // Contact listening callbacks.
     void contactStart(ofxBox2dContactArgs &e);
     void contactEnd(ofxBox2dContactArgs &e);

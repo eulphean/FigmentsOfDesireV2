@@ -28,15 +28,12 @@ void ofApp::setup(){
   
   hideGui = false;
   debug = false;
-  stopEverything = false; 
   showTexture = true;
   
   // Bounds
   bounds.x = -20; bounds.y = -20;
   bounds.width = ofGetWidth() + (-1) * bounds.x * 2; bounds.height = ofGetHeight() + (-1) * 2 * bounds.y;
   box2d.createBounds(bounds);
-  
-  enableSound = true;
   
   // Instantiate Midi.
   Midi::instance().setup();
@@ -224,64 +221,7 @@ void ofApp::processOsc() {
     ofxOscMessage m;
     receiver.getNextMessage(m);
     
-    // ABLETON messages.
-    // Process these OSC messages and based on which agent this needs to be delivered,
-    if(m.getAddress() == "/Attract"){
-      float val = m.getArgAsFloat(0);
-      // Pick a random figment and set applyAttraction to true
-      Agent *curAgent;
-      auto p = ofRandom(1);
-      if (p < 0.5) {
-        curAgent = agents[0];
-      } else {
-        curAgent = agents[1];
-      }
-      
-      // Enable attraction in the figment.
-      curAgent->setDesireState(Attraction);
-    }
-    
-    if(m.getAddress() == "/Repel"){
-      float val = m.getArgAsFloat(0);
-      
-      for (auto &a: agents) {
-        a->setDesireState(Repulsion);
-      }
-    }
-    
-    if(m.getAddress() == "/Stretch") {
-      float val = m.getArgAsFloat(0);
-      
-      // Populate random agents
-      std::vector<Agent *> curAgents;
-      auto p = ofRandom(1);
-        if (agents.size()>0) {
-        if (p < 0.33) {
-          curAgents.push_back(agents[0]); // Agent A
-        } else if (p < 0.66){
-          curAgents.push_back(agents[1]); // Agent B
-        } else { // Both agents.
-          curAgents.push_back(agents[0]);
-          curAgents.push_back(agents[1]);
-        }
-      }
-      
-      
-      // Enable stretch in the figment. 
-      for (auto &a : curAgents) {
-        if (a->desireState != Repulsion) {
-          a->setStretch();
-        }
-      }
-    }
-    
-    // STATE CHANGER!
-    if(m.getAddress() == "/Melody"){
-      float val = m.getArgAsFloat(0);
-      shouldBond = (val > 0); // At 1, don't bond anymore
-    }
-    
-// ------------------ GUI OSC Messages -----------------------
+// ------------------ PIPES/GUI OSC Messages -----------------------
     if(m.getAddress() == "/clear"){
       float val = m.getArgAsFloat(0);
       clearScreen();
@@ -428,11 +368,7 @@ void ofApp::clearScreen() {
 
 void ofApp::removeUnbonded() {
   ofRemove(agents, [&](Agent *a) {
-//    if (a->getPartner() == NULL) {
-//      a->clean(box2d);
-//      return true;
-//    }
-    
+  
     return false;
   });
 }
@@ -451,7 +387,40 @@ void ofApp::removeJoints() {
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){  
+void ofApp::keyPressed(int key){
+  
+  // ------------------ Interactive Gestures --------------------- //
+  
+  // Attract
+  if (key == 'a') {
+    attract();
+  }
+  
+  // Repel
+  if (key == 'r') {
+    repel();
+  }
+  
+  // Stretch
+  if (key == 's') {
+    stretch();
+  }
+  
+  // Enable/Disable Bonding
+  if (key == 'b') {
+    enableBonding();
+  }
+  
+  // Tickle the agents.
+  if (key == 'f') {
+    // Apply a random force
+    for (auto &a: agents) {
+      a -> setTickle(1.0);
+    }
+  }
+  
+  // ------------------ Interactive Gestures --------------------- //
+  
   if (key == 'd') {
     debug = !debug;
   }
@@ -472,21 +441,6 @@ void ofApp::keyPressed(int key){
     hideGui = !hideGui;
   }
   
-  if (key == 'f') {
-    // Apply a random force
-    for (auto &a: agents) {
-      a -> setTickle(1.0);
-    }
-  }
-  
-  if (key == 's') {
-    enableSound = !enableSound;
-  }
-  
-  if (key == ' ') {
-    stopEverything = !stopEverything;
-  }
-  
   if (key == 't') {
     showTexture = !showTexture; 
   }
@@ -496,6 +450,57 @@ void ofApp::exit() {
   box2d.disableEvents();
   gui.saveToFile("InterMesh.xml");
 }
+
+// ------------------------------ Interactive Behavior Routines --------------------------------------- //
+void ofApp::attract() {
+  // Pick a random figment and enable attraction for that figment.
+  Agent *curAgent;
+  auto p = ofRandom(1);
+  if (p < 0.5) {
+    curAgent = agents[0];
+  } else {
+    curAgent = agents[1];
+  }
+
+  // Enable attraction in the figment.
+  curAgent->setDesireState(Attraction);
+}
+
+void ofApp::repel() {
+  // Repel each figment away from each other
+  for (auto &a: agents) {
+    a->setDesireState(Repulsion);
+  }
+}
+
+void ofApp::stretch() {
+  // Populate random agents
+  std::vector<Agent *> curAgents;
+  auto p = ofRandom(1);
+    if (agents.size()>0) {
+    if (p < 0.33) {
+      curAgents.push_back(agents[0]); // Agent A
+    } else if (p < 0.66){
+      curAgents.push_back(agents[1]); // Agent B
+    } else { // Both agents.
+      curAgents.push_back(agents[0]);
+      curAgents.push_back(agents[1]);
+    }
+  }
+
+  // Enable stretch in the figment.
+  for (auto &a : curAgents) {
+    if (a->desireState != Repulsion) {
+      a->setStretch();
+    }
+  }
+}
+
+void ofApp::enableBonding() {
+  shouldBond = !shouldBond;
+}
+
+// ------------------------------ Interactive Behavior Routines --------------------------------------- //
 
 // Massive important function that determines when the 2 bodies actually bond.
 void ofApp::evaluateBonding(b2Body *bodyA, b2Body *bodyB, Agent *agentA, Agent *agentB) {
