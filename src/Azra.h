@@ -6,4 +6,13 @@
 class Azra : public Agent {
   public:
     Azra(ofxBox2d &box2d, AgentProperties agentProps);
+  
+    void updateMesh();
+    void createMesh(AgentProperties softBodyProperties);
+    void createSoftBody(ofxBox2d &box2d, AgentProperties softBodyProperties);
+  
+    float faceRadius; float faceCircumference; int meshPoints;
+    float softJointLength = 6.0;
+  
+    void update();
 };
