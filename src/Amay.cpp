@@ -23,7 +23,7 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
   maxStretchWeight = 1.5;
   stretchWeight = 0;
   
-  vertexRepulsionWeight = 1.5;
+  vertexRepulsionWeight = 2.5;
   repulsionWeight = 0;
   attractionWeight = 1.5; // Can this be changed when the other agent is trying to attack me?
   seekWeight = 0.4; // Probably seek with a single vertex.
@@ -37,8 +37,8 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
   
   filterChain = new FilterChain(agentProps.meshSize.x, agentProps.meshSize.y, "Chain");
   filterChain->addFilter(new PerlinPixellationFilter(agentProps.meshSize.x, agentProps.meshSize.y, 15.f));
-//  filterChain->addFilter(new LookupFilter(agentProps.meshSize.x, agentProps.meshSize.y, "img/lookup_amatorka.png"));
-//  filterChain->addFilter(new PoissonBlendFilter("img/grid.jpg", agentProps.meshSize.x, agentProps.meshSize.y, 0.6, 2));
+  // filterChain->addFilter(new LookupFilter(agentProps.meshSize.x, agentProps.meshSize.y, "img/lookup_amatorka.png"));
+  // filterChain->addFilter(new PoissonBlendFilter("img/grid.jpg", agentProps.meshSize.x, agentProps.meshSize.y, 0.6, 2));
   
   
   setup(box2d, agentProps);

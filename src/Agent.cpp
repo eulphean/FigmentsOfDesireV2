@@ -78,12 +78,14 @@ void Agent::draw(bool debug, bool showTexture) {
 
   if (debug) {
     auto centroid = mesh.getCentroid();
-    ofPushMatrix();
-      ofTranslate(centroid);
-      ofNoFill();
-      ofSetColor(ofColor::white);
-      ofDrawCircle(0, 0, desireRadius);
-    ofPopMatrix();
+    ofPushStyle();
+      ofPushMatrix();
+        ofTranslate(centroid);
+        ofNoFill();
+        ofSetColor(ofColor::white);
+        ofDrawCircle(0, 0, desireRadius);
+      ofPopMatrix();
+    ofPopStyle();
   }
 }
 
@@ -272,8 +274,9 @@ void Agent::handleAttraction() {
       }
     }
     
-    auto d = glm::distance(partner->getCentroid(), getCentroid()); // Distance till the centroid
-    float newWeight = ofMap(d, desireRadius * 3, 0, attractionWeight, 0, true);
+    auto vertexPos = vertices[minIdx]->getPosition();
+    auto d = glm::distance(partner->getCentroid(), glm::vec2(vertexPos.x, vertexPos.y)); // Distance till the centroid.
+    float newWeight = ofMap(d, desireRadius * 5, 0, attractionWeight, 0, true);
     auto pos = glm::vec2(partner->getCentroid().x, partner->getCentroid().y);
     vertices[minIdx]->addAttractionPoint({pos.x, pos.y}, newWeight);
   }

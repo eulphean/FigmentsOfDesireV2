@@ -3,19 +3,37 @@ Ars Electronica 2019 Deadlines
 06/23/2019 (Sunday)
 
 Behaviors
-- Activate the behaviors by interaction (this)
-- Interactive Entanglement (what if I turn on attraction and pick a random pair for entanglement)
-- Desires versus Behaviors. What direction is this work heading in?
+- How to make the interactive behaviors for all the agents, rather than just a few of them.
+What is the algorithm I should go with? 
+- Desires versus Behaviors. What direction is this work heading in? How do desires map on top of the behaviors? 
+- When we have desires, things we want. That's our mind telling us what we want, it leads to certain behaviors. 
+- When we come in contact with others, what sort of interactions happen? 
 - How to activate behaviors when there are multiple agents involved? 
+- Turn off swapping of textures for now. It's not really doing anything. 
+- It could be really interesting if the two agents are two different shapes.
 
-Entanglement
-- Bonds, when would bonding happen now? 
-
-Background
-- Update background. Make it more GOD like. 
+Visuals
+- Create another agent shape for the other one. Now, I'm actually commenting on Gender somehow, am I not? 
+- These agents interact and start developing pairs. 
+- They break and their desires keep evolving. They live in an open society without and get to be with whatever. 
+- Two different shapes will actually give it more character.  
 
 Frame Capture
 - For the screenshots for press release (this) => Add high quality frame capture for the screenshot. 
+
+Obstacles
+- Rather than having a boundary, an algorithm to move the creatures from one part of the screen to the other
+- Design obstacles the agents can hit
+
+Entanglement
+- Bonds, when would bonding happen now? Come with an algorithm to define when would these creatures express
+their desires and how would these desires work? 
+
+Background
+- Update background. Make it more GOD like. 
+Layers - Layers - Layers
+Layers - Layers - Layers
+
 
 Writeups
 - Think about the overall theme of this work. Is this about coexistence?

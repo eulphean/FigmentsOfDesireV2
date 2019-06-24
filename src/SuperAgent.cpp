@@ -5,7 +5,7 @@ void SuperAgent::setup(Agent *agent1, Agent *agent2, std::shared_ptr<ofxBox2dJoi
   agentB = agent2;
   joints.push_back(joint);
   maxExchangeCounter = 20;
-  curExchangeCounter = 0;
+  curExchangeCounter = 20; // Note: Currently diabling the exchange of the body texture. Set it 0 to enable it. 
 }
 
 void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool shouldBond, int maxJointForce) {
@@ -76,7 +76,9 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
       // Reset exchange counter since
       curExchangeCounter = maxExchangeCounter;
     } else {
-      curExchangeCounter -= 0.8;
+      // curExchangeCounter -= 0.8;
+      // Note: Disabling the exchange counter for now. Evaluate if and when this feature is really required.
+      // Is it really required? 
     }
   }
 }
