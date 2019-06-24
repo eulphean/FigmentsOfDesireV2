@@ -68,6 +68,11 @@ void Agent::draw(bool debug, bool showTexture) {
     }
     ofPopStyle();
   }
+  
+  ofPushMatrix();
+  ofTranslate(mesh.getCentroid());
+  secondFbo.draw(0, 0);
+  ofPopMatrix();
 
   if (debug) {
     auto centroid = mesh.getCentroid();
@@ -179,7 +184,7 @@ void Agent::createTexture(ofPoint meshSize) {
   firstFbo.end();
   
   // Create 2nd fbo and draw with filter and postProcessing
-  secondFbo.allocate(meshSize.x, meshSize.y, GL_RGBA);
+  secondFbo.allocate(100, 100, GL_RGBA);
   secondFbo.begin();
     ofClear(0, 0, 0, 0);
     filterChain->begin();

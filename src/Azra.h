@@ -12,7 +12,7 @@ class Azra : public Agent {
     void createSoftBody(ofxBox2d &box2d, AgentProperties softBodyProperties);
   
     float faceRadius; float faceCircumference; int meshPoints;
-    float softJointLength = 6.0;
+    float softJointLength = 1.5;
   
     void update();
 };
