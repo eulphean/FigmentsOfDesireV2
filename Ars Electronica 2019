@@ -2,15 +2,12 @@ Ars Electronica 2019 Deadlines
 
 06/23/2019 (Sunday)
 
-Behaviors
-- How to make the interactive behaviors for all the agents, rather than just a few of them.
-What is the algorithm I should go with? 
-- Desires versus Behaviors. What direction is this work heading in? How do desires map on top of the behaviors? 
+
+What is a Desire? 
+Desire is the energy that mind generates when it wishes something. It's a chaahat, it's an expression of longing. It's an expression of need. When a desire originates, we tend to behave certain ways. We tend to perform certain actions. Using this model, this system works. 
+
+What does it lead to?
 - When we have desires, things we want. That's our mind telling us what we want, it leads to certain behaviors. 
-- When we come in contact with others, what sort of interactions happen? 
-- How to activate behaviors when there are multiple agents involved? 
-- Turn off swapping of textures for now. It's not really doing anything. 
-- It could be really interesting if the two agents are two different shapes.
 
 Visuals
 - Create another agent shape for the other one. Now, I'm actually commenting on Gender somehow, am I not? 
