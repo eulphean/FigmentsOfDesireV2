@@ -25,7 +25,7 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
   
   vertexRepulsionWeight = 2.5;
   repulsionWeight = 0;
-  attractionWeight = 1.5; // Can this be changed when the other agent is trying to attack me?
+  attractionWeight = 1.0; // Can this be changed when the other agent is trying to attack me?
   seekWeight = 0.4; // Probably seek with a single vertex.
   tickleWeight = 2.5;
   maxVelocity = 15;

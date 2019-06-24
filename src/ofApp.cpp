@@ -454,13 +454,8 @@ void ofApp::exit() {
 // ------------------------------ Interactive Behavior Routines --------------------------------------- //
 void ofApp::attract() {
   // Pick a random figment and enable attraction for that figment.
-  Agent *curAgent;
-  auto p = ofRandom(1);
-  if (p < 0.5) {
-    curAgent = agents[0];
-  } else {
-    curAgent = agents[1];
-  }
+  int randIdx = ofRandom(agents.size());
+  Agent *curAgent = agents[randIdx];
 
   // Enable attraction in the figment.
   curAgent->setDesireState(Attraction);
@@ -474,24 +469,18 @@ void ofApp::repel() {
 }
 
 void ofApp::stretch() {
-  // Populate random agents
-  std::vector<Agent *> curAgents;
-  auto p = ofRandom(1);
-    if (agents.size()>0) {
-    if (p < 0.33) {
-      curAgents.push_back(agents[0]); // Agent A
-    } else if (p < 0.66){
-      curAgents.push_back(agents[1]); // Agent B
-    } else { // Both agents.
-      curAgents.push_back(agents[0]);
-      curAgents.push_back(agents[1]);
-    }
-  }
-
-  // Enable stretch in the figment.
-  for (auto &a : curAgents) {
-    if (a->desireState != Repulsion) {
-      a->setStretch();
+  // Either one or all the agents stretch based on a probability.
+  if (ofRandom(1) < 0.5) {
+    // Pick a random agent and make stretch.
+    int randIdx = ofRandom(agents.size());
+    auto agent = agents[randIdx];
+    agent->setStretch();
+  } else {
+    // Stretch them all.
+    for (auto &a : agents) {
+      if (a->desireState != Repulsion) {
+        a->setStretch();
+      }
     }
   }
 }
