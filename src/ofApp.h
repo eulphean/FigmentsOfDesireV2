@@ -44,7 +44,13 @@ class ofApp : public ofBaseApp{
     bool debug;
     bool enableSound;
     bool stopEverything;
-    bool showTexture; 
+    bool showTexture;
+    bool drawFbo; // For saving
+  
+    // Screengrab fbo
+    ofFbo screenGrabFbo;
+    int screenCaptureIdx = 0;
+  
   
     // Box2d
     ofxBox2d box2d;
@@ -104,6 +110,7 @@ class ofApp : public ofBaseApp{
     void clearScreen();
     void removeJoints();
     void removeUnbonded();
+    void drawSequence();
     glm::vec2 getBodyPosition(b2Body* body);
   
     // Super Agents (Inter Agent Bonding Logic)

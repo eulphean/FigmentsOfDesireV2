@@ -29,6 +29,7 @@ void ofApp::setup(){
   hideGui = false;
   debug = false;
   showTexture = true;
+  drawFbo = false;
   
   // Bounds
   bounds.x = -20; bounds.y = -20;
@@ -43,7 +44,10 @@ void ofApp::setup(){
   bg.setParams(bgParams);
   bg.createBg();
   
-  shouldBond = false; 
+  shouldBond = false;
+  
+  // Allocate the fbo for screen grabbing.
+  screenGrabFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 }
 
 void ofApp::contactStart(ofxBox2dContactArgs &e) {
@@ -175,10 +179,26 @@ void ofApp::update(){
     m.update();
     return m.shouldRemove;
   });
+  
+  // Start drawing in the screen grab fbo.
+  if (drawFbo) {
+    screenGrabFbo.begin();
+      ofClear(ofColor::black);
+      drawSequence();
+    screenGrabFbo.end();
+  }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+  if (drawFbo) {
+    screenGrabFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+  } else {
+    drawSequence();
+  }
+}
+
+void ofApp::drawSequence() {
   // Draw background.
   if (!debug) {
    bg.draw();
@@ -198,7 +218,7 @@ void ofApp::draw(){
     sa.draw();
   }
   
-  // Draw Agent is the virtual method for derived class. 
+  // Draw Agent is the virtual method for derived class.
   for (auto a: agents) {
     a -> draw(debug, showTexture);
   }
@@ -443,6 +463,19 @@ void ofApp::keyPressed(int key){
   
   if (key == 't') {
     showTexture = !showTexture; 
+  }
+  
+  if (key == 'f') {
+    drawFbo = !drawFbo;
+  }
+  
+  // Save a screen grab of the high quality fbo that is getting drawn currently. 
+  if (key == ' ') {
+    ofPixels pix;
+    screenGrabFbo.readToPixels(pix);
+    auto fileName = "High_Res" + ofToString(screenCaptureIdx) + ".png";
+    screenCaptureIdx++;
+    ofSaveImage(pix, fileName, OF_IMAGE_QUALITY_BEST);
   }
 }
 
