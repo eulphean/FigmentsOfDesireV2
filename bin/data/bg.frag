@@ -1,14 +1,11 @@
-#version 150
+#version 120
 
-out vec4 outputColor;
 uniform float time; 
 uniform vec2 resolution; 
-uniform vec2 mouse;
 
 // ------------------------------------------------------- //
 // Noise Helpers
 // ------------------------------------------------------- //
-
 float hash( float n )
 {
 	return fract(sin(n)*43758.5453);
@@ -47,7 +44,7 @@ void main(void)
 	m.y = -m.y;
 	p.y *= (resolution.x/resolution.y);
 
-	// EXTERIOR.
+	// Base and Top colors are mixed to create a background.
 	vec3 baseColor = vec3(0.77255, 0.78039, 0.78039);
 	vec3 topColor;
 	topColor.x = 0.062 + 0.7*fbm(2.0*p + vec2(time*0.4, time*0.5));
@@ -57,5 +54,5 @@ void main(void)
 	float f = fbm( 10.0*p+time );
 	baseColor = mix(baseColor, topColor, f);
 
-	outputColor = vec4(baseColor,1.0);
+	gl_FragColor = vec4(baseColor,1.0);
 }

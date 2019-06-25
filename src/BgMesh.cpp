@@ -5,55 +5,43 @@ void BgMesh::setParams(ofParameterGroup params) {
 }
 
 // Setup background
-void BgMesh::createBg() {
+void BgMesh::setup() {
   auto rectWidth = bgParams.getInt("Width");
   auto rectHeight = bgParams.getInt("Height");
   
-  bgImage.allocate(ofGetWidth()*2, ofGetHeight()*2, GL_RGBA);
-  bgImage.begin();
-    ofClear(0, 0, 0, 0);
-  int numRows = bgImage.getHeight()/rectHeight;
-  int numCols = bgImage.getWidth()/rectWidth;
+  // Load the background shader.
+  shader.load("bg.vert", "bg.frag");
   
-    int a = 0;
-    for (int y = 0; y < numRows; y++) {
-      for (int x = 0; x < numCols; x++) {
-        if (a % 2 == 0) {
-          ofSetColor(ofColor::fromHex(0xDBDBDB));
-        } else {
-          ofSetColor(ofColor::fromHex(0x525151));
-        }
-        ofPushMatrix();
-        ofTranslate(x * rectWidth, y * rectHeight);
-          ofDrawRectangle(0, 0, rectWidth, rectHeight) ;
-        ofPopMatrix();
-        a++;
-      }
+  // Allocate bg fbo and clear it for the background.
+  bgFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+  bgFbo.begin();
+    ofClear(ofColor::white);
+  bgFbo.end();
+  
+  // Allocate main fbo in which background is drawn.
+  mainFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 
-    a++;
-  }
-  
-  bgImage.end();
-  
-  testImage.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
-  testImage.begin();
-    ofClear(0, 0, 0, 0);
-    post.begin();
-    filter->begin();
-      bgImage.getTexture().drawSubsection(0, 0, ofGetWidth(), ofGetHeight(), 0, 0);
-    filter->end();
-    post.end();
-  testImage.end();
-  
-  //testImage.getTexture().enableMipmap();
-  //testImage.getTexture().setTextureMinMagFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-  
   // Create mesh for this background
   createMesh();
 }
 
 // Receive agent mesh
-void BgMesh::updateWithVertices(std::vector<ofMesh> agentMeshes) {
+void BgMesh::update(std::vector<ofMesh> agentMeshes) {
+  // Update the main fbo.
+  mainFbo.begin();
+    ofClear(0, 0, 0, 0);
+    // Run the post processing filter on it.
+    //post.begin();
+      // Background shader that's the meat of the background. 
+      shader.begin();
+        // Shader needs a fbo (a screen buffer to use the vertices and draw the pixels for)
+        shader.setUniform1f("time", (float) ofGetElapsedTimeMillis()/1000);
+        shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+        bgFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+      shader.end();
+    //post.end();
+  mainFbo.end();
+  
   // Empty vector as size of background mesh's vertices.
   std::vector<glm::vec2> offsets;
   offsets.assign(mesh.getVertices().size(), glm::vec2(0, 0));
@@ -76,26 +64,6 @@ void BgMesh::updateWithVertices(std::vector<ofMesh> agentMeshes) {
   }
 }
 
-void BgMesh::update(std::vector<glm::vec2> centroids) {
-  // Calculate net displacement due to each centroid and store in offsets.
-  std::vector<glm::vec2> offsets;
-  offsets.assign(mesh.getVertices().size(), glm::vec2(0, 0));
-  for (auto &c : centroids) {
-    for (int i = 0; i < mesh.getVertices().size(); i++) {
-      auto meshVertex = meshCopy.getVertices()[i];
-      offsets[i] = offsets.at(i) + interact(meshVertex, c, i);
-    }
-  }
-  
-  // Update each mesh vertex with a displacement.
-  for (int i = 0; i < mesh.getVertices().size(); i++) {
-    auto newVertex = meshCopy.getVertices()[i] + offsets.at(i);
-    mesh.setVertex(i, {newVertex.x, newVertex.y, 0});
-  }
-  
-  // Set filter parameter
-}
-
 glm::vec2 BgMesh::interact(glm::vec2 meshVertex, glm::vec2 centroid, int vIdx) {
   // Get distanceVector of this vertex from the position.
   glm::vec2 distance = centroid - meshVertex;
@@ -115,9 +83,9 @@ glm::vec2 BgMesh::interact(glm::vec2 meshVertex, glm::vec2 centroid, int vIdx) {
 }
 
 void BgMesh::draw() {
-  testImage.getTexture().bind();
+  mainFbo.getTexture().bind();
   mesh.draw();
-  testImage.getTexture().unbind();
+  mainFbo.getTexture().unbind();
 }
 
 void BgMesh::createMesh() {
@@ -131,12 +99,12 @@ void BgMesh::createMesh() {
   int rectHeight = bgParams.getInt("Height");
   
   // Rows/Columns
-  int numRows = testImage.getHeight()/rectHeight;
-  int numCols = testImage.getWidth()/rectWidth;
+  int numRows = bgFbo.getHeight()/rectHeight;
+  int numCols = bgFbo.getWidth()/rectWidth;
 
   // Mesh size.
-  int w = testImage.getWidth();
-  int h = testImage.getHeight();
+  int w = bgFbo.getWidth();
+  int h = bgFbo.getHeight();
   
   // Mesh vertices and texture mapping.
   for (int y = 0; y < numRows; y++) {
@@ -146,8 +114,8 @@ void BgMesh::createMesh() {
       mesh.addVertex({ix, iy, 0});
       
       // Texture vertices (0 - 1) since textures are normalized.
-      float texX = ofMap(ix, 0, testImage.getTexture().getWidth(), 0, 1, true); // Map the calculated x coordinate from 0 - 1
-      float texY = ofMap(iy, 0, testImage.getTexture().getHeight(), 0, 1, true); // Map the calculated y coordinate from 0 - 1
+      float texX = ofMap(ix, 0, bgFbo.getTexture().getWidth(), 0, 1, true); // Map the calculated x coordinate from 0 - 1
+      float texY = ofMap(iy, 0, bgFbo.getTexture().getHeight(), 0, 1, true); // Map the calculated y coordinate from 0 - 1
       mesh.addTexCoord(glm::vec2(texX, texY));
     }
   }
@@ -179,3 +147,61 @@ void BgMesh::createMesh() {
   // Deep mesh copy.
   meshCopy = mesh; 
 }
+
+//void BgMesh::update(std::vector<glm::vec2> centroids) {
+//  // Calculate net displacement due to each centroid and store in offsets.
+//  std::vector<glm::vec2> offsets;
+//  offsets.assign(mesh.getVertices().size(), glm::vec2(0, 0));
+//  for (auto &c : centroids) {
+//    for (int i = 0; i < mesh.getVertices().size(); i++) {
+//      auto meshVertex = meshCopy.getVertices()[i];
+//      offsets[i] = offsets.at(i) + interact(meshVertex, c, i);
+//    }
+//  }
+//
+//  // Update each mesh vertex with a displacement.
+//  for (int i = 0; i < mesh.getVertices().size(); i++) {
+//    auto newVertex = meshCopy.getVertices()[i] + offsets.at(i);
+//    mesh.setVertex(i, {newVertex.x, newVertex.y, 0});
+//  }
+//
+//  // Set filter parameter
+//}
+
+//  bgImage.allocate(ofGetWidth()*2, ofGetHeight()*2, GL_RGBA);
+//  bgImage.begin();
+//    ofClear(0, 0, 0, 0);
+//  int numRows = bgImage.getHeight()/rectHeight;
+//  int numCols = bgImage.getWidth()/rectWidth;
+//
+//    int a = 0;
+//    for (int y = 0; y < numRows; y++) {
+//      for (int x = 0; x < numCols; x++) {
+//        if (a % 2 == 0) {
+//          ofSetColor(ofColor::fromHex(0xDBDBDB));
+//        } else {
+//          ofSetColor(ofColor::fromHex(0x525151));
+//        }
+//        ofPushMatrix();
+//        ofTranslate(x * rectWidth, y * rectHeight);
+//          ofDrawRectangle(0, 0, rectWidth, rectHeight) ;
+//        ofPopMatrix();
+//        a++;
+//      }
+//
+//    a++;
+//  }
+//
+//  bgImage.end();
+
+
+//testImage.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+//  testImage.begin();
+//    ofClear(0, 0, 0, 0);
+//    post.begin();
+//    filter->begin();
+//      bgImage.getTexture().drawSubsection(0, 0, ofGetWidth(), ofGetHeight(), 0, 0);
+//    filter->end();
+//    post.end();
+//  testImage.end();
+//  

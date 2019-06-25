@@ -42,7 +42,7 @@ void ofApp::setup(){
   
   // Store params and create background. 
   bg.setParams(bgParams);
-  bg.createBg();
+  bg.setup();
   
   shouldBond = false;
   
@@ -172,7 +172,7 @@ void ofApp::update(){
   createSuperAgents();
   
   // Update background
-  bg.updateWithVertices(meshes);
+  bg.update(meshes);
   
   // Update memories.
   ofRemove(memories, [&](Memory &m) {
@@ -560,13 +560,13 @@ bool ofApp::canVertexBond(b2Body* body, Agent *curAgent) {
 void ofApp::widthChanged (int & newWidth) {
   // New background
   bg.setParams(bgParams);
-  bg.createBg();
+  bg.setup();
 }
 
 void ofApp::heightChanged (int & newHeight) {
   // New background
   bg.setParams(bgParams);
-  bg.createBg();
+  bg.setup();
 }
 
 void ofApp::updateParams(float & newVal) {

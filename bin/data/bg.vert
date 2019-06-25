@@ -1,10 +1,5 @@
-#version 150
-
-// Passed in from OF programmable renderer. 
-uniform mat4 modelViewProjectionMatrix;
-// Passed from the mesh by default. 
-in vec4 position;
+#version 120
 
 void main(){
-    gl_Position = modelViewProjectionMatrix * position;
+    gl_Position = ftransform();
 }
