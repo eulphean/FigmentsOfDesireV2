@@ -68,11 +68,6 @@ void Agent::draw(bool debug, bool showTexture) {
     }
     ofPopStyle();
   }
-  
-  ofPushMatrix();
-  ofTranslate(mesh.getCentroid());
-  secondFbo.draw(0, 0);
-  ofPopMatrix();
 
   if (debug) {
     auto centroid = mesh.getCentroid();

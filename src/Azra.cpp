@@ -48,43 +48,41 @@ void Azra::createMesh(AgentProperties agentProps) {
   mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
   
   // Face is the texture that gets mapped onto the circular mesh.
-//  float faceWidth = agentProps.meshSize.x;
-//  float faceHeight = agentProps.meshSize.y;
-  float faceWidth = 100;
-  float faceHeight = 100;
+  float faceWidth = agentProps.meshSize.x;
+  float faceHeight = agentProps.meshSize.y;
   float faceArea = faceWidth * faceHeight;
   glm::vec2 faceCenter = glm::vec2(faceWidth/2, faceHeight/2);
   
-  // Note:
-  // X, Y of this texture is 0, 0 only since it's a blank fbo that gets created from scratch.
-
   // Calculate face radius which we will use to define the mesh radius.
   faceRadius = sqrt(faceArea/PI);
-  //faceRadius = faceWidth/2;
   
   // Begin creating the mesh. 
   glm::vec3 meshOrigin = glm::vec3(agentProps.meshOrigin.x, agentProps.meshOrigin.y, 0);
  
   // Center vertex and texture coordinate.
   mesh.addVertex(meshOrigin);
-  mesh.addTexCoord(faceCenter);
+  mesh.addTexCoord(glm::vec2(0.5, 0.5)); // Texture coordinates need to be between 0 and 1 (ofDisableArbTex)
   
   // Ratio between the texture and the circular mesh.
-  float sizeRatio = 100/(faceRadius*2);
+  float sizeRatio = faceWidth/(faceRadius*2);
   
   // Calculate # of meshPoints and set the variable to that.
   faceCircumference = 2 * PI * faceRadius; // circumference
   meshPoints = faceCircumference / (agentProps.vertexRadius * 2); // Total number of points on the boundary
 
   // Add vertices around the center to form a circle.
-  for(int i = 1; i < meshPoints-1; i++){
+  for(int i = 1; i < meshPoints; i++){
     float n = ofMap(i, 1, meshPoints-1, 0.0, TWO_PI, true); // Calculate angle at each boundary point.
     float x = cos(n);
     float y = sin(n);
     
     // Boundary vertex and boundary texture coordinate
     mesh.addVertex({meshOrigin.x + (x * faceRadius), meshOrigin.y + y * faceRadius, 0});
-    mesh.addTexCoord(glm::vec2(faceWidth/2 + (x * faceRadius), faceHeight/2 + (y * faceRadius)));
+    
+    // Map the texture coordinates between 0 and 1 (ofDisableArbTex) 
+    float texX = ofMap(faceWidth/2 + (x * faceRadius), 0, faceWidth, 0, 1, true);
+    float texY = ofMap(faceHeight/2 + (y * faceRadius), 0, faceHeight, 0, 1, true);
+    mesh.addTexCoord(glm::vec2(texX, texY));
   }
 }
 
