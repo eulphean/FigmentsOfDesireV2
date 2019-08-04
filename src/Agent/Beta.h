@@ -1,11 +1,12 @@
-// Azra is a synthetic agent carrying information regarding Azra's behavior and traits. 
+// Beta is a type of synthetic agent with specific behaviors and traits. It is organic in nature
+// and is ROUND. Female is also identified with a circular symbol. 
 #pragma once
 #include "ofMain.h"
 #include "Agent.h"
 
-class Azra : public Agent {
+class Beta : public Agent {
   public:
-    Azra(ofxBox2d &box2d, AgentProperties agentProps);
+    Beta(ofxBox2d &box2d, AgentProperties agentProps);
   
     void updateMesh();
     void createMesh(AgentProperties softBodyProperties);

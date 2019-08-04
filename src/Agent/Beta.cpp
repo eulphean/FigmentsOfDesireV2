@@ -1,10 +1,7 @@
-#include "Azra.h"
+#include "Beta.h"
 
-Azra::Azra(ofxBox2d &box2d, AgentProperties agentProps) {
-  // Assign Azra's mesh origin (right corner).
-  ofPoint p = ofPoint(ofGetWidth() - agentProps.meshSize.x - 10, ofGetHeight() - agentProps.meshSize.y - 20);
-  agentProps.meshOrigin = p;
-  agentProps.vertexRadius = 8;
+Beta::Beta(ofxBox2d &box2d, AgentProperties agentProps) {
+  agentProps.vertexRadius = 8; // TODO: Make this come from the GUI.
   
   palette = { ofColor::fromHex(0xFFBE0B),
               ofColor::fromHex(0xFB5607),
@@ -15,7 +12,7 @@ Azra::Azra(ofxBox2d &box2d, AgentProperties agentProps) {
               ofColor::fromHex(0xC0F60B)
   };
   
-  this->numBogusMessages = 100;
+  this->numMessages = 100;
   
   // Force weights for body actions
   maxStretchWeight = 1.0;
@@ -43,7 +40,7 @@ Azra::Azra(ofxBox2d &box2d, AgentProperties agentProps) {
   setup(box2d, agentProps);
 }
 
-void Azra::createMesh(AgentProperties agentProps) {
+void Beta::createMesh(AgentProperties agentProps) {
   mesh.clear();
   mesh.setMode(OF_PRIMITIVE_TRIANGLE_FAN);
   
@@ -86,7 +83,7 @@ void Azra::createMesh(AgentProperties agentProps) {
   }
 }
 
-void Azra::createSoftBody(ofxBox2d &box2d, AgentProperties agentProps) {
+void Beta::createSoftBody(ofxBox2d &box2d, AgentProperties agentProps) {
   auto meshVertices = mesh.getVertices();
   
   // Clear the Box2d bodies to create them again.
@@ -145,7 +142,7 @@ void Azra::createSoftBody(ofxBox2d &box2d, AgentProperties agentProps) {
   }
 }
 
-void Azra::updateMesh() {
+void Beta::updateMesh() {
  for (int i = 0; i < meshPoints; i++) {
     // Get ith circle's position.
     glm::vec2 pos;
@@ -165,7 +162,7 @@ void Azra::updateMesh() {
 }
 
 
-void Azra::update() {
+void Beta::update() {
   // Update local mesh.
   updateMesh();
   

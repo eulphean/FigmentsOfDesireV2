@@ -3,7 +3,6 @@
 #include "ofxBox2d.h"
 #include "ofxFilterLibrary.h"
 #include "ofxPostProcessing.h"
-#include "Message.h"
 
 struct AgentProperties {
   ofPoint meshSize; // w, h of the mesh.
@@ -20,6 +19,21 @@ enum DesireState {
   Attraction,
   Repulsion
 };
+
+// Every agent is inscribed with certain messages. Right now they are just
+// used to create a texture for the agent. They might be used as certain
+// communicative elements between messages. Not sure what it could be but
+// could be something interesting. 
+class Message {
+  public:
+    Message(glm::vec2 loc, ofColor col, float size);
+    void draw(ofTrueTypeFont font);
+  
+    glm::vec2 location;
+    ofColor color;
+    float size;
+};
+
 
 // Subsection body that is torn apart from the actual texture and falls on the ground. 
 class Agent {
@@ -57,7 +71,7 @@ class Agent {
     void createTexture(ofPoint meshSize);
     ofPoint getTextureSize();
   
-    // Pubic iterator to access messages. 
+    // Public iterator to access messages. 
     std::vector<Message>::iterator curMsg;
     std::vector<Message> messages;
   
@@ -70,7 +84,7 @@ class Agent {
 
   protected:
     // Derived class needs to have access to these. 
-    int numBogusMessages;
+    int numMessages; // Number of messages each agent has
     std::vector<ofColor> palette;
     AbstractFilter *filter;
     FilterChain *filterChain;

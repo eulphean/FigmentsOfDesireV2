@@ -78,7 +78,8 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
     } else {
       // curExchangeCounter -= 0.8;
       // Note: Disabling the exchange counter for now. Evaluate if and when this feature is really required.
-      // Is it really required? 
+      // Is it really required?
+      // This is a good question. 
     }
   }
 }

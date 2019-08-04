@@ -341,17 +341,18 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 // ------------------------------ Interactive Routines --------------------------------------- //
 
 void ofApp::createAgents() {
-  // Create Amay & Azra
-  Amay *a = new Amay(box2d, agentProps);
-  Azra *b = new Azra(box2d, agentProps);
+  // Set the agent position.
+  // TODO: Also give a random position to be sent towards in the world.
+  // Right now, it gets created and is just sitting.
+  agentProps.meshOrigin = ofPoint(agentProps.meshSize.x + 10, ofGetHeight() - agentProps.meshSize.y - 20);
+  Agent *agent;
+  if (ofRandom(1) < 0.5) {
+    agent = new Alpha(box2d, agentProps);
+  } else {
+    agent = new Beta(box2d, agentProps);
+  }
   
-  // Set partners
-  a->partner = b;
-  b->partner = a;
-  
-  // Push agents in the array.
-  agents.push_back(a);
-  agents.push_back(b);
+  agents.push_back(agent);
 }
 
 void ofApp::attract() {
@@ -601,6 +602,7 @@ void ofApp::createSuperAgents() {
       std::shared_ptr<ofxBox2dJoint> j;
       // Check for existing joints.
       for (auto &sa : superAgents) {
+        // Is there a SuperAgent that already exists?
         if (sa.contains(agentA, agentB)) {
           j = createInterAgentJoint(collidingBodies[0], collidingBodies[1]);
           sa.joints.push_back(j);
@@ -608,6 +610,7 @@ void ofApp::createSuperAgents() {
         }
       }
     
+      // Create a new Super Agent. 
       if (!found) {
         j = createInterAgentJoint(collidingBodies[0], collidingBodies[1]);
         superAgent.setup(agentA, agentB, j); // Create a new super agent.

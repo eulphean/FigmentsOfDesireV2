@@ -1,5 +1,28 @@
 #include "Agent.h"
 
+
+// ------------------------------ Message --------------------------------------- //
+
+Message::Message(glm::vec2 loc, ofColor col, float s) {
+  location = loc;
+  color = col;
+  size = s;
+}
+
+void Message::draw(ofTrueTypeFont font) {
+  ofPushMatrix();
+    ofTranslate(location);
+      ofPushStyle();
+        ofColor c = ofColor(color, 250);
+        ofSetColor(c);
+        ofDrawCircle(0, 0, size);
+      ofPopStyle();
+  ofPopMatrix();
+}
+
+
+// ------------------------------ Agent --------------------------------------- //
+
 void Agent::setup(ofxBox2d &box2d, AgentProperties agentProps) {
   // Initialize the iterator.
   createTexture(agentProps.meshSize);
@@ -144,7 +167,7 @@ void Agent::clean(ofxBox2d &box2d) {
 
 void Agent::createTexture(ofPoint meshSize) {
   // Create spots on the agent's body
-  for (int i = 0; i < numBogusMessages; i++) {
+  for (int i = 0; i < numMessages; i++) {
     // Pick a random location on the mesh.
     int w = meshSize.x; int h = meshSize.y;
     auto x = ofRandom(0, w); auto y = ofRandom(0, h);
@@ -179,7 +202,7 @@ void Agent::createTexture(ofPoint meshSize) {
   firstFbo.end();
   
   // Create 2nd fbo and draw with filter and postProcessing
-  secondFbo.allocate(100, 100, GL_RGBA);
+  secondFbo.allocate(meshSize.x, meshSize.y, GL_RGBA);
   secondFbo.begin();
     ofClear(0, 0, 0, 0);
     filterChain->begin();
@@ -317,7 +340,6 @@ glm::vec2 Agent::getCentroid() {
 ofMesh& Agent::getMesh() {
   return mesh;
 }
-
 
 // Repulse the vertices constantly
 void Agent::repulseBondedVertices() {

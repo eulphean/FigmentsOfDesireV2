@@ -53,3 +53,26 @@ Send it to Duncan
 Continue Code Updates
 Maybe how they both look like
 Alpha Beta (Amay, Azra)
+
+
+LAN (local agent nest)
+To Do:
+Get rid of the PARTNER logic. 
+For background, pick the right vertex with wihich I want to interact with the background. 
+Clean up the GUI
+On Resizing of the window, clear all agents and recreate the world.
+Refactor the texture design for the agent (should they both look the same)
+Do Desire States still matter now? Maybe the states work differently now?
+Both the agents look way too similar right now, let's make sure there is enough variety in both of them so that whenever I create an agent, it looks different than the last one. 
+
+Agents are having a conversation with each other. Do they have a conversation with each other by sending each other messages.. Whenever a message is sent, there are certain conversations happening between them. 
+
+NEST => They are making a nest, a structural, system, a rhizomatic system of connections. That's their tendency. It's very much inspired from nature. How birds would come together. It creates this relationship between this nest and the humans like how we are in coexistence with animals. But what about this relationship? 
+
+So, using this nest as the material for inspiration, I need to go and create a discourse around this. A web of connections. Is it the internet? The agents have a tendency to get together and start weaving a nest. A structure that maintains harmony, that keeps them going, or else they exhibit a wild behavior of uncertainty or uneasiness. How does the relation of this nest work in connection with humans who can be interrupting this nest? What kind of a relation am I creating here? 
+
+That's why the sky is working out well I think, 
+
+MESSAGES 
+These are messages sent by agents across this web for communicating with each other. 
+

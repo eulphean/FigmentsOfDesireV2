@@ -1,11 +1,7 @@
-#include "Amay.h"
+#include "Alpha.h"
 
-// Customize filters and textures for Amay
-
-Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {  
-  // Assign Amay's mesh origin (left corner).
-  agentProps.meshOrigin = ofPoint(10, 20);
-  agentProps.vertexRadius = 7; 
+Alpha::Alpha(ofxBox2d &box2d, AgentProperties agentProps) {
+  agentProps.vertexRadius = 7; // Make this come from the GUI. 
   
   // Assign a color palette
   palette = { ofColor::fromHex(0x540D6E),
@@ -17,7 +13,7 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
               ofColor::fromHex(0x0BF6CD)
   };
   
-  this->numBogusMessages = 70;
+  this->numMessages = 100;
   
   // Force weight for body actions. This is heavier, so more weight.
   maxStretchWeight = 1.5;
@@ -45,7 +41,7 @@ Amay::Amay(ofxBox2d &box2d, AgentProperties agentProps) {
   setup(box2d, agentProps);
 }
 
-void Amay::createMesh(AgentProperties agentProps) {
+void Alpha::createMesh(AgentProperties agentProps) {
   mesh.clear();
   mesh.setMode(OF_PRIMITIVE_TRIANGLES);
   
@@ -97,7 +93,7 @@ void Amay::createMesh(AgentProperties agentProps) {
   }
 }
 
-void Amay::createSoftBody(ofxBox2d &box2d, AgentProperties agentProps) {
+void Alpha::createSoftBody(ofxBox2d &box2d, AgentProperties agentProps) {
   auto meshVertices = mesh.getVertices();
   vertices.clear();
   joints.clear();
@@ -141,7 +137,7 @@ void Amay::createSoftBody(ofxBox2d &box2d, AgentProperties agentProps) {
   }
 }
 
-void Amay::updateMesh() {
+void Alpha::updateMesh() {
   auto meshPoints = mesh.getVertices();
   
   for (int j = 0; j < meshPoints.size(); j++) {
@@ -157,7 +153,7 @@ void Amay::updateMesh() {
   }
 }
 
-void Amay::update() {
+void Alpha::update() {
   // Update local mesh. 
   updateMesh();
   

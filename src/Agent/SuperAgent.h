@@ -5,8 +5,9 @@
 #include "Memory.h"
 #include "Midi.h"
 
-// Subsection body that is torn apart from the actual texture and falls on the ground.
-// The entire thing acts like one unique bond now. 
+// This class defines the entire BOND structure between two agents.
+// For every two agents that bond with each other, I create a SuperAgent class.
+// It's not exactly SuperAgent. I think it can be renamed for sure. 
 class SuperAgent {
   public:
     void setup(Agent *agentA, Agent *agentB, std::shared_ptr<ofxBox2dJoint>);
