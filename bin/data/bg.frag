@@ -39,7 +39,7 @@ float fbm( vec2 p )
 void main(void)
 {    
 	vec2 q = gl_FragCoord.xy / resolution.xy;
-	vec2 p = -1.0 + 2.0 * q;
+	vec2 p = -1.0 + 1.5 * q;
 	vec2 m = -1.0 + 2.0 / resolution.xy;
 	m.y = -m.y;
 	p.y *= (resolution.x/resolution.y);
@@ -47,11 +47,16 @@ void main(void)
 	// Base and Top colors are mixed to create a background.
 	vec3 baseColor = vec3(0.77255, 0.78039, 0.78039);
 	vec3 topColor;
-	topColor.x = 0.062 + 0.7*fbm(2.0*p + vec2(time*0.4, time*0.5));
-	topColor.y = 0.670 + 0.4*fbm(1.5*p + vec2(time*0.1, time*0.2));
-	topColor.z = 0.796 + 0.2*fbm(1.0*p + vec2(time*0.3, time*0.3));
+	topColor.x = 0.278 + 0.941*fbm(2.0*p + vec2(time*0.4, time*0.1));
+	topColor.y = 0.729 + 0.470*fbm(1.5*p + vec2(time*0.1, time*0.2));
+	topColor.z = 0.941 + 0.278*fbm(1.0*p + vec2(time*0.3, time*0.1));
 
-	float f = fbm( 10.0*p+time );
+	// 0.062, 0.670, 0.796 (blueish)
+	// 0.77255, 0.78039, 0.78039 ()
+	// 0.7, 0.4, 0.2
+	// 0941, 0.470, 0.278
+
+	float f = fbm( 5.0*p+time*0.2 );
 	baseColor = mix(baseColor, topColor, f);
 
 	gl_FragColor = vec4(baseColor,1.0);
