@@ -32,6 +32,3 @@ class BgMesh {
 
     ofxPostProcessing post; 
 };
-
-
-//void update(std::vector<glm::vec2> centroids);

@@ -40,19 +40,15 @@ class ofApp : public ofBaseApp{
 		void keyPressed(int key);
     void exit();
   
+    // Flags to turn/turn off certain features
     bool hideGui;
     bool debug;
-    bool enableSound;
     bool stopEverything;
     bool showTexture;
     bool drawFbo; // For saving
+    bool shouldBond;
   
-    // Screengrab fbo
-    ofFbo screenGrabFbo;
-    int screenCaptureIdx = 0;
-  
-  
-    // Box2d
+    // Box2d world handle.
     ofxBox2d box2d;
   
     // Agents
@@ -100,7 +96,11 @@ class ofApp : public ofBaseApp{
     ofParameter<int> attraction;
     ofParameter<int> repulsion;
     ofParameter<float> shaderScale;
-
+  
+    // Screengrab fbo
+    ofFbo screenGrabFbo;
+    int screenCaptureIdx = 0;
+  
   private:
     std::vector<Memory> memories;
     std::vector<b2Body *> collidingBodies;
@@ -119,22 +119,18 @@ class ofApp : public ofBaseApp{
     void evaluateBonding(b2Body* bodyA, b2Body* bodyB, Agent *agentA, Agent *agentB);
     bool canVertexBond(b2Body* body, Agent *curAgent);
   
-    // Serial
-    ofSerial serial;
-  
     // SuperAgents => These are abstract agents that have a bond with each other. 
     std::vector<SuperAgent> superAgents;
   
     // Bounds
     ofRectangle bounds;
   
-    // OSC remote.
-    ofxOscReceiver receiver;
-  
     // Background
     BgMesh bg;
   
-    ofTrueTypeFont debugFont;
+    // Serial
+    ofSerial serial;
   
-    bool shouldBond; 
+    // OSC remote.
+    ofxOscReceiver receiver;
 };

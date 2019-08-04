@@ -6,8 +6,6 @@ void ofApp::setup(){
   receiver.setup(PORT);
   //ofHideCursor();
   
-  debugFont.load("opensansbond.ttf", 30);
-  
   ofBackground(ofColor::fromHex(0x2E2F2D));
   ofSetCircleResolution(20);
   ofDisableArbTex();
@@ -50,104 +48,6 @@ void ofApp::setup(){
   screenGrabFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 }
 
-void ofApp::contactStart(ofxBox2dContactArgs &e) {
-  
-}
-
-// Joint creation sequence.
-void ofApp::contactEnd(ofxBox2dContactArgs &e) {
-  // Based on the current state of desire, what should the vertices do if they hit each other
-  // How do they effect each other?
-  if (agents.size() > 0) {
-    if(e.a != NULL && e.b != NULL) {
-      if(e.a->GetType() == b2Shape::e_circle && e.b->GetType() == b2Shape::e_circle
-          && e.a->GetBody() && e.b->GetBody()) {
-        // Extract Agent pointers.
-        Agent* agentA = reinterpret_cast<VertexData*>(e.a->GetBody()->GetUserData())->agent;
-        Agent* agentB = reinterpret_cast<VertexData*>(e.b->GetBody()->GetUserData())->agent;
-        
-        // DEFINE INDIVIDUAL VERTEX BEHAVIORS.
-        if (agentA != agentB && agentA != NULL && agentB != NULL) {
-          // Collect datas
-          auto dataA = reinterpret_cast<VertexData*>(e.a->GetBody()->GetUserData());
-          auto dataB = reinterpret_cast<VertexData*>(e.b->GetBody()->GetUserData());
-          
-          // Update positions for repelling.
-          auto pos = getBodyPosition(e.b->GetBody());
-          dataA->targetPos = pos;
-
-          pos = getBodyPosition(e.a->GetBody());
-          dataB->targetPos = pos;
-          
-          // Desire state is NONE! Repel the vertices from each
-          // other. 
-          if (agentA->desireState == None) {
-            if (ofRandom(1) < 0.5) {
-              dataA->applyRepulsion = true;
-              e.a->GetBody()->SetUserData(dataA);
-            } else {
-              dataA->applyAttraction = true;
-              e.a->GetBody()->SetUserData(dataA);
-            }
-          }
-          
-          if (agentB->desireState == None) {
-            if (ofRandom(1) < 0.5) {
-              dataA->applyRepulsion = true;
-              e.a->GetBody()->SetUserData(dataA);
-            } else {
-              dataB->applyAttraction = true;
-              e.b->GetBody()->SetUserData(dataB);
-            }
-          }
-          
-          // Desire state is ATTRACTION!
-          // Repel the other agent.
-          if (agentA->desireState == Attraction) {
-             // Attract A's vertices
-             if (!dataA->hasInterAgentJoint) {
-               dataA->applyAttraction = true;
-               e.a->GetBody()->SetUserData(dataA);
-            }
-            
-            // Repel B's vertices
-            if (!dataB->hasInterAgentJoint) {
-              dataB->applyRepulsion = true;
-              e.b->GetBody()->SetUserData(dataB);
-            }
-          
-            // Reset agent state to None on collision.
-            agentA->setDesireState(None);
-          }
-          
-          if (agentB->desireState == Attraction) {
-            // Attract B's vertice
-             if (!dataB->hasInterAgentJoint) {
-              dataB->applyAttraction = true;
-              e.b->GetBody()->SetUserData(dataB);
-            }
-            
-            // Repel A's vertices
-            if (!dataA->hasInterAgentJoint) {
-               dataA->applyRepulsion = true;
-               e.a->GetBody()->SetUserData(dataA);
-            }
-            
-            // Reset agent state to None on collision.
-            agentB->setDesireState(None);
-          }
-
-          // Should the agents be evaluated for bonding?
-          if (shouldBond) {
-            evaluateBonding(e.a->GetBody(), e.b->GetBody(), agentA, agentB);
-          }
-        }
-      }
-    }
-  }
-}
-
-//--------------------------------------------------------------
 void ofApp::update(){
   box2d.update();
   processOsc();
@@ -162,6 +62,7 @@ void ofApp::update(){
   updateAgentProps();
   
   std::vector<ofMesh> meshes;
+  
   // Update agents
   for (auto &a : agents) {
     a -> update();
@@ -189,7 +90,6 @@ void ofApp::update(){
   }
 }
 
-//--------------------------------------------------------------
 void ofApp::draw(){
   if (drawFbo) {
     screenGrabFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -203,7 +103,7 @@ void ofApp::drawSequence() {
   if (!debug) {
    bg.draw();
   }
-  
+
   // Draw box2d bounds.
   ofPushStyle();
     ofSetColor(ofColor::fromHex(0x341517));
@@ -217,12 +117,12 @@ void ofApp::drawSequence() {
   for (auto sa: superAgents) {
     sa.draw();
   }
-  
+
   // Draw Agent is the virtual method for derived class.
   for (auto a: agents) {
     a -> draw(debug, showTexture);
   }
-  
+
   // Draw memories
   for (auto m : memories) {
     m.draw();
@@ -235,178 +135,6 @@ void ofApp::drawSequence() {
   }
 }
 
-void ofApp::processOsc() {
-  while(receiver.hasWaitingMessages()){
-    // get the next message
-    ofxOscMessage m;
-    receiver.getNextMessage(m);
-    
-// ------------------ PIPES/GUI OSC Messages -----------------------
-    if(m.getAddress() == "/clear"){
-      float val = m.getArgAsFloat(0);
-      clearScreen();
-    }
-    
-    if(m.getAddress() == "/new"){
-      float val = m.getArgAsFloat(0);
-      createAgents();
-    }
-    
-    if(m.getAddress() == "/leftBack"){
-      float val = m.getArgAsFloat(0);
-      Midi::instance().sendMidiControlChangeRotary(0, val);
-    }
-    
-    if(m.getAddress() == "/leftFront"){
-      float val = m.getArgAsFloat(0);
-      Midi::instance().sendMidiControlChangeRotary(1, val);
-    }
-    
-    if(m.getAddress() == "/rightBack"){
-      float val = m.getArgAsFloat(0);
-       Midi::instance().sendMidiControlChangeRotary(2, val);
-    }
-    
-    if(m.getAddress() == "/rightFront"){
-      float val = m.getArgAsFloat(0);
-        Midi::instance().sendMidiControlChangeRotary(3, val);
-    }
-    
-    if(m.getAddress() == "/rain"){
-      float val = m.getArgAsFloat(0);
-       Midi::instance().sendMidiControlChangeRotary(4, val);
-    }
-    
-    if(m.getAddress() == "/rightBackMix"){
-      float val = m.getArgAsFloat(0);
-       Midi::instance().sendMidiControlChangeRotary(5, val);
-    }
-    
-    if(m.getAddress() == "/leftFrontMix"){
-      float val = m.getArgAsFloat(0);
-       Midi::instance().sendMidiControlChangeRotary(6, val);
-    }
-  }
-}
-
-void ofApp::updateAgentProps() {
-    // Create Soft Body payload to create objects.
-  agentProps.meshDimensions = ofPoint(meshRows, meshColumns);
-  agentProps.meshSize = ofPoint(meshWidth, meshHeight);
-  agentProps.vertexRadius = vertexRadius;
-  agentProps.vertexPhysics = ofPoint(vertexBounce, vertexDensity, vertexFriction); // x (bounce), y (density), z (friction)
-  agentProps.jointPhysics = ofPoint(jointFrequency, jointDamping); // x (frequency), y (damping)
-}
-
-void ofApp::createAgents() {
-  // Create Amay & Azra
-  Amay *a = new Amay(box2d, agentProps);
-  Azra *b = new Azra(box2d, agentProps);
-  
-  // Set partners
-  a->partner = b;
-  b->partner = a;
-  
-  // Push agents in the array.
-  agents.push_back(a);
-  agents.push_back(b);
-}
-
-void ofApp::setupGui() {
-    gui.setup();
-    settings.setName("Inter Mesh Settings");
-  
-    // Mesh parameters.
-    meshParams.setName("Mesh Params");
-    meshParams.add(meshRows.set("Mesh Rows", 5, 5, 100)); // Add the current value
-    meshParams.add(meshColumns.set("Mesh Columns", 5, 5, 100));
-    meshParams.add(meshWidth.set("Mesh Width", 100, 10, ofGetWidth()));
-    meshParams.add(meshHeight.set("Mesh Height", 100, 10, ofGetHeight()));
-  
-    // Vertex parameters
-    vertexParams.setName("Vertex Params");
-    vertexParams.add(vertexRadius.set("Vertex Radius", 6, 1, 30));
-    vertexParams.add(vertexDensity.set("Vertex Density", 1, 0, 5));
-    vertexParams.add(vertexBounce.set("Vertex Bounce", 0.3, 0, 1));
-    vertexParams.add(vertexFriction.set("Vertex Friction", 1, 0, 1));
-  
-    // Joint parameters
-    jointParams.setName("Joint Params");
-    jointParams.add(jointFrequency.set("Joint Frequency", 2.0f, 0.0f, 20.0f));
-    jointParams.add(jointDamping.set("Joint Damping", 1.0f, 0.0f, 5.0f));
-  
-    // InterAgentJoint parameters
-    interAgentJointParams.setName("InterAgentJoint Params");
-    interAgentJointParams.add(frequency.set("Joint Frequency", 2.0f, 0.0f, 20.0f));
-    interAgentJointParams.add(damping.set("Joint Damping", 1.0f, 0.0f, 10.0f));
-    interAgentJointParams.add(maxJointForce.set("Max Joint Force", 6.f, 1.f, 100.0f));
-  
-    // Background group
-    bgParams.setName("Background Params");
-    bgParams.add(rectWidth.set("Width", 20, 10, 50));
-    bgParams.add(rectHeight.set("Height", 20, 10, 50));
-    bgParams.add(attraction.set("Attraction", 20, -200, 200));
-    bgParams.add(repulsion.set("Repulsion", -20, -200, 200));
-    bgParams.add(shaderScale.set("Scale", 1.f, 0.f, 10.f));
-    rectWidth.addListener(this, &ofApp::widthChanged);
-    rectHeight.addListener(this, &ofApp::heightChanged);
-    attraction.addListener(this, &ofApp::updateForce);
-    repulsion.addListener(this, &ofApp::updateForce);
-    shaderScale.addListener(this, &ofApp::updateParams);
-  
-    settings.add(meshParams);
-    settings.add(vertexParams);
-    settings.add(jointParams);
-    settings.add(interAgentJointParams);
-    settings.add(bgParams);
-  
-    gui.setup(settings);
-    gui.loadFromFile("InterMesh.xml");
-}
-
-void ofApp::clearScreen() {
-  // [WARNING] For some reason, these events are still fired when trying to clean things as one could be in the
-    // middle of a step function. Disabling and renabling the events work as a good solution for now.
-  box2d.disableEvents();
-  collidingBodies.clear();
-
-  // Clear SuperAgents
-  for (auto &sa : superAgents) {
-    sa.clean(box2d);
-  }
-  superAgents.clear();
-
-  // Clean agents
-  for (auto &a : agents) {
-    a -> clean(box2d);
-    delete a;
-  }
-  agents.clear();
-
-  box2d.enableEvents();
-}
-
-void ofApp::removeUnbonded() {
-  ofRemove(agents, [&](Agent *a) {
-  
-    return false;
-  });
-}
-
-void ofApp::removeJoints() {
-  box2d.disableEvents();
-
-  // Clear superAgents only
-  for (auto &sa : superAgents) {
-    sa.clean(box2d);
-  }
-  superAgents.clear();
-
-  superAgents.clear();
-  box2d.enableEvents();
-}
-
-//--------------------------------------------------------------
 void ofApp::keyPressed(int key){
   
   // ------------------ Interactive Gestures --------------------- //
@@ -484,7 +212,148 @@ void ofApp::exit() {
   gui.saveToFile("InterMesh.xml");
 }
 
-// ------------------------------ Interactive Behavior Routines --------------------------------------- //
+// ------------------------------ Critical Helper Routines --------------------------------------- //
+
+void ofApp::setupGui() {
+    gui.setup();
+    settings.setName("Inter Mesh Settings");
+  
+    // Mesh parameters.
+    meshParams.setName("Mesh Params");
+    meshParams.add(meshRows.set("Mesh Rows", 5, 5, 100)); // Add the current value
+    meshParams.add(meshColumns.set("Mesh Columns", 5, 5, 100));
+    meshParams.add(meshWidth.set("Mesh Width", 100, 10, ofGetWidth()));
+    meshParams.add(meshHeight.set("Mesh Height", 100, 10, ofGetHeight()));
+  
+    // Vertex parameters
+    vertexParams.setName("Vertex Params");
+    vertexParams.add(vertexRadius.set("Vertex Radius", 6, 1, 30));
+    vertexParams.add(vertexDensity.set("Vertex Density", 1, 0, 5));
+    vertexParams.add(vertexBounce.set("Vertex Bounce", 0.3, 0, 1));
+    vertexParams.add(vertexFriction.set("Vertex Friction", 1, 0, 1));
+  
+    // Joint parameters
+    jointParams.setName("Joint Params");
+    jointParams.add(jointFrequency.set("Joint Frequency", 2.0f, 0.0f, 20.0f));
+    jointParams.add(jointDamping.set("Joint Damping", 1.0f, 0.0f, 5.0f));
+  
+    // InterAgentJoint parameters
+    interAgentJointParams.setName("InterAgentJoint Params");
+    interAgentJointParams.add(frequency.set("Joint Frequency", 2.0f, 0.0f, 20.0f));
+    interAgentJointParams.add(damping.set("Joint Damping", 1.0f, 0.0f, 10.0f));
+    interAgentJointParams.add(maxJointForce.set("Max Joint Force", 6.f, 1.f, 100.0f));
+  
+    // Background group
+    bgParams.setName("Background Params");
+    bgParams.add(rectWidth.set("Width", 20, 10, 50));
+    bgParams.add(rectHeight.set("Height", 20, 10, 50));
+    bgParams.add(attraction.set("Attraction", 20, -200, 200));
+    bgParams.add(repulsion.set("Repulsion", -20, -200, 200));
+    bgParams.add(shaderScale.set("Scale", 1.f, 0.f, 10.f));
+    rectWidth.addListener(this, &ofApp::widthChanged);
+    rectHeight.addListener(this, &ofApp::heightChanged);
+    attraction.addListener(this, &ofApp::updateForce);
+    repulsion.addListener(this, &ofApp::updateForce);
+    shaderScale.addListener(this, &ofApp::updateParams);
+  
+    settings.add(meshParams);
+    settings.add(vertexParams);
+    settings.add(jointParams);
+    settings.add(interAgentJointParams);
+    settings.add(bgParams);
+  
+    gui.setup(settings);
+    gui.loadFromFile("InterMesh.xml");
+}
+
+void ofApp::updateAgentProps() {
+    // Create Soft Body payload to create objects.
+  agentProps.meshDimensions = ofPoint(meshRows, meshColumns);
+  agentProps.meshSize = ofPoint(meshWidth, meshHeight);
+  agentProps.vertexRadius = vertexRadius;
+  agentProps.vertexPhysics = ofPoint(vertexBounce, vertexDensity, vertexFriction); // x (bounce), y (density), z (friction)
+  agentProps.jointPhysics = ofPoint(jointFrequency, jointDamping); // x (frequency), y (damping)
+}
+
+void ofApp::processOsc() {
+  while(receiver.hasWaitingMessages()){
+    // get the next message
+    ofxOscMessage m;
+    receiver.getNextMessage(m);
+    
+    // ------------------ PIPES/GUI OSC Messages -----------------------
+    if(m.getAddress() == "/clear"){
+      float val = m.getArgAsFloat(0);
+      clearScreen();
+    }
+    
+    if(m.getAddress() == "/new"){
+      float val = m.getArgAsFloat(0);
+      createAgents();
+    }
+    
+    if(m.getAddress() == "/leftBack"){
+      float val = m.getArgAsFloat(0);
+      Midi::instance().sendMidiControlChangeRotary(0, val);
+    }
+    
+    if(m.getAddress() == "/leftFront"){
+      float val = m.getArgAsFloat(0);
+      Midi::instance().sendMidiControlChangeRotary(1, val);
+    }
+    
+    if(m.getAddress() == "/rightBack"){
+      float val = m.getArgAsFloat(0);
+       Midi::instance().sendMidiControlChangeRotary(2, val);
+    }
+    
+    if(m.getAddress() == "/rightFront"){
+      float val = m.getArgAsFloat(0);
+        Midi::instance().sendMidiControlChangeRotary(3, val);
+    }
+    
+    if(m.getAddress() == "/rain"){
+      float val = m.getArgAsFloat(0);
+       Midi::instance().sendMidiControlChangeRotary(4, val);
+    }
+    
+    if(m.getAddress() == "/rightBackMix"){
+      float val = m.getArgAsFloat(0);
+       Midi::instance().sendMidiControlChangeRotary(5, val);
+    }
+    
+    if(m.getAddress() == "/leftFrontMix"){
+      float val = m.getArgAsFloat(0);
+       Midi::instance().sendMidiControlChangeRotary(6, val);
+    }
+  }
+}
+
+glm::vec2 ofApp::getBodyPosition(b2Body* body) {
+  auto xf = body->GetTransform();
+  b2Vec2 pos = body->GetLocalCenter();
+  b2Vec2 b2Center = b2Mul(xf, pos);
+  auto p = worldPtToscreenPt(b2Center);
+  return glm::vec2(p.x, p.y);
+}
+
+
+// ------------------------------ Interactive Routines --------------------------------------- //
+
+void ofApp::createAgents() {
+  // Create Amay & Azra
+  Amay *a = new Amay(box2d, agentProps);
+  Azra *b = new Azra(box2d, agentProps);
+  
+  // Set partners
+  a->partner = b;
+  b->partner = a;
+  
+  // Push agents in the array.
+  agents.push_back(a);
+  agents.push_back(b);
+}
+
 void ofApp::attract() {
   // Pick a random figment and enable attraction for that figment.
   int randIdx = ofRandom(agents.size());
@@ -518,11 +387,174 @@ void ofApp::stretch() {
   }
 }
 
+void ofApp::removeJoints() {
+  box2d.disableEvents();
+
+  // Clear superAgents only
+  for (auto &sa : superAgents) {
+    sa.clean(box2d);
+  }
+  superAgents.clear();
+
+  superAgents.clear();
+  box2d.enableEvents();
+}
+
 void ofApp::enableBonding() {
   shouldBond = !shouldBond;
 }
 
-// ------------------------------ Interactive Behavior Routines --------------------------------------- //
+void ofApp::removeUnbonded() {
+  ofRemove(agents, [&](Agent *a) {
+  
+    return false;
+  });
+}
+
+void ofApp::clearScreen() {
+  // [WARNING] For some reason, these events are still fired when trying to clean things as one could be in the
+  // middle of a step function. Disabling and renabling the events work as a good solution for now.
+  box2d.disableEvents();
+  collidingBodies.clear();
+
+  // Clear SuperAgents
+  for (auto &sa : superAgents) {
+    sa.clean(box2d);
+  }
+  superAgents.clear();
+
+  // Clean agents
+  for (auto &a : agents) {
+    a -> clean(box2d);
+    delete a;
+  }
+  agents.clear();
+
+  box2d.enableEvents();
+}
+
+// ------------------------------ Background Update Routine --------------------------------------- //
+
+void ofApp::widthChanged (int & newWidth) {
+  // New background
+  bg.setParams(bgParams);
+  bg.setup();
+}
+
+void ofApp::heightChanged (int & newHeight) {
+  // New background
+  bg.setParams(bgParams);
+  bg.setup();
+}
+
+void ofApp::updateParams(float & newVal) {
+  bg.setParams(bgParams);
+}
+
+void ofApp::updateForce(int & newVal) {
+  bg.setParams(bgParams);
+}
+
+// ------------------------------ Agent Body Contact Routines --------------------------------------- //
+
+void ofApp::contactStart(ofxBox2dContactArgs &e) {
+  
+}
+
+// Joint creation sequence.
+void ofApp::contactEnd(ofxBox2dContactArgs &e) {
+  // Based on the current state of desire, what should the vertices do if they hit each other
+  // How do they effect each other?
+  if (agents.size() > 0) {
+    if(e.a != NULL && e.b != NULL) {
+      if(e.a->GetType() == b2Shape::e_circle && e.b->GetType() == b2Shape::e_circle
+          && e.a->GetBody() && e.b->GetBody()) {
+        // Extract Agent pointers.
+        Agent* agentA = reinterpret_cast<VertexData*>(e.a->GetBody()->GetUserData())->agent;
+        Agent* agentB = reinterpret_cast<VertexData*>(e.b->GetBody()->GetUserData())->agent;
+        
+        // DEFINE INDIVIDUAL VERTEX BEHAVIORS.
+        if (agentA != agentB && agentA != NULL && agentB != NULL) {
+          // Collect datas
+          auto dataA = reinterpret_cast<VertexData*>(e.a->GetBody()->GetUserData());
+          auto dataB = reinterpret_cast<VertexData*>(e.b->GetBody()->GetUserData());
+          
+          // Update positions for repelling.
+          auto pos = getBodyPosition(e.b->GetBody());
+          dataA->targetPos = pos;
+
+          pos = getBodyPosition(e.a->GetBody());
+          dataB->targetPos = pos;
+          
+          // Desire state is NONE! Repel the vertices from each
+          // other.
+          if (agentA->desireState == None) {
+            if (ofRandom(1) < 0.5) {
+              dataA->applyRepulsion = true;
+              e.a->GetBody()->SetUserData(dataA);
+            } else {
+              dataA->applyAttraction = true;
+              e.a->GetBody()->SetUserData(dataA);
+            }
+          }
+          
+          if (agentB->desireState == None) {
+            if (ofRandom(1) < 0.5) {
+              dataA->applyRepulsion = true;
+              e.a->GetBody()->SetUserData(dataA);
+            } else {
+              dataB->applyAttraction = true;
+              e.b->GetBody()->SetUserData(dataB);
+            }
+          }
+          
+          // Desire state is ATTRACTION!
+          // Repel the other agent.
+          if (agentA->desireState == Attraction) {
+             // Attract A's vertices
+             if (!dataA->hasInterAgentJoint) {
+               dataA->applyAttraction = true;
+               e.a->GetBody()->SetUserData(dataA);
+            }
+            
+            // Repel B's vertices
+            if (!dataB->hasInterAgentJoint) {
+              dataB->applyRepulsion = true;
+              e.b->GetBody()->SetUserData(dataB);
+            }
+          
+            // Reset agent state to None on collision.
+            agentA->setDesireState(None);
+          }
+          
+          if (agentB->desireState == Attraction) {
+            // Attract B's vertice
+             if (!dataB->hasInterAgentJoint) {
+              dataB->applyAttraction = true;
+              e.b->GetBody()->SetUserData(dataB);
+            }
+            
+            // Repel A's vertices
+            if (!dataA->hasInterAgentJoint) {
+               dataA->applyRepulsion = true;
+               e.a->GetBody()->SetUserData(dataA);
+            }
+            
+            // Reset agent state to None on collision.
+            agentB->setDesireState(None);
+          }
+
+          // Should the agents be evaluated for bonding?
+          if (shouldBond) {
+            evaluateBonding(e.a->GetBody(), e.b->GetBody(), agentA, agentB);
+          }
+        }
+      }
+    }
+  }
+}
+
+// ------------------------------ Inter-Agent Bonding Routines ------------------------------------ //
 
 // Massive important function that determines when the 2 bodies actually bond.
 void ofApp::evaluateBonding(b2Body *bodyA, b2Body *bodyB, Agent *agentA, Agent *agentB) {
@@ -555,34 +587,6 @@ bool ofApp::canVertexBond(b2Body* body, Agent *curAgent) {
   }
 
   return true;
-}
-
-void ofApp::widthChanged (int & newWidth) {
-  // New background
-  bg.setParams(bgParams);
-  bg.setup();
-}
-
-void ofApp::heightChanged (int & newHeight) {
-  // New background
-  bg.setParams(bgParams);
-  bg.setup();
-}
-
-void ofApp::updateParams(float & newVal) {
-  bg.setParams(bgParams);
-}
-
-void ofApp::updateForce(int & newVal) {
-  bg.setParams(bgParams);
-}
-
-glm::vec2 ofApp::getBodyPosition(b2Body* body) {
-  auto xf = body->GetTransform();
-  b2Vec2 pos      = body->GetLocalCenter();
-  b2Vec2 b2Center = b2Mul(xf, pos);
-  auto p = worldPtToscreenPt(b2Center);
-  return glm::vec2(p.x, p.y);
 }
 
 void ofApp::createSuperAgents() {

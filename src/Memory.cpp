@@ -1,5 +1,5 @@
 #include "Memory.h"
-#include "Agent.h" 
+#include "Agent.h"
 
 Memory::Memory(ofxBox2d &box2d, glm::vec2 location) {
   mem = std::make_shared<ofxBox2dCircle>();
@@ -19,7 +19,7 @@ Memory::Memory(ofxBox2d &box2d, glm::vec2 location) {
 void Memory::update() {
   elapsedTime = ofGetElapsedTimeMillis() - curTime;
   if (elapsedTime >= maxTime) {
-    shouldRemove = true; 
+    shouldRemove = true;
   }
 }
 
@@ -34,4 +34,3 @@ void Memory::draw() {
     ofPopStyle();
   ofPopMatrix();
 }
-
