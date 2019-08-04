@@ -3,11 +3,11 @@
 	<Mesh_Params>
 		<Mesh_Rows>8</Mesh_Rows>
 		<Mesh_Columns>8</Mesh_Columns>
-		<Mesh_Width>250</Mesh_Width>
-		<Mesh_Height>150</Mesh_Height>
+		<Mesh_Width>100</Mesh_Width>
+		<Mesh_Height>100</Mesh_Height>
 	</Mesh_Params>
 	<Vertex_Params>
-		<Vertex_Radius>3</Vertex_Radius>
+		<Vertex_Radius>2</Vertex_Radius>
 		<Vertex_Density>1</Vertex_Density>
 		<Vertex_Bounce>0.3</Vertex_Bounce>
 		<Vertex_Friction>1</Vertex_Friction>

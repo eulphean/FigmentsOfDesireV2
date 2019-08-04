@@ -25,8 +25,8 @@ enum DesireState {
 class Agent {
   public:
     void setup(ofxBox2d &box2d, AgentProperties softBodyProperties);
-    void update();
     void draw(bool debug, bool showTexture);
+    virtual void update();
   
     // Clean the agent
     void clean(ofxBox2d &box2d);
@@ -48,10 +48,10 @@ class Agent {
     glm::vec2 getCentroid();
     ofMesh& getMesh();
     void setDesireState(DesireState state);
-    void enableAttraction(); 
   
-    // Vertices
+    // Vertices and Joints
     std::vector<std::shared_ptr<ofxBox2dCircle>> vertices; // Every vertex in the mesh is a circle.
+    std::vector<std::shared_ptr<ofxBox2dJoint>> joints; // Joints connecting those vertices.
   
     // Texture
     void createTexture(ofPoint meshSize);
@@ -85,18 +85,20 @@ class Agent {
     float attractionWeight;
     float seekWeight;
     float maxVelocity;
+  
+    // Each derived class will override these methods as they define their own
+    // meshes and soft bodies.
+    virtual void createMesh(AgentProperties softBodyProperties) {};
+    virtual void createSoftBody(ofxBox2d &box2d, AgentProperties softBodyProperties) {};
+    virtual void updateMesh() {};
+  
+    // Mesh must be accessible in the derived class. 
+    ofMesh mesh;
     
   private:
-    void createMesh(AgentProperties softBodyProperties);
-    void createSoftBody(ofxBox2d &box2d, AgentProperties softBodyProperties);
-    void updateMesh();
     void assignIndices(AgentProperties agentProps);
   
     // ----------------- Data members -------------------
-    std::vector<std::shared_ptr<ofxBox2dJoint>> joints; // Joints connecting those vertices.
-  
-    // Mesh.
-    ofMesh mesh;
   
     // Seek
     glm::vec2 seekTargetPos;
