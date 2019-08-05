@@ -40,26 +40,28 @@ void BgMesh::update(std::vector<ofMesh> agentMeshes) {
       shader.end();
   mainFbo.end();
   
-  // Empty vector as size of background mesh's vertices.
-  std::vector<glm::vec2> offsets;
-  offsets.assign(mesh.getVertices().size(), glm::vec2(0, 0));
-  for (auto m : agentMeshes) {
-    auto vertices = m.getVertices();
-    std::vector<glm::vec2> randVertices;
-    randVertices.push_back(vertices[vertices.size()/2 -1]);
-    for (auto v : randVertices) {
-      for (int i = 0; i < mesh.getVertices().size(); i++) {
-        auto meshVertex = meshCopy.getVertices()[i];
-        offsets[i] = offsets.at(i) + interact(meshVertex, v, i);
-      }
-    }
-  }
-  
-  // Update each mesh vertex with a displacement.
-  for (int i = 0; i < mesh.getVertices().size(); i++) {
-    auto newVertex = meshCopy.getVertices()[i] + offsets.at(i);
-    mesh.setVertex(i, {newVertex.x, newVertex.y, 0});
-  }
+  // This is eating up so many frames. Highly calculation intense.
+  // Let's not do this for  now. 
+//  // Empty vector as size of background mesh's vertices.
+//  std::vector<glm::vec2> offsets;
+//  offsets.assign(mesh.getVertices().size(), glm::vec2(0, 0));
+//  for (auto m : agentMeshes) {
+//    auto vertices = m.getVertices();
+//    std::vector<glm::vec2> randVertices;
+//    randVertices.push_back(vertices[vertices.size()/2 -1]);
+//    for (auto v : randVertices) {
+//      for (int i = 0; i < mesh.getVertices().size(); i++) {
+//        auto meshVertex = meshCopy.getVertices()[i];
+//        offsets[i] = offsets.at(i) + interact(meshVertex, v, i);
+//      }
+//    }
+//  }
+//
+//  // Update each mesh vertex with a displacement.
+//  for (int i = 0; i < mesh.getVertices().size(); i++) {
+//    auto newVertex = meshCopy.getVertices()[i] + offsets.at(i);
+//    mesh.setVertex(i, {newVertex.x, newVertex.y, 0});
+//  }
 }
 
 void BgMesh::draw(bool debug) {

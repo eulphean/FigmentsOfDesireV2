@@ -45,14 +45,14 @@ void Alpha::createMesh(AlphaAgentProperties agentProps) {
   // Create the mesh.
   for (int y = 0; y < nRows; y++) {
     for (int x = 0; x < nCols; x++) {
-      float ix = agentProps.meshOrigin.x + meshSize.x * x / (nCols - 1);
-      float iy = agentProps.meshOrigin.y + meshSize.y * y / (nRows - 1);
+      float ix = agentProps.meshOrigin.x + meshSize.x * x / (nCols - 1); float tx = textureSize.x * x / (nCols - 1);
+      float iy = agentProps.meshOrigin.y + meshSize.y * y / (nRows - 1); float ty = textureSize.y * y / (nRows - 1);
      
       mesh.addVertex({ix, iy, 0});
       
       // Height and Width of the texture is same as the width/height sent in via agentProps
-      float texX = ofMap(ix - agentProps.meshOrigin.x, 0, textureSize.x, 0, 1, true); // Map the calculated x coordinate from 0 - 1
-      float texY = ofMap(iy - agentProps.meshOrigin.y, 0, textureSize.y, 0, 1, true); // Map the calculated y coordinate from 0 - 1
+      float texX = ofMap(tx, 0, textureSize.x, 0, 1, true); // Map the calculated x coordinate from 0 - 1
+      float texY = ofMap(ty, 0, textureSize.y, 0, 1, true); // Map the calculated y coordinate from 0 - 1
       mesh.addTexCoord({texX, texY});
     }
   }

@@ -32,36 +32,10 @@ Layers - Layers - Layers
 Layers - Layers - Layers
 
 
-Writeups
-- Think about the overall theme of this work. Is this about coexistence?
-- What is this work about really? 
-- Work Title
-- Work Snippet (500 words)
-- Artist statement | Artist Bio
-
-Send it in by Monday night (Chicago, Monday morning)9
-
-06/24/2019 (Monday)
-Continue code updates. 
-Write the press release text.
-- Work's Title 
-- Works Statement
-- Artist Bio | Artist Statement
-Send it to Duncan
-
-06/25/2019 (Tuesday)
-Continue Code Updates
-Maybe how they both look like
-Alpha Beta (Amay, Azra)
-
-
 LAN (local agent nest)
 To Do:
 Get rid of the PARTNER logic. 
-For background, pick the right vertex with wihich I want to interact with the background. 
-Clean up the GUI
-On Resizing of the window, clear all agents and recreate the world.
-Refactor the texture design for the agent (should they both look the same)
+
 Do Desire States still matter now? Maybe the states work differently now?
 Both the agents look way too similar right now, let's make sure there is enough variety in both of them so that whenever I create an agent, it looks different than the last one. 
 
@@ -74,7 +48,10 @@ So, using this nest as the material for inspiration, I need to go and create a d
 That's why the sky is working out well I think, 
 
 MESSAGES 
-These are messages sent by agents across this web for communicating with each other. 
+These are messages sent by agents across this web for communicating with each other.
 
-Resize and GUI cleanup (right now, right now)
-Very simple interaction. 
+THINGS BROKEN
+- Partner logic
+- AssignIndices 
+- Handling Any Sort of Behavior except Stretch/Flick not working
+- No autonomy of agents currently

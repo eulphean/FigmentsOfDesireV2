@@ -9,33 +9,35 @@
 	<Alpha_Agent_Params>
 		<Mesh_Rows>5</Mesh_Rows>
 		<Mesh_Columns>5</Mesh_Columns>
-		<Mesh_Width>50</Mesh_Width>
-		<Mesh_Height>50</Mesh_Height>
-		<Texture_Width>50</Texture_Width>
-		<Texture_Height>50</Texture_Height>
-		<Vertex_Density>1</Vertex_Density>
-		<Vertex_Bounce>0.1</Vertex_Bounce>
-		<Vertex_Friction>1</Vertex_Friction>
-		<Vertex_Radius>1</Vertex_Radius>
-		<Joint_Frequency>1.63265</Joint_Frequency>
-		<Joint_Damping>1</Joint_Damping>
-	</Alpha_Agent_Params>
-	<Beta_Agent_Params>
-		<Mesh_Radius>10</Mesh_Radius>
-		<Texture_Width>50</Texture_Width>
-		<Texture_Height>50</Texture_Height>
+		<Mesh_Width>100</Mesh_Width>
+		<Mesh_Height>100</Mesh_Height>
+		<Texture_Width>200</Texture_Width>
+		<Texture_Height>200</Texture_Height>
 		<Vertex_Density>1</Vertex_Density>
 		<Vertex_Bounce>0.1</Vertex_Bounce>
 		<Vertex_Friction>1</Vertex_Friction>
 		<Vertex_Radius>5</Vertex_Radius>
-		<Center_Joint_Frequency>2</Center_Joint_Frequency>
-		<Center_Joint_Damping>1</Center_Joint_Damping>
-		<Side_Joint_Frequency>2</Side_Joint_Frequency>
-		<Side_Joint_Damping>1</Side_Joint_Damping>
-		<Side_Joint_Length>1.5</Side_Joint_Length>
+		<Joint_Frequency>1</Joint_Frequency>
+		<Joint_Damping>4</Joint_Damping>
+	</Alpha_Agent_Params>
+	<Beta_Agent_Params>
+		<Mesh_Radius>50</Mesh_Radius>
+		<Texture_Width>200</Texture_Width>
+		<Texture_Height>200</Texture_Height>
+		<Vertex_Density>1</Vertex_Density>
+		<Vertex_Bounce>0.1</Vertex_Bounce>
+		<Vertex_Friction>1</Vertex_Friction>
+		<Vertex_Radius>5</Vertex_Radius>
+		<Center_Joint_Frequency>1</Center_Joint_Frequency>
+		<Center_Joint_Damping>5</Center_Joint_Damping>
+		<Side_Joint_Frequency>1</Side_Joint_Frequency>
+		<Side_Joint_Damping>5</Side_Joint_Damping>
+		<Side_Joint_Length>0</Side_Joint_Length>
 	</Beta_Agent_Params>
 	<InterAgentJoint_Params>
 		<Joint_Frequency>2</Joint_Frequency>
 		<Joint_Damping>1</Joint_Damping>
+		<Min_Joint_Length>400</Min_Joint_Length>
+		<Max_Joint_Length>500</Max_Joint_Length>
 	</InterAgentJoint_Params>
 </The_Nest_GUI>

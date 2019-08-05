@@ -55,7 +55,7 @@ void ofApp::update(){
   // Update agents
   for (auto &a : agents) {
     a -> update();
-    meshes.push_back(a->getMesh());
+    // meshes.push_back(a->getMesh());
   }
   
   // Create super agents based on collision bodies.
@@ -65,7 +65,7 @@ void ofApp::update(){
   if (bg.isAllocated()) {
     bg.update(meshes);
   }
-  
+
   // Update memories.
   ofRemove(memories, [&](Memory &m) {
     m.update();
@@ -95,15 +95,6 @@ void ofApp::drawSequence() {
     bg.draw(debug);
   }
 
-  // Draw box2d bounds.
-  ofPushStyle();
-    ofSetColor(ofColor::fromHex(0x341517));
-    ofFill();
-    ofDrawRectangle(0, 0, bounds.x, ofGetHeight());
-    ofDrawRectangle(0, ofGetHeight() - bounds.x, ofGetWidth(), bounds.x);
-    ofDrawRectangle(ofGetWidth()-bounds.x, 0, bounds.x, ofGetHeight());
-  ofPopStyle();
-
   // Draw all what's inside the super agents.
   for (auto sa: superAgents) {
     sa.draw();
@@ -111,7 +102,7 @@ void ofApp::drawSequence() {
 
   // Draw Agent is the virtual method for derived class.
   for (auto a: agents) {
-    a -> draw(debug, showTexture);
+    a->draw(debug, showTexture);
   }
 
   // Draw memories
@@ -278,12 +269,13 @@ void ofApp::setupGui() {
     betaAgentParams.add(bCenterJointDamping.set("Center Joint Damping", 1, 0, 5));
     betaAgentParams.add(bSideJointFrequency.set("Side Joint Frequency", 2, 0, 20));
     betaAgentParams.add(bSideJointDamping.set("Side Joint Damping", 1, 0, 5));
-    betaAgentParams.add(bSideJointLength.set("Side Joint Length", 1.5, 0, 5));
   
     // InterAgentJoint GUI parameters
     interAgentJointParams.setName("InterAgentJoint Params");
     interAgentJointParams.add(iJointFrequency.set("Joint Frequency", 2, 0, 20));
     interAgentJointParams.add(iJointDamping.set("Joint Damping", 1, 0, 10));
+    interAgentJointParams.add(iMinJointLength.set("Min Joint Length", 250, 50, 600));
+    interAgentJointParams.add(iMaxJointLength.set("Max Joint Length", 300, 50, 600));
 
     settings.add(bgParams);
     settings.add(alphaAgentParams);
@@ -310,7 +302,6 @@ void ofApp::updateAgentProps() {
   betaAgentProps.vertexRadius = bVertexRadius;
   betaAgentProps.centerJointPhysics = ofPoint(bCenterJointFrequency, bCenterJointDamping);
   betaAgentProps.sideJointPhysics = ofPoint(bSideJointFrequency, bSideJointDamping);
-  betaAgentProps.sideJointLength = bSideJointLength;
 }
 
 void ofApp::processOsc() {
@@ -379,14 +370,13 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 // ------------------------------ Interactive Routines --------------------------------------- //
 
 void ofApp::createAgents() {
-  ofPoint origin; Agent *agent;
+  ofPoint origin = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
+  Agent *agent;
   // Based on a probablity, create a new agent.
   if (ofRandom(1) < 0.5) {
-    origin = ofPoint(alphaAgentProps.meshSize.x + 10, ofGetHeight() - alphaAgentProps.meshSize.y - 20);
     alphaAgentProps.meshOrigin = origin;
     agent = new Alpha(box2d, alphaAgentProps);
   } else {
-    origin = ofPoint(betaAgentProps.textureSize.x + 10, ofGetHeight() - betaAgentProps.textureSize.y - 20);
     betaAgentProps.meshOrigin = origin;
     agent = new Beta(box2d, betaAgentProps);
   }
@@ -656,7 +646,7 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
     j->setup(box2d.getWorld(), bodyA, bodyB, f, d); // Use the interAgentJoint props.
   
     // Joint length
-    int jointLength = ofRandom(250, 300);
+    int jointLength = ofRandom(iMinJointLength, iMaxJointLength);
     j->setLength(jointLength);
   
     // Enable interAgentJoint

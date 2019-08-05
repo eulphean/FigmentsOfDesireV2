@@ -46,8 +46,8 @@ void Beta::createMesh(BetaAgentProperties agentProps) {
   mesh.addTexCoord(glm::vec2(0.5, 0.5)); // Texture coordinates need to be between 0 and 1 (ofDisableArbTex)
   
   // Calculate # of meshPoints and set the variable to that.
-  float meshCircumference = 2 * PI * meshRadius; // circumference
-  numMeshPoints = meshCircumference / (meshRadius * 2); // Total number of points on the boundary
+  float meshCircumference = 2 * PI * meshRadius; // circumference of the agent.
+  numMeshPoints = meshCircumference / (agentProps.vertexRadius * 2); // Total number of points on the boundary
   // TOOD: This meshPoints can be subtracted by 1 for sure here ----> Right now, it's just packed with circles
 
   // Add vertices around the center to form a circle.
@@ -79,14 +79,14 @@ void Beta::createSoftBody(ofxBox2d &box2d, BetaAgentProperties agentProps) {
     vertex -> setPhysics(agentProps.vertexPhysics.x, agentProps.vertexPhysics.y, agentProps.vertexPhysics.y); // bounce, density, friction
     
     if (i == 0) { // This is the 0th vertex.
-      vertex -> setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius + 2);
+      vertex->setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius + 2);
     } else {
-      vertex -> setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius);
+      vertex->setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius);
     }
     
     // Other properties. 
-    vertex -> setFixedRotation(true);
-    vertex -> setData(new VertexData(this)); // Data is passed with current Agent's pointer
+    vertex->setFixedRotation(true);
+    vertex->setData(new VertexData(this)); // Data is passed with current Agent's pointer
 
     vertices.push_back(vertex);
   }
@@ -101,13 +101,7 @@ void Beta::createSoftBody(ofxBox2d &box2d, BetaAgentProperties agentProps) {
     joints.push_back(joint);
   }
   
-  float meshCircumference = 2 * PI * agentProps.meshRadius;
-  
   // Connect joints with each other.
-  // We go 1 less than the mesh points because last point in the mesh is the
-  // same as the second point (after center).
-  float totalJointLength = meshCircumference / agentProps.sideJointLength;
-  float length = totalJointLength / numMeshPoints;
   for(auto i=1; i < vertices.size(); i++) {
     auto joint = std::make_shared<ofxBox2dJoint>();
 
@@ -118,8 +112,7 @@ void Beta::createSoftBody(ofxBox2d &box2d, BetaAgentProperties agentProps) {
     }
 
     // Note: Outer Joint should have a seperate prop passed in for Azra's joints.
-    joint -> setup(box2d.getWorld(), vertices[fromIdx] -> body, vertices[toIdx] -> body, agentProps.sideJointPhysics.x, agentProps.sideJointPhysics.y);
-    joints.push_back(joint);
+    joint->setup(box2d.getWorld(), vertices[fromIdx] -> body, vertices[toIdx] -> body, agentProps.sideJointPhysics.x, agentProps.sideJointPhysics.y);
   }
 }
 
