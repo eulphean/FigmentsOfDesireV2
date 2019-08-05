@@ -17,6 +17,8 @@ class BgMesh {
     void setup();
     void update(std::vector<ofMesh> meshes);
     void draw();
+    bool isAllocated();
+    void destroy();
   
   private:
     void createMesh();
@@ -29,6 +31,6 @@ class BgMesh {
     ofMesh mesh;
     ofMesh meshCopy;
     ofParameterGroup bgParams;
-
+    
     ofxPostProcessing post; 
 };

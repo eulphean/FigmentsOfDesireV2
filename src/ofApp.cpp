@@ -28,24 +28,10 @@ void ofApp::setup(){
   debug = false;
   showTexture = true;
   drawFbo = false;
-  
-  // Bounds
-  bounds.x = -20; bounds.y = -20;
-  bounds.width = ofGetWidth() + (-1) * bounds.x * 2; bounds.height = ofGetHeight() + (-1) * 2 * bounds.y;
-  box2d.createBounds(bounds);
+  shouldBond = false;
   
   // Instantiate Midi.
   Midi::instance().setup();
-  
-  
-  // Store params and create background. 
-  bg.setParams(bgParams);
-  bg.setup();
-  
-  shouldBond = false;
-  
-  // Allocate the fbo for screen grabbing.
-  screenGrabFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 }
 
 void ofApp::update(){
@@ -73,7 +59,9 @@ void ofApp::update(){
   createSuperAgents();
   
   // Update background
-  bg.update(meshes);
+  if (bg.isAllocated()) {
+    bg.update(meshes);
+  }
   
   // Update memories.
   ofRemove(memories, [&](Memory &m) {
@@ -100,7 +88,7 @@ void ofApp::draw(){
 
 void ofApp::drawSequence() {
   // Draw background.
-  if (!debug) {
+  if (!debug && bg.isAllocated()) {
    bg.draw();
   }
 
@@ -197,6 +185,10 @@ void ofApp::keyPressed(int key){
     drawFbo = !drawFbo;
   }
   
+  if (key == 'w') {
+    createWorld();
+  }
+  
   // Save a screen grab of the high quality fbo that is getting drawn currently. 
   if (key == ' ') {
     ofPixels pix;
@@ -213,6 +205,27 @@ void ofApp::exit() {
 }
 
 // ------------------------------ Critical Helper Routines --------------------------------------- //
+
+void ofApp::createWorld() {
+  if (bg.isAllocated()) {
+    cout << "Destroying the background." << endl;
+    bg.destroy();
+  }
+  
+  cout << "Allocating new bounds. Creating new background." << endl; 
+  
+  // Bounds
+  bounds.x = -20; bounds.y = -20;
+  bounds.width = ofGetWidth() + (-1) * bounds.x * 2; bounds.height = ofGetHeight() + (-1) * 2 * bounds.y;
+  box2d.createBounds(bounds);
+  
+  // Store params and create background.
+  bg.setParams(bgParams);
+  bg.setup();
+  
+  // Allocate the fbo for screen grabbing.
+  screenGrabFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+}
 
 void ofApp::setupGui() {
     gui.setup();
@@ -250,8 +263,6 @@ void ofApp::setupGui() {
     bgParams.add(attraction.set("Attraction", 20, -200, 200));
     bgParams.add(repulsion.set("Repulsion", -20, -200, 200));
     bgParams.add(shaderScale.set("Scale", 1.f, 0.f, 10.f));
-    rectWidth.addListener(this, &ofApp::widthChanged);
-    rectHeight.addListener(this, &ofApp::heightChanged);
     attraction.addListener(this, &ofApp::updateForce);
     repulsion.addListener(this, &ofApp::updateForce);
     shaderScale.addListener(this, &ofApp::updateParams);
@@ -435,18 +446,6 @@ void ofApp::clearScreen() {
 }
 
 // ------------------------------ Background Update Routine --------------------------------------- //
-
-void ofApp::widthChanged (int & newWidth) {
-  // New background
-  bg.setParams(bgParams);
-  bg.setup();
-}
-
-void ofApp::heightChanged (int & newHeight) {
-  // New background
-  bg.setParams(bgParams);
-  bg.setup();
-}
 
 void ofApp::updateParams(float & newVal) {
   bg.setParams(bgParams);

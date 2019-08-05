@@ -4,8 +4,13 @@ void BgMesh::setParams(ofParameterGroup params) {
     bgParams = params;
 }
 
+bool BgMesh::isAllocated() {
+  return mainFbo.isAllocated();
+}
+
 // Setup background
 void BgMesh::setup() {
+  cout << "Setup is called." << endl; 
   auto rectWidth = bgParams.getInt("Width");
   auto rectHeight = bgParams.getInt("Height");
   
@@ -61,6 +66,17 @@ void BgMesh::update(std::vector<ofMesh> agentMeshes) {
   }
 }
 
+void BgMesh::draw() {
+  mainFbo.getTexture().bind();
+  mesh.draw();
+  mainFbo.getTexture().unbind();
+}
+
+void BgMesh::destroy() {
+  bgFbo.clear();
+  mainFbo.clear();
+}
+
 glm::vec2 BgMesh::interact(glm::vec2 meshVertex, glm::vec2 centroid, int vIdx) {
   // Get distanceVector of this vertex from the position.
   glm::vec2 distance = centroid - meshVertex;
@@ -77,12 +93,6 @@ glm::vec2 BgMesh::interact(glm::vec2 meshVertex, glm::vec2 centroid, int vIdx) {
   int displacement = ofMap(distanceToCentroid, 0, 800, attraction, -repulsion, true);
   
   return displacement * normal;
-}
-
-void BgMesh::draw() {
-  mainFbo.getTexture().bind();
-  mesh.draw();
-  mainFbo.getTexture().unbind();
 }
 
 void BgMesh::createMesh() {

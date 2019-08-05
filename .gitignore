@@ -10,6 +10,7 @@
 ###########################
 
 /bin/*
+/bin/FigmentsOfDesireV2.app/Contents/MacOS/FigmentsOfDesireV2
 !/bin/data/
 
 #########

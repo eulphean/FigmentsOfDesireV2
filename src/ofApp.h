@@ -20,6 +20,8 @@ class ofApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
+    void keyPressed(int key);
+    void exit();
   
     void setupGui();
     void createAgents();
@@ -35,10 +37,6 @@ class ofApp : public ofBaseApp{
     // Contact listening callbacks.
     void contactStart(ofxBox2dContactArgs &e);
     void contactEnd(ofxBox2dContactArgs &e);
-  
-    // Interactive elements
-		void keyPressed(int key);
-    void exit();
   
     // Flags to turn/turn off certain features
     bool hideGui;
@@ -89,8 +87,6 @@ class ofApp : public ofBaseApp{
     ofParameter<int> rectWidth;
     ofParameter<int> rectHeight;
     // Callbacks to create new background. 
-    void widthChanged(int & newWidth);
-    void heightChanged(int & newHeight);
     void updateForce(int & newVal);
     void updateParams(float & newVal);
     ofParameter<int> attraction;
@@ -112,6 +108,7 @@ class ofApp : public ofBaseApp{
     void removeUnbonded();
     void drawSequence();
     glm::vec2 getBodyPosition(b2Body* body);
+    void createWorld(); 
   
     // Super Agents (Inter Agent Bonding Logic)
     void createSuperAgents();
