@@ -32,6 +32,9 @@ void ofApp::setup(){
   
   // Instantiate Midi.
   Midi::instance().setup();
+  
+  // [NOTE] Press w to create a new world after setting the bounds of the program
+  // in the extended monitor. 
 }
 
 void ofApp::update(){
@@ -212,7 +215,7 @@ void ofApp::createWorld() {
     bg.destroy();
   }
   
-  cout << "Allocating new bounds. Creating new background." << endl; 
+  cout << "Allocating new bounds. Creating new background." << endl;
   
   // Bounds
   bounds.x = -20; bounds.y = -20;

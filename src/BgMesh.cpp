@@ -10,7 +10,6 @@ bool BgMesh::isAllocated() {
 
 // Setup background
 void BgMesh::setup() {
-  cout << "Setup is called." << endl; 
   auto rectWidth = bgParams.getInt("Width");
   auto rectHeight = bgParams.getInt("Height");
   
