@@ -20,25 +20,26 @@ void Message::draw(ofTrueTypeFont font) {
   ofPopMatrix();
 }
 
-
 // ------------------------------ Agent --------------------------------------- //
 
-void Agent::setup(ofxBox2d &box2d, AgentProperties agentProps) {
-  // Initialize the iterator.
-  createTexture(agentProps.meshSize);
+void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
+  // Setup post-process filter for the texture.
+  
+  // DEAD filter
+  filter = new GaussianBlurFilter(textureSize.x, textureSize.y, 7.f, 1.f);
+  
+  // ACTIVE filter
+  filterChain = new FilterChain(textureSize.x, textureSize.y, "Chain");
+  filterChain->addFilter(new PerlinPixellationFilter(textureSize.x, textureSize.y, 15.f));
+  
+  // Num messages to inscribe on the texture.
+  this->numMessages = 100; 
+  
+  // This is common for both the agents. 
+  createTexture(textureSize);
   curMsg = messages.begin(); // Need the message to draw
   
-  // Assign corner and boundary indices for applying forces on vertices. 
-  assignIndices(agentProps);
-  
-  // Calculate a desireRadius based on the size of the mesh
-  auto area = agentProps.meshSize.x * agentProps.meshSize.y;
-  desireRadius = sqrt(area/PI);
-  
-  // Target position
-  seekTargetPos = glm::vec2(ofRandom(150, ofGetWidth() - 200), ofRandom(50 , 250));
-  
-  // These are actions. But, what are the desires?
+  // Behaviors. 
   applyStretch = true;
   applyTickle = false;
   applyAttraction = false;
@@ -99,49 +100,50 @@ void Agent::draw(bool debug, bool showTexture) {
         ofTranslate(centroid);
         ofNoFill();
         ofSetColor(ofColor::white);
-        ofDrawCircle(0, 0, desireRadius);
+          // BROKEN
+//        ofDrawCircle(0, 0, desireRadius);
       ofPopMatrix();
     ofPopStyle();
   }
 }
 
-void Agent::assignIndices(AgentProperties agentProps) {
-  // Store the corner indices in this array to access it when applying forces.
-  auto rows = agentProps.meshDimensions.x; auto cols = agentProps.meshDimensions.y;
-
-  // Corners
-  cornerIndices[0] = 0; cornerIndices[1] = (cols-1) + 0 * (cols-1);
-  cornerIndices[2] = 0 + (rows-1) * (cols-1); cornerIndices[3] = (cols-1) + (rows-1) * (cols-1);
-  
-  // Boundaries.
-  
-  // TOP
-  int x; int y = 0;
-  for (x = 0; x < cols-1; x++) {
-    int idx = x + y * (cols-1);
-    boundaryIndices.push_back(idx);
-  }
-  
-  // BOTTOM
-  y = rows-1;
-  for (x = 0; x < cols-1; x++) {
-    int idx = x + y * (cols-1);
-    boundaryIndices.push_back(idx);
-  }
-  
-  // LEFT
-  x = 0;
-  for (y = 0; y < rows-1; y++) {
-    int idx = x + y * (cols-1);
-    boundaryIndices.push_back(idx);
-  }
-  
-  // RIGHT
-  x = cols-1;
-  for (y = 0; y < rows-1; y++) {
-    int idx = x + y * (cols-1);
-    boundaryIndices.push_back(idx);
-  }
+void Agent::assignIndices(ofPoint textureSize) {
+//  // Store the corner indices in this array to access it when applying forces.
+//  auto rows = agentProps.meshDimensions.x; auto cols = agentProps.meshDimensions.y;
+//
+//  // Corners
+//  cornerIndices[0] = 0; cornerIndices[1] = (cols-1) + 0 * (cols-1);
+//  cornerIndices[2] = 0 + (rows-1) * (cols-1); cornerIndices[3] = (cols-1) + (rows-1) * (cols-1);
+//
+//  // Boundaries.
+//
+//  // TOP
+//  int x; int y = 0;
+//  for (x = 0; x < cols-1; x++) {
+//    int idx = x + y * (cols-1);
+//    boundaryIndices.push_back(idx);
+//  }
+//
+//  // BOTTOM
+//  y = rows-1;
+//  for (x = 0; x < cols-1; x++) {
+//    int idx = x + y * (cols-1);
+//    boundaryIndices.push_back(idx);
+//  }
+//
+//  // LEFT
+//  x = 0;
+//  for (y = 0; y < rows-1; y++) {
+//    int idx = x + y * (cols-1);
+//    boundaryIndices.push_back(idx);
+//  }
+//
+//  // RIGHT
+//  x = cols-1;
+//  for (y = 0; y < rows-1; y++) {
+//    int idx = x + y * (cols-1);
+//    boundaryIndices.push_back(idx);
+//  }
 }
 
 ofPoint Agent::getTextureSize() {
@@ -165,11 +167,11 @@ void Agent::clean(ofxBox2d &box2d) {
   vertices.clear();
 }
 
-void Agent::createTexture(ofPoint meshSize) {
+void Agent::createTexture(ofPoint textureSize) {
   // Create spots on the agent's body
   for (int i = 0; i < numMessages; i++) {
     // Pick a random location on the mesh.
-    int w = meshSize.x; int h = meshSize.y;
+    int w = textureSize.x; int h = textureSize.y;
     auto x = ofRandom(0, w); auto y = ofRandom(0, h);
     
     // Pick a random color for the message (anything except the background)
@@ -185,7 +187,7 @@ void Agent::createTexture(ofPoint meshSize) {
   }
   
   // Create 1st fbo and draw all the messages. 
-  firstFbo.allocate(meshSize.x*2, meshSize.y*2, GL_RGBA);
+  firstFbo.allocate(textureSize.x*2, textureSize.y*2, GL_RGBA);
   firstFbo.begin();
     ofClear(0, 0, 0, 0);
   
@@ -202,11 +204,11 @@ void Agent::createTexture(ofPoint meshSize) {
   firstFbo.end();
   
   // Create 2nd fbo and draw with filter and postProcessing
-  secondFbo.allocate(meshSize.x, meshSize.y, GL_RGBA);
+  secondFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
   secondFbo.begin();
     ofClear(0, 0, 0, 0);
     filterChain->begin();
-      firstFbo.getTexture().drawSubsection(0, 0, meshSize.x, meshSize.y, 0, 0);
+      firstFbo.getTexture().drawSubsection(0, 0, textureSize.x, textureSize.y, 0, 0);
     filterChain->end();
   secondFbo.end();
 }
@@ -376,4 +378,9 @@ void Agent::setDesireState(DesireState newState) {
     applyRepulsion = true;
   }
 }
+
+
+  // Move it to individual figments.
+  // [BROKEN] Assign corner and boundary indices for applying forces on vertices.
+  // assignIndices(textureSize);
 

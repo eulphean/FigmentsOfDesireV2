@@ -4,14 +4,32 @@
 #include "ofMain.h"
 #include "Agent.h"
 
+struct AlphaAgentProperties {
+  ofPoint meshSize; // w, h of the mesh.
+  ofPoint textureSize; // w, h of the texture that gets mapped. 
+  ofPoint meshRowsColumns; // row, columns of the mesh.
+  ofPoint vertexPhysics;
+  float vertexRadius;
+  ofPoint jointPhysics;
+  ofPoint meshOrigin;
+}; 
+
 class Alpha : public Agent {
   public:
-    Alpha(ofxBox2d &box2d, AgentProperties agentProps);
+    Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps);
   
     // Overriding methods. 
     void updateMesh();
-    void createMesh(AgentProperties softBodyProperties);
-    void createSoftBody(ofxBox2d &box2d, AgentProperties softBodyProperties);
+    void createMesh(AlphaAgentProperties softBodyProperties);
+    void createSoftBody(ofxBox2d &box2d, AlphaAgentProperties softBodyProperties);
   
     void update();
+};
+
+struct AgentProperties {
+  ofPoint vertexPhysics;
+  ofPoint jointPhysics;
+  ofPoint textureDimensions; // Use it when we have a texture.
+  ofPoint meshOrigin; // Derived class populates this.
+  float vertexRadius;
 };

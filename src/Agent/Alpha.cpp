@@ -1,8 +1,6 @@
 #include "Alpha.h"
 
-Alpha::Alpha(ofxBox2d &box2d, AgentProperties agentProps) {
-  agentProps.vertexRadius = 7; // Make this come from the GUI. 
-  
+Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {  
   // Assign a color palette
   palette = { ofColor::fromHex(0x540D6E),
               ofColor::fromHex(0x982A41),
@@ -12,8 +10,6 @@ Alpha::Alpha(ofxBox2d &box2d, AgentProperties agentProps) {
               ofColor::fromHex(0xFF4A4A),
               ofColor::fromHex(0x0BF6CD)
   };
-  
-  this->numMessages = 100;
   
   // Force weight for body actions. This is heavier, so more weight.
   maxStretchWeight = 1.5;
@@ -26,44 +22,37 @@ Alpha::Alpha(ofxBox2d &box2d, AgentProperties agentProps) {
   tickleWeight = 2.5;
   maxVelocity = 15;
   
-  // Post process filters.
-  // DEAD filter
-  filter = new GaussianBlurFilter(agentProps.meshSize.x, agentProps.meshSize.y, 7.f, 1.f);
-  
-  // ACTIVE filter
-  filterChain = new FilterChain(agentProps.meshSize.x, agentProps.meshSize.y, "Chain");
-  filterChain->addFilter(new PerlinPixellationFilter(agentProps.meshSize.x, agentProps.meshSize.y, 15.f));
-  
-  // Create mesh and soft body here. 
+  // Create Mesh
   createMesh(agentProps);
   createSoftBody(box2d, agentProps);
   
-  setup(box2d, agentProps);
+  // Let the parent class setup the rest of the Agent (especially Texture)
+  setup(box2d, agentProps.textureSize);
 }
 
-void Alpha::createMesh(AgentProperties agentProps) {
+void Alpha::createMesh(AlphaAgentProperties agentProps) {
   mesh.clear();
   mesh.setMode(OF_PRIMITIVE_TRIANGLES);
   
   // Create a mesh for the grabber.
-  int nRows = agentProps.meshDimensions.x;
-  int nCols = agentProps.meshDimensions.y;
+  int nRows = agentProps.meshRowsColumns.x;
+  int nCols = agentProps.meshRowsColumns.y;
   
-  // Width, height for mapping the correct texture coordinate.
-  int w = agentProps.meshSize.x;
-  int h = agentProps.meshSize.y;
+  // Width, height for the mesh.
+  ofPoint meshSize = agentProps.meshSize; // Width, Height (mesh)
+  ofPoint textureSize = agentProps.textureSize; // Width, Height (texture)
   
   // Create the mesh.
   for (int y = 0; y < nRows; y++) {
     for (int x = 0; x < nCols; x++) {
-      float ix = agentProps.meshOrigin.x + w * x / (nCols - 1);
-      float iy = agentProps.meshOrigin.y + h * y / (nRows - 1);
+      float ix = agentProps.meshOrigin.x + meshSize.x * x / (nCols - 1);
+      float iy = agentProps.meshOrigin.y + meshSize.y * y / (nRows - 1);
      
       mesh.addVertex({ix, iy, 0});
       
       // Height and Width of the texture is same as the width/height sent in via agentProps
-      float texX = ofMap(ix - agentProps.meshOrigin.x, 0, w, 0, 1, true); // Map the calculated x coordinate from 0 - 1
-      float texY = ofMap(iy - agentProps.meshOrigin.y, 0, h, 0, 1, true); // Map the calculated y coordinate from 0 - 1
+      float texX = ofMap(ix - agentProps.meshOrigin.x, 0, textureSize.x, 0, 1, true); // Map the calculated x coordinate from 0 - 1
+      float texY = ofMap(iy - agentProps.meshOrigin.y, 0, textureSize.y, 0, 1, true); // Map the calculated y coordinate from 0 - 1
       mesh.addTexCoord({texX, texY});
     }
   }
@@ -93,7 +82,7 @@ void Alpha::createMesh(AgentProperties agentProps) {
   }
 }
 
-void Alpha::createSoftBody(ofxBox2d &box2d, AgentProperties agentProps) {
+void Alpha::createSoftBody(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
   auto meshVertices = mesh.getVertices();
   vertices.clear();
   joints.clear();
@@ -102,14 +91,14 @@ void Alpha::createSoftBody(ofxBox2d &box2d, AgentProperties agentProps) {
   for (int i = 0; i < meshVertices.size(); i++) {
     auto vertex = std::make_shared<ofxBox2dCircle>();
     vertex -> setPhysics(agentProps.vertexPhysics.x, agentProps.vertexPhysics.y, agentProps.vertexPhysics.z); // bounce, density, friction
-    vertex -> setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius); // ofRandom(3, agentProps.vertexRadius)
+    vertex -> setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius);
     vertex -> setFixedRotation(true);
     vertex -> setData(new VertexData(this)); // Data is passed with current Agent's pointer
     vertices.push_back(vertex);
   }
   
-  int meshRows = agentProps.meshDimensions.x;
-  int meshColumns = agentProps.meshDimensions.y;
+  int meshRows = agentProps.meshRowsColumns.x;
+  int meshColumns = agentProps.meshRowsColumns.y;
   
   // Create Box2d joints for the mesh.
   for (int y = 0; y < meshRows; y++) {

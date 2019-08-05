@@ -16,7 +16,7 @@ class BgMesh {
     // Core methods. 
     void setup();
     void update(std::vector<ofMesh> meshes);
-    void draw();
+    void draw(bool debug);
     bool isAllocated();
     void destroy();
   

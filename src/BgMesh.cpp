@@ -10,9 +10,6 @@ bool BgMesh::isAllocated() {
 
 // Setup background
 void BgMesh::setup() {
-  auto rectWidth = bgParams.getInt("Width");
-  auto rectHeight = bgParams.getInt("Height");
-  
   // Load the background shader.
   shader.load("bg.vert", "bg.frag");
   
@@ -65,10 +62,14 @@ void BgMesh::update(std::vector<ofMesh> agentMeshes) {
   }
 }
 
-void BgMesh::draw() {
-  mainFbo.getTexture().bind();
-  mesh.draw();
-  mainFbo.getTexture().unbind();
+void BgMesh::draw(bool debug) {
+  if (debug) {
+    mesh.draw();
+  } else {
+    mainFbo.getTexture().bind();
+    mesh.draw();
+    mainFbo.getTexture().unbind();
+  }
 }
 
 void BgMesh::destroy() {

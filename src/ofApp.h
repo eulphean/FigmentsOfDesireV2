@@ -51,51 +51,61 @@ class ofApp : public ofBaseApp{
   
     // Agents
     std::vector<Agent *> agents;
-    AgentProperties agentProps;
+    // GUI parameters for Alpha/Beta agents. 
+    AlphaAgentProperties alphaAgentProps;
+    BetaAgentProperties betaAgentProps;
   
     // GUI
     ofxPanel gui;
-    ofParameterGroup settings; 
-  
-    // Mesh group
-    ofParameterGroup meshParams;
-    ofParameter<int> meshColumns;
-    ofParameter<int> meshRows;
-    ofParameter<int> meshWidth;
-    ofParameter<int> meshHeight;
-  
-    // Vertex group
-    ofParameterGroup vertexParams;
-    ofParameter<float> vertexRadius;
-    ofParameter<float> vertexDensity;
-    ofParameter<float> vertexBounce;
-    ofParameter<float> vertexFriction;
-  
-    // Agent joint (joints inside the agent)
-    ofParameterGroup jointParams;
-    ofParameter<float> jointFrequency;
-    ofParameter<float> jointDamping;
-  
-    // InterAgentJoint
-    ofParameterGroup interAgentJointParams;
-    ofParameter<float> frequency;
-    ofParameter<float> damping;
-    ofParameter<int> maxJointForce;
-  
-    // Background group.
-    ofParameterGroup bgParams;
-    ofParameter<int> rectWidth;
-    ofParameter<int> rectHeight;
-    // Callbacks to create new background. 
-    void updateForce(int & newVal);
-    void updateParams(float & newVal);
-    ofParameter<int> attraction;
-    ofParameter<int> repulsion;
-    ofParameter<float> shaderScale;
+    ofParameterGroup settings;
   
     // Screengrab fbo
     ofFbo screenGrabFbo;
     int screenCaptureIdx = 0;
+  
+    // Alpha Agent Group params. 
+    ofParameterGroup alphaAgentParams;
+    ofParameter<int> aMeshColumns;
+    ofParameter<int> aMeshRows;
+    ofParameter<int> aMeshWidth;
+    ofParameter<int> aMeshHeight;
+    ofParameter<int> aTextureWidth;
+    ofParameter<int> aTextureHeight;
+    ofParameter<float> aVertexDensity;
+    ofParameter<float> aVertexBounce;
+    ofParameter<float> aVertexFriction;
+    ofParameter<float> aVertexRadius;
+    ofParameter<float> aJointFrequency;
+    ofParameter<float> aJointDamping;
+  
+    // Beta Agent GUI params.
+    ofParameterGroup betaAgentParams;
+    ofParameter<int> bTextureWidth;
+    ofParameter<int> bTextureHeight;
+    ofParameter<float> bMeshRadius;
+    ofParameter<float> bVertexDensity;
+    ofParameter<float> bVertexBounce;
+    ofParameter<float> bVertexFriction;
+    ofParameter<float> bVertexRadius;
+    ofParameter<float> bCenterJointFrequency;
+    ofParameter<float> bCenterJointDamping;
+    ofParameter<float> bSideJointFrequency;
+    ofParameter<float> bSideJointDamping;
+    ofParameter<float> bSideJointLength; 
+  
+    // InterAgentJoint GUI params.
+    ofParameterGroup interAgentJointParams;
+    ofParameter<float> iJointFrequency;
+    ofParameter<float> iJointDamping;
+  
+    // Background GUI params.
+    ofParameterGroup bgParams;
+    ofParameter<int> bgRectWidth;
+    ofParameter<int> bgRectHeight;
+    ofParameter<int> bgAttraction;
+    ofParameter<int> bgRepulsion;
+    void bgUpdateParams(int & newVal); // For attraction/repulsion
+    void bgUpdateSize(int & newVal); // For rectWidth/rectHeight
   
   private:
     std::vector<Memory> memories;
@@ -108,7 +118,7 @@ class ofApp : public ofBaseApp{
     void removeUnbonded();
     void drawSequence();
     glm::vec2 getBodyPosition(b2Body* body);
-    void createWorld(); 
+    void createWorld(bool createBonds); 
   
     // Super Agents (Inter Agent Bonding Logic)
     void createSuperAgents();

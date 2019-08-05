@@ -11,7 +11,7 @@
 class SuperAgent {
   public:
     void setup(Agent *agentA, Agent *agentB, std::shared_ptr<ofxBox2dJoint>);
-    void update(ofxBox2d &box2d, std::vector<Memory> &memories, bool shouldBond, int maxJointForce);
+    void update(ofxBox2d &box2d, std::vector<Memory> &memories, bool shouldBond);
     void draw();
     bool contains(Agent *agentA, Agent *agentB);
     void clean(ofxBox2d &box2d);

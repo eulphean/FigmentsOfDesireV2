@@ -43,7 +43,7 @@ void ofApp::update(){
   
   // Update super agents
   ofRemove(superAgents, [&](SuperAgent &sa){
-    sa.update(box2d, memories, shouldBond, maxJointForce);
+    sa.update(box2d, memories, shouldBond);
     return sa.shouldRemove;
   });
   
@@ -91,8 +91,8 @@ void ofApp::draw(){
 
 void ofApp::drawSequence() {
   // Draw background.
-  if (!debug && bg.isAllocated()) {
-   bg.draw();
+  if (bg.isAllocated()) {
+    bg.draw(debug);
   }
 
   // Draw box2d bounds.
@@ -189,7 +189,7 @@ void ofApp::keyPressed(int key){
   }
   
   if (key == 'w') {
-    createWorld();
+    createWorld(true);
   }
   
   // Save a screen grab of the high quality fbo that is getting drawn currently. 
@@ -209,84 +209,108 @@ void ofApp::exit() {
 
 // ------------------------------ Critical Helper Routines --------------------------------------- //
 
-void ofApp::createWorld() {
+void ofApp::createWorld(bool createBounds) {
   if (bg.isAllocated()) {
     cout << "Destroying the background." << endl;
     bg.destroy();
   }
   
-  cout << "Allocating new bounds. Creating new background." << endl;
+  if (createBounds) {
+    cout << "Creating new bounds." << endl;
+    // Bounds
+    bounds.x = -20; bounds.y = -20;
+    bounds.width = ofGetWidth() + (-1) * bounds.x * 2; bounds.height = ofGetHeight() + (-1) * 2 * bounds.y;
+    box2d.createBounds(bounds);
+    
+    // Allocate the fbo for screen grabbing.
+    if (screenGrabFbo.isAllocated()) {
+      screenGrabFbo.clear();
+      screenGrabFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+    }
+  }
   
-  // Bounds
-  bounds.x = -20; bounds.y = -20;
-  bounds.width = ofGetWidth() + (-1) * bounds.x * 2; bounds.height = ofGetHeight() + (-1) * 2 * bounds.y;
-  box2d.createBounds(bounds);
-  
-  // Store params and create background.
+  cout << "Create new background." << endl;
+  // Store params (must) and create background.
   bg.setParams(bgParams);
   bg.setup();
-  
-  // Allocate the fbo for screen grabbing.
-  screenGrabFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 }
 
 void ofApp::setupGui() {
     gui.setup();
-    settings.setName("Inter Mesh Settings");
+    settings.setName("The Nest GUI");
   
-    // Mesh parameters.
-    meshParams.setName("Mesh Params");
-    meshParams.add(meshRows.set("Mesh Rows", 5, 5, 100)); // Add the current value
-    meshParams.add(meshColumns.set("Mesh Columns", 5, 5, 100));
-    meshParams.add(meshWidth.set("Mesh Width", 100, 10, ofGetWidth()));
-    meshParams.add(meshHeight.set("Mesh Height", 100, 10, ofGetHeight()));
-  
-    // Vertex parameters
-    vertexParams.setName("Vertex Params");
-    vertexParams.add(vertexRadius.set("Vertex Radius", 6, 1, 30));
-    vertexParams.add(vertexDensity.set("Vertex Density", 1, 0, 5));
-    vertexParams.add(vertexBounce.set("Vertex Bounce", 0.3, 0, 1));
-    vertexParams.add(vertexFriction.set("Vertex Friction", 1, 0, 1));
-  
-    // Joint parameters
-    jointParams.setName("Joint Params");
-    jointParams.add(jointFrequency.set("Joint Frequency", 2.0f, 0.0f, 20.0f));
-    jointParams.add(jointDamping.set("Joint Damping", 1.0f, 0.0f, 5.0f));
-  
-    // InterAgentJoint parameters
-    interAgentJointParams.setName("InterAgentJoint Params");
-    interAgentJointParams.add(frequency.set("Joint Frequency", 2.0f, 0.0f, 20.0f));
-    interAgentJointParams.add(damping.set("Joint Damping", 1.0f, 0.0f, 10.0f));
-    interAgentJointParams.add(maxJointForce.set("Max Joint Force", 6.f, 1.f, 100.0f));
-  
-    // Background group
+    // Background GUI parameters.
     bgParams.setName("Background Params");
-    bgParams.add(rectWidth.set("Width", 20, 10, 50));
-    bgParams.add(rectHeight.set("Height", 20, 10, 50));
-    bgParams.add(attraction.set("Attraction", 20, -200, 200));
-    bgParams.add(repulsion.set("Repulsion", -20, -200, 200));
-    bgParams.add(shaderScale.set("Scale", 1.f, 0.f, 10.f));
-    attraction.addListener(this, &ofApp::updateForce);
-    repulsion.addListener(this, &ofApp::updateForce);
-    shaderScale.addListener(this, &ofApp::updateParams);
+    bgParams.add(bgRectWidth.set("Width", 20, 10, 50)); // Recreate World (w).
+    bgParams.add(bgRectHeight.set("Height", 20, 10, 50)); // Recreate World (w).
+    bgParams.add(bgAttraction.set("Attraction", 20, -200, 200));
+    bgParams.add(bgRepulsion.set("Repulsion", -20, -200, 200));
+    bgRectWidth.addListener(this, &ofApp::bgUpdateSize);
+    bgRectHeight.addListener(this, &ofApp::bgUpdateSize);
+    bgAttraction.addListener(this, &ofApp::bgUpdateParams);
+    bgRepulsion.addListener(this, &ofApp::bgUpdateParams);
   
-    settings.add(meshParams);
-    settings.add(vertexParams);
-    settings.add(jointParams);
-    settings.add(interAgentJointParams);
+    // Alpha Agent GUI parameters
+    alphaAgentParams.setName("Alpha Agent Params");
+    alphaAgentParams.add(aMeshRows.set("Mesh Rows", 5, 5, 100));
+    alphaAgentParams.add(aMeshColumns.set("Mesh Columns", 5, 5, 100));
+    alphaAgentParams.add(aMeshWidth.set("Mesh Width", 50, 10, 300));
+    alphaAgentParams.add(aMeshHeight.set("Mesh Height", 50, 10, 300));
+    alphaAgentParams.add(aTextureWidth.set("Texture Width", 50, 10, 500));
+    alphaAgentParams.add(aTextureHeight.set("Texture Height", 50, 10, 500));
+    alphaAgentParams.add(aVertexDensity.set("Vertex Density", 1, 0, 5));
+    alphaAgentParams.add(aVertexBounce.set("Vertex Bounce", 0.1, 0, 1));
+    alphaAgentParams.add(aVertexFriction.set("Vertex Friction", 1, 0, 1));
+    alphaAgentParams.add(aVertexRadius.set("Vertex Radius", 5, 1, 10));
+    alphaAgentParams.add(aJointFrequency.set("Joint Frequency", 2, 0, 20));
+    alphaAgentParams.add(aJointDamping.set("Joint Damping", 1, 0, 5));
+
+    // Beta Agent GUI parameters
+    betaAgentParams.setName("Beta Agent Params");
+    betaAgentParams.add(bMeshRadius.set("Mesh Radius", 10, 5, 100));
+    betaAgentParams.add(bTextureWidth.set("Texture Width", 50, 10, 300));
+    betaAgentParams.add(bTextureHeight.set("Texture Height", 50, 10, 300));
+    betaAgentParams.add(bVertexDensity.set("Vertex Density", 1, 0, 5));
+    betaAgentParams.add(bVertexBounce.set("Vertex Bounce", 0.1, 0, 1));
+    betaAgentParams.add(bVertexFriction.set("Vertex Friction", 1, 0, 1));
+    betaAgentParams.add(bVertexRadius.set("Vertex Radius", 5, 1, 10));
+    betaAgentParams.add(bCenterJointFrequency.set("Center Joint Frequency", 2, 0, 20));
+    betaAgentParams.add(bCenterJointDamping.set("Center Joint Damping", 1, 0, 5));
+    betaAgentParams.add(bSideJointFrequency.set("Side Joint Frequency", 2, 0, 20));
+    betaAgentParams.add(bSideJointDamping.set("Side Joint Damping", 1, 0, 5));
+    betaAgentParams.add(bSideJointLength.set("Side Joint Length", 1.5, 0, 5));
+  
+    // InterAgentJoint GUI parameters
+    interAgentJointParams.setName("InterAgentJoint Params");
+    interAgentJointParams.add(iJointFrequency.set("Joint Frequency", 2, 0, 20));
+    interAgentJointParams.add(iJointDamping.set("Joint Damping", 1, 0, 10));
+
     settings.add(bgParams);
+    settings.add(alphaAgentParams);
+    settings.add(betaAgentParams);
+    settings.add(interAgentJointParams);
   
     gui.setup(settings);
     gui.loadFromFile("InterMesh.xml");
 }
 
 void ofApp::updateAgentProps() {
-    // Create Soft Body payload to create objects.
-  agentProps.meshDimensions = ofPoint(meshRows, meshColumns);
-  agentProps.meshSize = ofPoint(meshWidth, meshHeight);
-  agentProps.vertexRadius = vertexRadius;
-  agentProps.vertexPhysics = ofPoint(vertexBounce, vertexDensity, vertexFriction); // x (bounce), y (density), z (friction)
-  agentProps.jointPhysics = ofPoint(jointFrequency, jointDamping); // x (frequency), y (damping)
+  // Alpha Agent GUI param payload.
+  alphaAgentProps.meshSize = ofPoint(aMeshWidth, aMeshHeight);
+  alphaAgentProps.meshRowsColumns = ofPoint(aMeshRows, aMeshColumns);
+  alphaAgentProps.textureSize = ofPoint(aTextureWidth, aTextureHeight);
+  alphaAgentProps.vertexPhysics = ofPoint(aVertexBounce, aVertexDensity, aVertexFriction);
+  alphaAgentProps.vertexRadius = aVertexRadius;
+  alphaAgentProps.jointPhysics = ofPoint(aJointFrequency, aJointDamping);
+  
+  // Beta Agent GUI param payload.
+  betaAgentProps.meshRadius = bMeshRadius;
+  betaAgentProps.textureSize = ofPoint(bTextureWidth, bTextureHeight);
+  betaAgentProps.vertexPhysics = ofPoint(bVertexBounce, bVertexDensity, bVertexFriction);
+  betaAgentProps.vertexRadius = bVertexRadius;
+  betaAgentProps.centerJointPhysics = ofPoint(bCenterJointFrequency, bCenterJointDamping);
+  betaAgentProps.sideJointPhysics = ofPoint(bSideJointFrequency, bSideJointDamping);
+  betaAgentProps.sideJointLength = bSideJointLength;
 }
 
 void ofApp::processOsc() {
@@ -355,15 +379,16 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 // ------------------------------ Interactive Routines --------------------------------------- //
 
 void ofApp::createAgents() {
-  // Set the agent position.
-  // TODO: Also give a random position to be sent towards in the world.
-  // Right now, it gets created and is just sitting.
-  agentProps.meshOrigin = ofPoint(agentProps.meshSize.x + 10, ofGetHeight() - agentProps.meshSize.y - 20);
-  Agent *agent;
+  ofPoint origin; Agent *agent;
+  // Based on a probablity, create a new agent.
   if (ofRandom(1) < 0.5) {
-    agent = new Alpha(box2d, agentProps);
+    origin = ofPoint(alphaAgentProps.meshSize.x + 10, ofGetHeight() - alphaAgentProps.meshSize.y - 20);
+    alphaAgentProps.meshOrigin = origin;
+    agent = new Alpha(box2d, alphaAgentProps);
   } else {
-    agent = new Beta(box2d, agentProps);
+    origin = ofPoint(betaAgentProps.textureSize.x + 10, ofGetHeight() - betaAgentProps.textureSize.y - 20);
+    betaAgentProps.meshOrigin = origin;
+    agent = new Beta(box2d, betaAgentProps);
   }
   
   agents.push_back(agent);
@@ -448,14 +473,15 @@ void ofApp::clearScreen() {
   box2d.enableEvents();
 }
 
-// ------------------------------ Background Update Routine --------------------------------------- //
+// ------------------------------ Background Parameter Update Routine ------------------------------- // 
 
-void ofApp::updateParams(float & newVal) {
+void ofApp::bgUpdateParams(int & newVal) {
   bg.setParams(bgParams);
 }
 
-void ofApp::updateForce(int & newVal) {
-  bg.setParams(bgParams);
+void ofApp::bgUpdateSize(int & newVal) {
+  // Only update the background and not the bounds.
+  createWorld(false);
 }
 
 // ------------------------------ Agent Body Contact Routines --------------------------------------- //
@@ -625,8 +651,8 @@ void ofApp::createSuperAgents() {
 
 std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Body *bodyB) {
     auto j = std::make_shared<ofxBox2dJoint>();
-    float f = ofRandom(0.3, frequency);
-    float d = ofRandom(1, damping);
+    float f = ofRandom(0.3, iJointFrequency);
+    float d = ofRandom(1, iJointDamping);
     j->setup(box2d.getWorld(), bodyA, bodyB, f, d); // Use the interAgentJoint props.
   
     // Joint length

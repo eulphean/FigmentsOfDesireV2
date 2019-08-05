@@ -4,16 +4,6 @@
 #include "ofxFilterLibrary.h"
 #include "ofxPostProcessing.h"
 
-struct AgentProperties {
-  ofPoint meshSize; // w, h of the mesh.
-  ofPoint meshDimensions; // row, columns of the mesh.
-  ofPoint vertexPhysics;
-  ofPoint jointPhysics;
-  ofPoint textureDimensions; // Use it when we have a texture.
-  ofPoint meshOrigin; // Derived class populates this. 
-  float vertexRadius;
-};
-
 enum DesireState {
   None,
   Attraction,
@@ -38,7 +28,7 @@ class Message {
 // Subsection body that is torn apart from the actual texture and falls on the ground. 
 class Agent {
   public:
-    void setup(ofxBox2d &box2d, AgentProperties softBodyProperties);
+    void setup(ofxBox2d &box2d, ofPoint textureSize);
     void draw(bool debug, bool showTexture);
     virtual void update();
   
@@ -102,20 +92,15 @@ class Agent {
   
     // Each derived class will override these methods as they define their own
     // meshes and soft bodies.
-    virtual void createMesh(AgentProperties softBodyProperties) {};
-    virtual void createSoftBody(ofxBox2d &box2d, AgentProperties softBodyProperties) {};
     virtual void updateMesh() {};
   
     // Mesh must be accessible in the derived class. 
     ofMesh mesh;
     
   private:
-    void assignIndices(AgentProperties agentProps);
+    void assignIndices(ofPoint textureSize);
   
     // ----------------- Data members -------------------
-  
-    // Seek
-    glm::vec2 seekTargetPos;
   
     // Tickle.
     bool applyTickle;
@@ -132,9 +117,6 @@ class Agent {
     // Texture
     ofFbo firstFbo;
     ofFbo secondFbo;
-  
-    // Messages for this agent.
-    std::vector<string> textMsgs;
   
     // Figment's corner indices
     int cornerIndices[4];

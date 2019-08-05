@@ -8,7 +8,7 @@ void SuperAgent::setup(Agent *agent1, Agent *agent2, std::shared_ptr<ofxBox2dJoi
   curExchangeCounter = 20; // Note: Currently diabling the exchange of the body texture. Set it 0 to enable it. 
 }
 
-void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool shouldBond, int maxJointForce) {
+void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool shouldBond) {
   // Max Force based on which the joint breaks.
   ofRemove(joints, [&](std::shared_ptr<ofxBox2dJoint> j) {
     if (!shouldBond) {
