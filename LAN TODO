@@ -55,3 +55,4 @@ THINGS BROKEN
 - AssignIndices 
 - Handling Any Sort of Behavior except Stretch/Flick not working
 - No autonomy of agents currently
+- Background doesn't move with the agents (this makes us frop way too many frames. It's difficult)
