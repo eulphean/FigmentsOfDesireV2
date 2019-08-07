@@ -54,7 +54,7 @@ void ofApp::update(){
   
   // Update agents
   for (auto &a : agents) {
-    a -> update();
+    a->update();
     // meshes.push_back(a->getMesh());
   }
   
@@ -118,7 +118,6 @@ void ofApp::drawSequence() {
 }
 
 void ofApp::keyPressed(int key){
-  
   // ------------------ Interactive Gestures --------------------- //
   
   // Attract
