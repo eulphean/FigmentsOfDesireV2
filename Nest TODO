@@ -55,4 +55,12 @@ THINGS BROKEN
 - AssignIndices 
 - Handling Any Sort of Behavior except Stretch/Flick not working
 - No autonomy of agents currently
-- Background doesn't move with the agents (this makes us frop way too many frames. It's difficult)
+- Background doesn't move with the agents (this makes us frop way too many frames. It's difficul
+
+Installation Notes
+Install the projector with the mirror and try to get it as rectangular as possible with keystoning. 
+Put some big object in the center of the projeted area. 
+Install the Kinect and put the app in Debug mode.
+Try to align the center of the Kinect with the center of the object. 
+That's when both Kinect and Projector will be aligned to scan properly. 
+Now, use the KinectParams in the app to set the max/min distance for detect object properly. 
