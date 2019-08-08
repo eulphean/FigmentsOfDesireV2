@@ -4,7 +4,7 @@
 void ofApp::setup(){
   // Setup OSC
   receiver.setup(PORT);
-  //ofHideCursor();
+  ofHideCursor();
   
   ofBackground(ofColor::fromHex(0x2E2F2D));
   ofSetCircleResolution(20);
@@ -24,14 +24,18 @@ void ofApp::setup(){
   // Setup gui.
   setupGui();
   
-  hideGui = false;
+  showGui = false;
   debug = false;
   showTexture = true;
   drawFbo = false;
   shouldBond = false;
+  hideKinectGui = false; 
   
   // Instantiate Midi.
   Midi::instance().setup();
+  
+  // Setup Kinect.
+  kinect.setup();
   
   // [NOTE] Press w to create a new world after setting the bounds of the program
   // in the extended monitor. 
@@ -39,7 +43,8 @@ void ofApp::setup(){
 
 void ofApp::update(){
   box2d.update();
-  processOsc();
+//  processOsc();
+  kinect.update();
   
   // Update super agents
   ofRemove(superAgents, [&](SuperAgent &sa){
@@ -109,12 +114,20 @@ void ofApp::drawSequence() {
   for (auto m : memories) {
     m.draw();
   }
-
+  
+  // Always show frame rate.
+  ofPushStyle();
+    ofSetColor(ofColor::black);
+    ofDrawBitmapString(ofGetFrameRate(), 200, 50);
+  ofPopStyle();
+  
   // Health parameters
-  if (hideGui) {
-     ofDrawBitmapString(ofGetFrameRate(), 300, 50);
+  if (showGui) {
     gui.draw();
   }
+  
+  // Draw Kinect content.
+  kinect.draw(debug, showGui);
 }
 
 void ofApp::keyPressed(int key){
@@ -167,7 +180,7 @@ void ofApp::keyPressed(int key){
   }
   
   if (key == 'h') {
-    hideGui = !hideGui;
+    showGui = !showGui;
   }
   
   if (key == 't') {
@@ -180,6 +193,10 @@ void ofApp::keyPressed(int key){
   
   if (key == 'w') {
     createWorld(true);
+  }
+  
+  if (key == 'k') {
+    hideKinectGui = !hideKinectGui;
   }
   
   // Save a screen grab of the high quality fbo that is getting drawn currently. 
@@ -195,6 +212,7 @@ void ofApp::keyPressed(int key){
 void ofApp::exit() {
   box2d.disableEvents();
   gui.saveToFile("InterMesh.xml");
+  kinect.gui.saveToFile("Kinect.xml");
 }
 
 // ------------------------------ Critical Helper Routines --------------------------------------- //
@@ -231,12 +249,8 @@ void ofApp::setupGui() {
   
     // Background GUI parameters.
     bgParams.setName("Background Params");
-    bgParams.add(bgRectWidth.set("Width", 20, 10, 50)); // Recreate World (w).
-    bgParams.add(bgRectHeight.set("Height", 20, 10, 50)); // Recreate World (w).
     bgParams.add(bgAttraction.set("Attraction", 20, -200, 200));
     bgParams.add(bgRepulsion.set("Repulsion", -20, -200, 200));
-    bgRectWidth.addListener(this, &ofApp::bgUpdateSize);
-    bgRectHeight.addListener(this, &ofApp::bgUpdateSize);
     bgAttraction.addListener(this, &ofApp::bgUpdateParams);
     bgRepulsion.addListener(this, &ofApp::bgUpdateParams);
   
@@ -372,7 +386,7 @@ void ofApp::createAgents() {
   ofPoint origin = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
   Agent *agent;
   // Based on a probablity, create a new agent.
-  if (ofRandom(1) < 0.5) {
+  if (ofRandom(1) < 0.8) {
     alphaAgentProps.meshOrigin = origin;
     agent = new Alpha(box2d, alphaAgentProps);
   } else {
@@ -466,11 +480,6 @@ void ofApp::clearScreen() {
 
 void ofApp::bgUpdateParams(int & newVal) {
   bg.setParams(bgParams);
-}
-
-void ofApp::bgUpdateSize(int & newVal) {
-  // Only update the background and not the bounds.
-  createWorld(false);
 }
 
 // ------------------------------ Agent Body Contact Routines --------------------------------------- //

@@ -51,11 +51,6 @@ void main(void)
 	topColor.y = 0.729 + 0.470*fbm(1.5*p + vec2(time*0.1, time*0.2));
 	topColor.z = 0.941 + 0.278*fbm(1.0*p + vec2(time*0.3, time*0.1));
 
-	// 0.062, 0.670, 0.796 (blueish)
-	// 0.77255, 0.78039, 0.78039 ()
-	// 0.7, 0.4, 0.2
-	// 0941, 0.470, 0.278
-
 	float f = fbm( 5.0*p+time*0.2 );
 	baseColor = mix(baseColor, topColor, f);
 

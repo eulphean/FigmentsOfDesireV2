@@ -21,22 +21,30 @@ void BgMesh::setup() {
   
   // Allocate main fbo in which background is drawn.
   mainFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
-
-  // Create mesh for this background
-  createMesh();
+  
+  mainFbo.begin();
+    ofClear(0, 0, 0, 0);
+      // Background shader that's the meat of the background.
+      shader.begin();
+        // Shader needs a fbo (a screen buffer to use the vertices and draw the pixels for)
+        shader.setUniform1f("time", (float) ofGetElapsedTimeMillis()/1000);
+        shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+        bgFbo.draw(0, 0);
+      shader.end();
+  mainFbo.end();
 }
 
 // Receive agent mesh
 void BgMesh::update(std::vector<ofMesh> agentMeshes) {
   // Update the main fbo.
-  mainFbo.begin();
-    ofClear(0, 0, 0, 0);
-      // Background shader that's the meat of the background. 
+   mainFbo.begin();
+//    ofClear(0, 0, 0, 0);
+      // Background shader that's the meat of the background.
       shader.begin();
         // Shader needs a fbo (a screen buffer to use the vertices and draw the pixels for)
         shader.setUniform1f("time", (float) ofGetElapsedTimeMillis()/1000);
-        shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
-        bgFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+//        shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+        bgFbo.draw(0, 0);
       shader.end();
   mainFbo.end();
   
@@ -65,13 +73,16 @@ void BgMesh::update(std::vector<ofMesh> agentMeshes) {
 }
 
 void BgMesh::draw(bool debug) {
-  if (debug) {
-    mesh.draw();
-  } else {
-    mainFbo.getTexture().bind();
-    mesh.draw();
-    mainFbo.getTexture().unbind();
-  }
+//  if (debug) {
+//    mesh.draw();
+//  } else {
+    if (!debug) {
+//      mainFbo.getTexture().bind();
+//      mesh.draw();
+//      mainFbo.getTexture().unbind();
+        mainFbo.draw(0, 0);
+    }
+//  }
 }
 
 void BgMesh::destroy() {

@@ -1,15 +1,9 @@
 #pragma once
 #include "ofMain.h"
-#include "ofxPostProcessing.h"
 
 class BgMesh {
   public:
-    BgMesh() {
-      post.init(ofGetWidth(), ofGetHeight());
-      post.createPass<FxaaPass>()->setEnabled(true);
-      //post.createPass<DofAltPass>()->setEnabled(true);
-      post.createPass<DofPass>()->setEnabled(true);
-    }
+    BgMesh() {}
   
     void setParams(ofParameterGroup params);
   
@@ -31,6 +25,4 @@ class BgMesh {
     ofMesh mesh;
     ofMesh meshCopy;
     ofParameterGroup bgParams;
-    
-    ofxPostProcessing post; 
 };

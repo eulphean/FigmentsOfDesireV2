@@ -3,32 +3,36 @@
 #include "ofMain.h"
 #include "ofxBox2d.h"
 #include "ofxGui.h"
+#include "ofxOsc.h"
+
 #include "Agent.h"
 #include "Alpha.h"
 #include "Beta.h"
-#include "SuperAgent.h"
-#include "ofxOsc.h"
-#include "Midi.h"
 #include "BgMesh.h"
+#include "Kinect.h"
 #include "Memory.h"
+#include "Midi.h"
+#include "SuperAgent.h"
 
 #define PORT 8000
 
 class ofApp : public ofBaseApp{
 
 	public:
+    // OF methods.
 		void setup();
 		void update();
 		void draw();
     void keyPressed(int key);
     void exit();
   
+    // Public helpers.
     void setupGui();
     void createAgents();
     void clearAgents();
     void updateAgentProps();
   
-    // Behavior activating functions.
+    // Behavior methods.
     void attract();
     void repel();
     void stretch();
@@ -39,11 +43,12 @@ class ofApp : public ofBaseApp{
     void contactEnd(ofxBox2dContactArgs &e);
   
     // Flags to turn/turn off certain features
-    bool hideGui;
+    bool showGui;
     bool debug;
+    bool hideKinectGui; 
     bool stopEverything;
     bool showTexture;
-    bool drawFbo; // For saving
+    bool drawFbo; // For saving frames.
     bool shouldBond;
   
     // Box2d world handle.
@@ -55,13 +60,13 @@ class ofApp : public ofBaseApp{
     AlphaAgentProperties alphaAgentProps;
     BetaAgentProperties betaAgentProps;
   
-    // GUI
-    ofxPanel gui;
-    ofParameterGroup settings;
-  
     // Screengrab fbo
     ofFbo screenGrabFbo;
     int screenCaptureIdx = 0;
+  
+    // GUI
+    ofxPanel gui;
+    ofParameterGroup settings;
   
     // Alpha Agent Group params. 
     ofParameterGroup alphaAgentParams;
@@ -101,12 +106,9 @@ class ofApp : public ofBaseApp{
   
     // Background GUI params.
     ofParameterGroup bgParams;
-    ofParameter<int> bgRectWidth;
-    ofParameter<int> bgRectHeight;
     ofParameter<int> bgAttraction;
     ofParameter<int> bgRepulsion;
     void bgUpdateParams(int & newVal); // For attraction/repulsion
-    void bgUpdateSize(int & newVal); // For rectWidth/rectHeight
   
   private:
     std::vector<Memory> memories;
@@ -141,4 +143,7 @@ class ofApp : public ofBaseApp{
   
     // OSC remote.
     ofxOscReceiver receiver;
+  
+    // Kinect handle
+    Kinect kinect;
 };

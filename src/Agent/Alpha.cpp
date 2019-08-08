@@ -90,10 +90,10 @@ void Alpha::createSoftBody(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
   // Create mesh vertices as Box2D elements.
   for (int i = 0; i < meshVertices.size(); i++) {
     auto vertex = std::make_shared<ofxBox2dCircle>();
-    vertex -> setPhysics(agentProps.vertexPhysics.x, agentProps.vertexPhysics.y, agentProps.vertexPhysics.z); // bounce, density, friction
-    vertex -> setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius);
-    vertex -> setFixedRotation(true);
-    vertex -> setData(new VertexData(this)); // Data is passed with current Agent's pointer
+    vertex->setPhysics(agentProps.vertexPhysics.x, agentProps.vertexPhysics.y, agentProps.vertexPhysics.z); // bounce, density, friction
+    vertex->setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius);
+    vertex->setFixedRotation(true);
+    vertex->setData(new VertexData(this)); // Data is passed with current Agent's pointer
     vertices.push_back(vertex);
   }
   
