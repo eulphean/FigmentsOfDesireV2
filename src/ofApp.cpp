@@ -115,11 +115,14 @@ void ofApp::drawSequence() {
     m.draw();
   }
   
-  // Always show frame rate.
-  ofPushStyle();
-    ofSetColor(ofColor::black);
-    ofDrawBitmapString(ofGetFrameRate(), 200, 50);
-  ofPopStyle();
+  // Show the current frame rate. 
+  ofPushMatrix();
+    ofScale(2, 2);
+    ofPushStyle();
+      ofSetColor(ofColor::black);
+      ofDrawBitmapString(ofGetFrameRate(), 50, 50);
+    ofPopStyle();
+  ofPopMatrix();
   
   // Health parameters
   if (showGui) {
