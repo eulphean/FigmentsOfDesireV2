@@ -67,10 +67,10 @@ void Kinect::draw(bool isDebug, bool hideKinectGui) {
           // Use the texture width, height as the baseline to draw all the 4 debug screens.
           auto w = texDepth.getWidth(); auto h = texDepth.getHeight();
         
-          drawTextureAtRowAndColumn("RGB Pixels", texRGB, 1, 1, w, h);
-          drawTextureAtRowAndColumn("RGB Pixels, Registered", texRGBRegistered, 1, 0, w, h);
+//          drawTextureAtRowAndColumn("RGB Pixels", texRGB, 1, 1, w, h);
+//          drawTextureAtRowAndColumn("RGB Pixels, Registered", texRGBRegistered, 1, 0, w, h);
           drawTextureAtRowAndColumn("Depth Pixels, Mapped", texDepth, 0, 0, w, h);
-          drawTextureAtRowAndColumn("IR Pixels, Mapped", texIR, 0, 1, w, h);
+//          drawTextureAtRowAndColumn("IR Pixels, Mapped", texIR, 0, 1, w, h);
         
           // Draw contours on top of the depth pixels with Age, Label.
           ofPushMatrix();
