@@ -4,7 +4,7 @@
 void ofApp::setup(){
   // Setup OSC
   receiver.setup(PORT);
-  ofHideCursor();
+//  ofHideCursor();
   
   ofBackground(ofColor::fromHex(0x2E2F2D));
   ofSetCircleResolution(20);
@@ -115,7 +115,7 @@ void ofApp::drawSequence() {
     m.draw();
   }
   
-  // Show the current frame rate. 
+  // Show the current frame rate.
   ofPushMatrix();
     ofScale(2, 2);
     ofPushStyle();
