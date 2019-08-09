@@ -4,7 +4,7 @@
 		<Width>19</Width>
 		<Height>19</Height>
 		<Attraction>-16</Attraction>
-		<Repulsion>29</Repulsion>
+		<Repulsion>-55</Repulsion>
 	</Background_Params>
 	<Alpha_Agent_Params>
 		<Mesh_Rows>5</Mesh_Rows>
