@@ -48,7 +48,7 @@ void ofApp::update(){
   
   // Update super agents
   ofRemove(superAgents, [&](SuperAgent &sa){
-    sa.update(box2d, memories, shouldBond);
+    sa.update(box2d, memories, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
     return sa.shouldRemove;
   });
   
@@ -652,19 +652,22 @@ void ofApp::createSuperAgents() {
 
 std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Body *bodyB) {
     auto j = std::make_shared<ofxBox2dJoint>();
-    float f = ofRandom(0.3, iJointFrequency);
-    float d = ofRandom(1, iJointDamping);
-    j->setup(box2d.getWorld(), bodyA, bodyB, f, d); // Use the interAgentJoint props.
+//    float f = ofRandom(0.3, iJointFrequency);
+//    float d = ofRandom(1, iJointDamping);
+    j->setup(box2d.getWorld(), bodyA, bodyB, iJointFrequency, iJointDamping); // Use the interAgentJoint props.
   
-    // Joint length
+    // Joint length (determine with probability)
     int jointLength = ofRandom(iMinJointLength, iMaxJointLength);
     j->setLength(jointLength);
   
     // Enable interAgentJoint
+  
+    // Update Body A
     auto data = reinterpret_cast<VertexData*>(bodyA->GetUserData());
     data->hasInterAgentJoint = true;
     bodyA->SetUserData(data);
   
+    // Update Body B
     data = reinterpret_cast<VertexData*>(bodyB->GetUserData());
     data->hasInterAgentJoint = true;
     bodyB->SetUserData(data);

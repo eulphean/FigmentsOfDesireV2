@@ -59,3 +59,10 @@ Install the Kinect and put the app in Debug mode.
 Try to align the center of the Kinect with the center of the object. 
 That's when both Kinect and Projector will be aligned to scan properly. 
 Now, use the KinectParams in the app to set the max/min distance for detect object properly. 
+Align the Kinect and the projector so it's easier to set it up while installing. 
+
+Optimization
+Red texture ball to draw bodies
+Mesh to draw bonds 
+Limit number of bonds
+GUI to adjust forces on the agents
