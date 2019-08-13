@@ -25,12 +25,8 @@ void Message::draw(ofTrueTypeFont font) {
 void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   // Setup post-process filter for the texture.
   
-  // DEAD filter
-  filter = new GaussianBlurFilter(textureSize.x, textureSize.y, 7.f, 1.f);
-  
   // ACTIVE filter
-  filterChain = new FilterChain(textureSize.x, textureSize.y, "Chain");
-  filterChain->addFilter(new PerlinPixellationFilter(textureSize.x, textureSize.y, 15.f));
+  filter = new PerlinPixellationFilter(textureSize.x, textureSize.y, 15.f);
   
   // Num messages to inscribe on the texture.
   this->numMessages = 100; 
@@ -207,9 +203,9 @@ void Agent::createTexture(ofPoint textureSize) {
   secondFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
   secondFbo.begin();
     ofClear(0, 0, 0, 0);
-    filterChain->begin();
+    filter->begin();
       firstFbo.getTexture().drawSubsection(0, 0, textureSize.x, textureSize.y, 0, 0);
-    filterChain->end();
+    filter->end();
   secondFbo.end();
 }
 

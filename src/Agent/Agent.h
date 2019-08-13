@@ -77,8 +77,6 @@ class Agent {
     int numMessages; // Number of messages each agent has
     std::vector<ofColor> palette;
     AbstractFilter *filter;
-    FilterChain *filterChain;
-    ofxPostProcessing post;
   
     // Weights
     float tickleWeight;

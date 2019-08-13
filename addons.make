@@ -1,10 +1,8 @@
 ofxBox2d
 ofxCv
-ofxFft
 ofxFilterLibrary
 ofxGui
 ofxKinectV2
 ofxMidi
 ofxOpenCv
 ofxOsc
-ofxPostProcessing
