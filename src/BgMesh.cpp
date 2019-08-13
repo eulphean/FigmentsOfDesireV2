@@ -11,7 +11,7 @@ bool BgMesh::isAllocated() {
 // Setup background
 void BgMesh::setup() {
   // Load the background shader.
-  shader.load("bg.vert", "bg.frag");
+  shader.load("background/bg.vert", "background/bg.frag");
   
   // Allocate bg fbo and clear it for the background.
   bgFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);

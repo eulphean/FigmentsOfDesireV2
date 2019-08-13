@@ -61,18 +61,15 @@ void Agent::update() {
 }
 
 void Agent::draw(bool debug, bool showTexture) {
-  // Draw the meshes.
-  // Draw the soft bodies.
-  ofPushStyle();
-    for(auto v: vertices) {
-      ofPushMatrix();
-        ofTranslate(v->getPosition());
-        ofSetColor(ofColor::red);
-        ofFill();
-        ofDrawCircle(0, 0, v->getRadius());
-      ofPopMatrix();
-    }
-  ofPopStyle();
+ // Draw the mesh vertices as soft bodies
+ // Get the radius of the soft body and change the size.
+ auto bodyRadius = this->vertices[0]->getRadius();
+ glPointSize(bodyRadius*2);
+ 
+ ofPushStyle();
+  ofSetColor(ofColor::red);
+  mesh.drawVertices();
+ ofPopStyle();
   
   if (showTexture) {
     secondFbo.getTexture().bind();

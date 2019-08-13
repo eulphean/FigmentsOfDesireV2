@@ -111,8 +111,6 @@ class ofApp : public ofBaseApp{
     void bgUpdateParams(int & newVal); // For attraction/repulsion
   
   private:
-    std::vector<Memory> memories;
-    std::vector<b2Body *> collidingBodies;
   
     // Helper methods.
     void processOsc();
@@ -121,7 +119,10 @@ class ofApp : public ofBaseApp{
     void removeUnbonded();
     void drawSequence();
     glm::vec2 getBodyPosition(b2Body* body);
-    void createWorld(bool createBonds); 
+    void createWorld(bool createBonds);
+  
+    std::vector<Memory> memories;
+    std::vector<b2Body *> collidingBodies;
   
     // Super Agents (Inter Agent Bonding Logic)
     void createSuperAgents();

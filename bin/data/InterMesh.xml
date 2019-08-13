@@ -16,18 +16,18 @@
 		<Vertex_Density>1</Vertex_Density>
 		<Vertex_Bounce>0.1</Vertex_Bounce>
 		<Vertex_Friction>1</Vertex_Friction>
-		<Vertex_Radius>5</Vertex_Radius>
+		<Vertex_Radius>3</Vertex_Radius>
 		<Joint_Frequency>1.5</Joint_Frequency>
 		<Joint_Damping>1</Joint_Damping>
 	</Alpha_Agent_Params>
 	<Beta_Agent_Params>
-		<Mesh_Radius>43.2473</Mesh_Radius>
+		<Mesh_Radius>50</Mesh_Radius>
 		<Texture_Width>100</Texture_Width>
 		<Texture_Height>100</Texture_Height>
 		<Vertex_Density>1</Vertex_Density>
 		<Vertex_Bounce>0.1</Vertex_Bounce>
 		<Vertex_Friction>1</Vertex_Friction>
-		<Vertex_Radius>5</Vertex_Radius>
+		<Vertex_Radius>4.5</Vertex_Radius>
 		<Center_Joint_Frequency>1.5</Center_Joint_Frequency>
 		<Center_Joint_Damping>1</Center_Joint_Damping>
 		<Side_Joint_Frequency>0</Side_Joint_Frequency>

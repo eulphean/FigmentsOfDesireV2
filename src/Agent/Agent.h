@@ -2,7 +2,6 @@
 #include "ofMain.h"
 #include "ofxBox2d.h"
 #include "ofxFilterLibrary.h"
-#include "ofxPostProcessing.h"
 
 enum DesireState {
   None,

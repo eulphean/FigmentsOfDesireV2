@@ -37,6 +37,9 @@ void ofApp::setup(){
   // Setup Kinect.
   kinect.setup();
   
+//  glPointSize(10);
+  glEnable(GL_POINT_SMOOTH);
+  
   // [NOTE] Press w to create a new world after setting the bounds of the program
   // in the extended monitor. 
 }
@@ -268,19 +271,19 @@ void ofApp::setupGui() {
     alphaAgentParams.add(aVertexDensity.set("Vertex Density", 1, 0, 5));
     alphaAgentParams.add(aVertexBounce.set("Vertex Bounce", 0.1, 0, 1));
     alphaAgentParams.add(aVertexFriction.set("Vertex Friction", 1, 0, 1));
-    alphaAgentParams.add(aVertexRadius.set("Vertex Radius", 5, 1, 10));
+    alphaAgentParams.add(aVertexRadius.set("Vertex Radius", 3, 1, 10));
     alphaAgentParams.add(aJointFrequency.set("Joint Frequency", 2, 0, 20));
     alphaAgentParams.add(aJointDamping.set("Joint Damping", 1, 0, 5));
 
     // Beta Agent GUI parameters
     betaAgentParams.setName("Beta Agent Params");
-    betaAgentParams.add(bMeshRadius.set("Mesh Radius", 10, 5, 100));
+    betaAgentParams.add(bMeshRadius.set("Mesh Radius", 5, 5, 100));
     betaAgentParams.add(bTextureWidth.set("Texture Width", 50, 10, 300));
     betaAgentParams.add(bTextureHeight.set("Texture Height", 50, 10, 300));
     betaAgentParams.add(bVertexDensity.set("Vertex Density", 1, 0, 5));
     betaAgentParams.add(bVertexBounce.set("Vertex Bounce", 0.1, 0, 1));
     betaAgentParams.add(bVertexFriction.set("Vertex Friction", 1, 0, 1));
-    betaAgentParams.add(bVertexRadius.set("Vertex Radius", 5, 1, 10));
+    betaAgentParams.add(bVertexRadius.set("Vertex Radius", 3, 1, 10));
     betaAgentParams.add(bCenterJointFrequency.set("Center Joint Frequency", 2, 0, 20));
     betaAgentParams.add(bCenterJointDamping.set("Center Joint Damping", 1, 0, 5));
     betaAgentParams.add(bSideJointFrequency.set("Side Joint Frequency", 2, 0, 20));
@@ -389,7 +392,7 @@ void ofApp::createAgents() {
   ofPoint origin = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
   Agent *agent;
   // Based on a probablity, create a new agent.
-  if (ofRandom(1) < 0.8) {
+  if (ofRandom(1) < 0.6) {
     alphaAgentProps.meshOrigin = origin;
     agent = new Alpha(box2d, alphaAgentProps);
   } else {
