@@ -9,6 +9,7 @@ struct BetaAgentProperties {
   ofPoint vertexPhysics;
   float vertexRadius;
   float meshRadius;
+  float sideJointOffset; 
   ofPoint centerJointPhysics;
   ofPoint sideJointPhysics;
   ofPoint meshOrigin;

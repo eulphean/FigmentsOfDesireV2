@@ -288,6 +288,7 @@ void ofApp::setupGui() {
     betaAgentParams.add(bCenterJointDamping.set("Center Joint Damping", 1, 0, 5));
     betaAgentParams.add(bSideJointFrequency.set("Side Joint Frequency", 2, 0, 20));
     betaAgentParams.add(bSideJointDamping.set("Side Joint Damping", 1, 0, 5));
+    betaAgentParams.add(bSideJointOffset.set("Side Joint Offset", 5, 0, 30));
   
     // InterAgentJoint GUI parameters
     interAgentJointParams.setName("InterAgentJoint Params");
@@ -321,6 +322,7 @@ void ofApp::updateAgentProps() {
   betaAgentProps.vertexRadius = bVertexRadius;
   betaAgentProps.centerJointPhysics = ofPoint(bCenterJointFrequency, bCenterJointDamping);
   betaAgentProps.sideJointPhysics = ofPoint(bSideJointFrequency, bSideJointDamping);
+  betaAgentProps.sideJointOffset = bSideJointOffset; 
 }
 
 void ofApp::processOsc() {
@@ -392,7 +394,7 @@ void ofApp::createAgents() {
   ofPoint origin = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
   Agent *agent;
   // Based on a probablity, create a new agent.
-  if (ofRandom(1) < 0.6) {
+  if (ofRandom(1) < 0.1) {
     alphaAgentProps.meshOrigin = origin;
     agent = new Alpha(box2d, alphaAgentProps);
   } else {

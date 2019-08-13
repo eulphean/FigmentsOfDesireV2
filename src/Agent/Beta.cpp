@@ -47,7 +47,7 @@ void Beta::createMesh(BetaAgentProperties agentProps) {
   
   // Calculate # of meshPoints and set the variable to that.
   float meshCircumference = 2 * PI * meshRadius; // circumference of the agent.
-  numMeshPoints = meshCircumference / (agentProps.vertexRadius * 2); // Total number of points on the boundary
+  numMeshPoints = meshCircumference / (agentProps.vertexRadius * 2 + agentProps.sideJointOffset); // Total number of points on the boundary
   // TOOD: This meshPoints can be subtracted by 1 for sure here ----> Right now, it's just packed with circles
 
   // Add vertices around the center to form a circle.

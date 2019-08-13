@@ -96,6 +96,7 @@ class ofApp : public ofBaseApp{
     ofParameter<float> bCenterJointDamping;
     ofParameter<float> bSideJointFrequency;
     ofParameter<float> bSideJointDamping;
+    ofParameter<float> bSideJointOffset; 
   
     // InterAgentJoint GUI params.
     ofParameterGroup interAgentJointParams;
