@@ -59,7 +59,7 @@ void main(void)
 
 	// float f = fbm( 5.0*p+time*0.002 );
 	float f = fbm(5.0*q + time*0.002);
-	baseColor = mix(baseColor, topColor, f);
+	baseColor = mix(baseColor, topColor, sin(time));
 
 	gl_FragColor = vec4(baseColor,1.0);
 }
