@@ -48,12 +48,12 @@ void main(void)
 	// vec3 baseColor = vec3(0.77255, 0.78039, 0.78039);
 	vec3 baseColor = vec3(0.662, 0.847, 0.917);
 	vec3 topColor;
-	topColor.x = 0.278 + 0.941*fbm(2.0*p + vec2(time*0.4, time*0.1));
-	topColor.y = 0.729 + 0.470*fbm(1.5*p + vec2(time*0.1, time*0.2));
-	topColor.z = 0.941 + 0.278*fbm(1.0*p + vec2(time*0.3, time*0.1));
+	topColor.x = clamp(0.278 + 0.941*fbm(2.0*p + vec2(time*0.4, time*0.1)), 0, 1.0);
+	topColor.y = clamp(0.729 + 0.470*fbm(1.5*p + vec2(time*0.1, time*0.2)), 0, 1.0);
+	topColor.z = clamp(0.941 + 0.278*fbm(1.0*p + vec2(time*0.3, time*0.1)), 0, 1.0);
 
 	float f = fbm( 5.0*p+time*0.002 );
-	baseColor = mix(baseColor, topColor, sin(time/10));
+	baseColor = mix(baseColor, topColor, f);
 
-	gl_FragColor = vec4(baseColor,0.5);
+	gl_FragColor = vec4(baseColor,1.0);
 }

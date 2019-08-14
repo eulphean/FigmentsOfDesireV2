@@ -12,7 +12,7 @@ bool BgMesh::isAllocated() {
 void BgMesh::setup() {
   // Load the background shader.
   shader.load("background/bg.vert", "background/bg.frag");
-    ofLoadImage(bgTex, "bg.png");
+  ofLoadImage(bgTex, "bg.jpg");
   
   // Allocate bg fbo and clear it for the background.
   bgFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
@@ -51,7 +51,7 @@ void BgMesh::update(std::vector<ofMesh> agentMeshes) {
 
 void BgMesh::draw(bool debug) {
   if (!debug) {
-    bgTex.draw(0, 0, ofGetWidth(), ofGetHeight());
+//    bgTex.draw(0, 0, ofGetWidth(), ofGetHeight());
     mainFbo.draw(0, 0);
   }
 }
