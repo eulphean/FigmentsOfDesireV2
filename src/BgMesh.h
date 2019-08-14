@@ -17,7 +17,8 @@ class BgMesh {
   private:
     ofFbo bgFbo;
     ofFbo mainFbo; 
-    ofShader shader; 
+    ofShader shader;
+    ofTexture bgTex;
   
     ofParameterGroup bgParams;
 };

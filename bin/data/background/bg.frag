@@ -52,8 +52,8 @@ void main(void)
 	topColor.y = 0.729 + 0.470*fbm(1.5*p + vec2(time*0.1, time*0.2));
 	topColor.z = 0.941 + 0.278*fbm(1.0*p + vec2(time*0.3, time*0.1));
 
-	//float f = fbm( 5.0*p+time*0.2 );
-	//baseColor = mix(baseColor, topColor, f);
+	float f = fbm( 5.0*p+time*0.002 );
+	baseColor = mix(baseColor, topColor, sin(time/10));
 
-	gl_FragColor = vec4(baseColor,1.0);
+	gl_FragColor = vec4(baseColor,0.5);
 }
