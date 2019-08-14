@@ -55,5 +55,5 @@ void main(void)
 	float f = fbm( 5.0*p+time*0.002 );
 	baseColor = mix(baseColor, topColor, sin(time/10));
 
-	gl_FragColor = vec4(baseColor,0.5);
+	gl_FragColor = vec4(baseColor,0.65);
 }
