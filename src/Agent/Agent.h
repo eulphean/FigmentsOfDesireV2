@@ -23,13 +23,26 @@ class Message {
     float size;
 };
 
+// Common Agent Props
+struct AgentProps {
+  ofPoint meshOrigin;
+  ofPoint textureSize; // w, h of the texture that gets mapped.
+  ofPoint vertexPhysics;
+  float vertexRadius; 
+  // Weights
+  float stretchWeight;
+  float repulsionWeight;
+  float attractionWeight;
+  float tickleWeight;
+  float velocity;
+};
 
 // Subsection body that is torn apart from the actual texture and falls on the ground. 
 class Agent {
   public:
     void setup(ofxBox2d &box2d, ofPoint textureSize);
     void draw(bool debug, bool showTexture);
-    virtual void update();
+    virtual void update(AgentProps alphaProps, AgentProps betaProps);
   
     // Clean the agent
     void clean(ofxBox2d &box2d);
@@ -43,8 +56,8 @@ class Agent {
     void handleTickle();
   
     // Enabling behaviors
-    void setTickle(float weight);
-    void setStretch();
+    void tickle();
+    void stretch();
     void repulseBondedVertices();
   
     // Helpers
@@ -78,18 +91,20 @@ class Agent {
     AbstractFilter *filter;
   
     // Weights
-    float tickleWeight;
     float maxStretchWeight;
+    float maxRepulsionWeight;
+    float maxTickleWeight;
+    float maxAttractionWeight;
+    float maxVelocity;
+  
+    // These weights are lerped. 
     float stretchWeight;
     float repulsionWeight;
-    float vertexRepulsionWeight; 
-    float attractionWeight;
-    float seekWeight;
-    float maxVelocity;
   
     // Each derived class will override these methods as they define their own
     // meshes and soft bodies.
     virtual void updateMesh() {};
+    virtual void updateWeights(AgentProps props) {}; 
   
     // Mesh must be accessible in the derived class. 
     ofMesh mesh;

@@ -11,17 +11,11 @@ Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
               ofColor::fromHex(0x0BF6CD)
   };
   
-  // Force weight for body actions. This is heavier, so more weight.
-  maxStretchWeight = 1.5;
-  stretchWeight = 0;
-  
-  vertexRepulsionWeight = 2.5;
+  // Lerped weights.
   repulsionWeight = 0;
-  attractionWeight = 1.0; // Can this be changed when the other agent is trying to attack me?
-  seekWeight = 0.4; // Probably seek with a single vertex.
-  tickleWeight = 2.5;
-  maxVelocity = 15;
-  
+  stretchWeight = 0;
+  updateWeights(agentProps);
+
   // Create Mesh
   createMesh(agentProps);
   createSoftBody(box2d, agentProps);
@@ -131,7 +125,7 @@ void Alpha::updateMesh() {
   
   for (int j = 0; j < meshPoints.size(); j++) {
     // Get the box2D vertex position.
-    glm::vec2 pos = vertices[j] -> getPosition();
+    glm::vec2 pos = vertices[j]->getPosition();
     
     // Update mesh point's position with the position of
     // the box2d vertex.
@@ -142,10 +136,20 @@ void Alpha::updateMesh() {
   }
 }
 
-void Alpha::update() {
+void Alpha::update(AgentProps alphaProps, AgentProps betaProps) {
   // Update local mesh. 
   updateMesh();
   
+  updateWeights(alphaProps); 
+  
   // Call base class's update method.
-  Agent::update();
+  Agent::update(alphaProps, betaProps);
+}
+
+void Alpha::updateWeights(AgentProps agentProps) {
+  maxStretchWeight = agentProps.stretchWeight;
+  maxRepulsionWeight = agentProps.repulsionWeight;
+  maxAttractionWeight = agentProps.attractionWeight; // Can this be changed when the other agent is trying to attack me?
+  maxTickleWeight = agentProps.tickleWeight;
+  maxVelocity = agentProps.velocity;
 }

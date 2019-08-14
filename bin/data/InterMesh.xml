@@ -19,6 +19,11 @@
 		<Vertex_Radius>3</Vertex_Radius>
 		<Joint_Frequency>5</Joint_Frequency>
 		<Joint_Damping>1</Joint_Damping>
+		<Max_Stretch_Weight>1</Max_Stretch_Weight>
+		<Max_Repulsion_Weight>0</Max_Repulsion_Weight>
+		<Max_Attraction_Weight>0</Max_Attraction_Weight>
+		<Max_Tickle_Weight>0</Max_Tickle_Weight>
+		<Max_Velocity>5</Max_Velocity>
 	</Alpha_Agent_Params>
 	<Beta_Agent_Params>
 		<Mesh_Radius>60</Mesh_Radius>
@@ -30,10 +35,15 @@
 		<Vertex_Radius>2.5</Vertex_Radius>
 		<Center_Joint_Frequency>0.9</Center_Joint_Frequency>
 		<Center_Joint_Damping>0.5</Center_Joint_Damping>
-		<Side_Joint_Frequency>0</Side_Joint_Frequency>
+		<Side_Joint_Frequency>1.5</Side_Joint_Frequency>
 		<Side_Joint_Damping>5</Side_Joint_Damping>
 		<Side_Joint_Length>0</Side_Joint_Length>
 		<Side_Joint_Offset>10</Side_Joint_Offset>
+		<Max_Stretch_Weight>1</Max_Stretch_Weight>
+		<Max_Repulsion_Weight>6</Max_Repulsion_Weight>
+		<Max_Attraction_Weight>1</Max_Attraction_Weight>
+		<Max_Tickle_Weight>0</Max_Tickle_Weight>
+		<Max_Velocity>10</Max_Velocity>
 	</Beta_Agent_Params>
 	<InterAgentJoint_Params>
 		<Joint_Frequency>1</Joint_Frequency>

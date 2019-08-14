@@ -10,16 +10,11 @@ Beta::Beta(ofxBox2d &box2d, BetaAgentProperties agentProps) {
               ofColor::fromHex(0xC0F60B)
   };
   
-  // Force weights for body actions
-  maxStretchWeight = 1.0;
+  // Lerped weights.
+  repulsionWeight = 0;
   stretchWeight = 0;
   
-  vertexRepulsionWeight = 2.5;
-  repulsionWeight = 0;
-  attractionWeight = 0.5; // Can this be changed when the other agent is trying to attack me?
-  seekWeight = 0.4; // Probably seek with a single vertex.
-  tickleWeight = 2.5;
-  maxVelocity = 15;
+  updateWeights(agentProps);
   
   // Create mesh and soft body here.
   createMesh(agentProps);
@@ -136,10 +131,20 @@ void Beta::updateMesh() {
 }
 
 
-void Beta::update() {
+void Beta::update(AgentProps alphaProps, AgentProps betaProps) {
   // Update local mesh.
   updateMesh();
   
+  updateWeights(betaProps);
+  
   // Call base class's update method.
-  Agent::update();
+  Agent::update(alphaProps, betaProps);
+}
+
+void Beta::updateWeights(AgentProps agentProps) {
+  maxStretchWeight = agentProps.stretchWeight;
+  maxRepulsionWeight = agentProps.repulsionWeight;
+  maxAttractionWeight = agentProps.attractionWeight; // Can this be changed when the other agent is trying to attack me?
+  maxTickleWeight = agentProps.tickleWeight;
+  maxVelocity = agentProps.velocity;
 }

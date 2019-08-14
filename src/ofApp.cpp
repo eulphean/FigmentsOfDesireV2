@@ -44,8 +44,8 @@ void ofApp::setup(){
 }
 
 void ofApp::update(){
-  box2d.update();
 //  processOsc();
+  box2d.update();
   kinect.update();
   
   // Update super agents
@@ -61,8 +61,7 @@ void ofApp::update(){
   
   // Update agents
   for (auto &a : agents) {
-    a->update();
-    // meshes.push_back(a->getMesh());
+    a->update(alphaAgentProps, betaAgentProps);
   }
   
   // Create super agents based on collision bodies.
@@ -79,7 +78,7 @@ void ofApp::update(){
     return m.shouldRemove;
   });
   
-  // Start drawing in the screen grab fbo.
+  // Draw in the fbo if I'm screen capturing.
   if (drawFbo) {
     screenGrabFbo.begin();
       ofClear(ofColor::black);
@@ -160,7 +159,7 @@ void ofApp::keyPressed(int key){
   if (key == 'f') {
     // Apply a random force
     for (auto &a: agents) {
-      a -> setTickle(1.0);
+      a->tickle();
     }
   }
   
@@ -271,6 +270,12 @@ void ofApp::setupGui() {
     alphaAgentParams.add(aVertexRadius.set("Vertex Radius", 3, 1, 10));
     alphaAgentParams.add(aJointFrequency.set("Joint Frequency", 2, 0, 20));
     alphaAgentParams.add(aJointDamping.set("Joint Damping", 1, 0, 5));
+    // Weights.
+    alphaAgentParams.add(aStretchWeight.set("Max Stretch Weight", 1.5, 0, 10));
+    alphaAgentParams.add(aRepulsionWeight.set("Max Repulsion Weight", 2.5, 0, 20));
+    alphaAgentParams.add(aAttractionWeight.set("Max Attraction Weight", 1.0, 0, 20));
+    alphaAgentParams.add(aTickleWeight.set("Max Tickle Weight", 2.5, 0, 20));
+    alphaAgentParams.add(aVelocity.set("Max Velocity", 15, 1, 20));
 
     // Beta Agent GUI parameters
     betaAgentParams.setName("Beta Agent Params");
@@ -286,6 +291,12 @@ void ofApp::setupGui() {
     betaAgentParams.add(bSideJointFrequency.set("Side Joint Frequency", 2, 0, 20));
     betaAgentParams.add(bSideJointDamping.set("Side Joint Damping", 1, 0, 5));
     betaAgentParams.add(bSideJointOffset.set("Side Joint Offset", 5, 0, 30));
+    // Weights.
+    betaAgentParams.add(bStretchWeight.set("Max Stretch Weight", 1.0, 0, 10));
+    betaAgentParams.add(bRepulsionWeight.set("Max Repulsion Weight", 2.5, 0, 20));
+    betaAgentParams.add(bAttractionWeight.set("Max Attraction Weight", 0.5, 0, 20));
+    betaAgentParams.add(bTickleWeight.set("Max Tickle Weight", 2.5, 0, 20));
+    betaAgentParams.add(bVelocity.set("Max Velocity", 15, 1, 20));
   
     // InterAgentJoint GUI parameters
     interAgentJointParams.setName("InterAgentJoint Params");
@@ -311,6 +322,12 @@ void ofApp::updateAgentProps() {
   alphaAgentProps.vertexPhysics = ofPoint(aVertexBounce, aVertexDensity, aVertexFriction);
   alphaAgentProps.vertexRadius = aVertexRadius;
   alphaAgentProps.jointPhysics = ofPoint(aJointFrequency, aJointDamping);
+  // Weights.
+  alphaAgentProps.stretchWeight = aStretchWeight;
+  alphaAgentProps.repulsionWeight = aRepulsionWeight;
+  alphaAgentProps.attractionWeight = aAttractionWeight;
+  alphaAgentProps.tickleWeight = aTickleWeight;
+  alphaAgentProps.velocity = aVelocity;
   
   // Beta Agent GUI param payload.
   betaAgentProps.meshRadius = bMeshRadius;
@@ -319,7 +336,13 @@ void ofApp::updateAgentProps() {
   betaAgentProps.vertexRadius = bVertexRadius;
   betaAgentProps.centerJointPhysics = ofPoint(bCenterJointFrequency, bCenterJointDamping);
   betaAgentProps.sideJointPhysics = ofPoint(bSideJointFrequency, bSideJointDamping);
-  betaAgentProps.sideJointOffset = bSideJointOffset; 
+  betaAgentProps.sideJointOffset = bSideJointOffset;
+  // Weights.
+  betaAgentProps.stretchWeight = bStretchWeight;
+  betaAgentProps.repulsionWeight = bRepulsionWeight;
+  betaAgentProps.attractionWeight = bAttractionWeight;
+  betaAgentProps.tickleWeight = bTickleWeight;
+  betaAgentProps.velocity = bVelocity;
 }
 
 void ofApp::processOsc() {
@@ -424,12 +447,12 @@ void ofApp::stretch() {
     // Pick a random agent and make stretch.
     int randIdx = ofRandom(agents.size());
     auto agent = agents[randIdx];
-    agent->setStretch();
+    agent->stretch();
   } else {
     // Stretch them all.
     for (auto &a : agents) {
       if (a->desireState != Repulsion) {
-        a->setStretch();
+        a->stretch();
       }
     }
   }
@@ -443,6 +466,7 @@ void ofApp::removeJoints() {
     sa.clean(box2d);
   }
   superAgents.clear();
+  SuperAgent::initJointMesh(); // Clear the mesh and reinitialize
 
   superAgents.clear();
   box2d.enableEvents();
@@ -450,11 +474,14 @@ void ofApp::removeJoints() {
 
 void ofApp::enableBonding() {
   shouldBond = !shouldBond;
+  
+  if (!shouldBond) {
+    SuperAgent::initJointMesh(); // Clear the mesh and reinitialize
+  }
 }
 
 void ofApp::removeUnbonded() {
   ofRemove(agents, [&](Agent *a) {
-  
     return false;
   });
 }
@@ -470,10 +497,11 @@ void ofApp::clearScreen() {
     sa.clean(box2d);
   }
   superAgents.clear();
-
+  SuperAgent::initJointMesh(); // Clear the joint mesh as well.
+  
   // Clean agents
   for (auto &a : agents) {
-    a -> clean(box2d);
+    a->clean(box2d);
     delete a;
   }
   agents.clear();

@@ -45,7 +45,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   desireState = None;
 }
 
-void Agent::update() {  
+void Agent::update(AgentProps alphaProps, AgentProps betaProps) {
   // Print the velocity of vertices.
   for (auto &v : vertices) {
     auto vel = v->getVelocity().length();
@@ -71,19 +71,21 @@ void Agent::draw(bool debug, bool showTexture) {
   mesh.draw(OF_MESH_POINTS);
  ofPopStyle();
   
-  if (showTexture) {
-    secondFbo.getTexture().bind();
-      mesh.draw();
-    secondFbo.getTexture().unbind();
-  } else {
-    ofPushStyle();
-    for(auto j: joints) {
-      ofPushMatrix();
-        ofSetColor(ofColor::green);
-        j->draw();
-      ofPopMatrix();
+  if (secondFbo.isAllocated()) {
+    if (showTexture) {
+      secondFbo.getTexture().bind();
+        mesh.draw();
+      secondFbo.getTexture().unbind();
+    } else {
+      ofPushStyle();
+      for(auto j: joints) {
+        ofPushMatrix();
+          ofSetColor(ofColor::green);
+          j->draw();
+        ofPopMatrix();
+      }
+      ofPopStyle();
     }
-    ofPopStyle();
   }
 
   if (debug) {
@@ -98,45 +100,6 @@ void Agent::draw(bool debug, bool showTexture) {
       ofPopMatrix();
     ofPopStyle();
   }
-}
-
-void Agent::assignIndices(ofPoint textureSize) {
-//  // Store the corner indices in this array to access it when applying forces.
-//  auto rows = agentProps.meshDimensions.x; auto cols = agentProps.meshDimensions.y;
-//
-//  // Corners
-//  cornerIndices[0] = 0; cornerIndices[1] = (cols-1) + 0 * (cols-1);
-//  cornerIndices[2] = 0 + (rows-1) * (cols-1); cornerIndices[3] = (cols-1) + (rows-1) * (cols-1);
-//
-//  // Boundaries.
-//
-//  // TOP
-//  int x; int y = 0;
-//  for (x = 0; x < cols-1; x++) {
-//    int idx = x + y * (cols-1);
-//    boundaryIndices.push_back(idx);
-//  }
-//
-//  // BOTTOM
-//  y = rows-1;
-//  for (x = 0; x < cols-1; x++) {
-//    int idx = x + y * (cols-1);
-//    boundaryIndices.push_back(idx);
-//  }
-//
-//  // LEFT
-//  x = 0;
-//  for (y = 0; y < rows-1; y++) {
-//    int idx = x + y * (cols-1);
-//    boundaryIndices.push_back(idx);
-//  }
-//
-//  // RIGHT
-//  x = cols-1;
-//  for (y = 0; y < rows-1; y++) {
-//    int idx = x + y * (cols-1);
-//    boundaryIndices.push_back(idx);
-//  }
 }
 
 ofPoint Agent::getTextureSize() {
@@ -196,14 +159,16 @@ void Agent::createTexture(ofPoint textureSize) {
 
   firstFbo.end();
   
-  // Create 2nd fbo and draw with filter and postProcessing
-  secondFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
-  secondFbo.begin();
-    ofClear(0, 0, 0, 0);
-    filter->begin();
-      firstFbo.getTexture().drawSubsection(0, 0, textureSize.x, textureSize.y, 0, 0);
-    filter->end();
-  secondFbo.end();
+  if (firstFbo.isAllocated()) {
+    // Create 2nd fbo and draw with filter and postProcessing
+    secondFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
+    secondFbo.begin();
+      ofClear(0, 0, 0, 0);
+      filter->begin();
+        firstFbo.getTexture().drawSubsection(0, 0, textureSize.x, textureSize.y, 0, 0);
+      filter->end();
+    secondFbo.end();
+  }
 }
 
 void Agent::applyBehaviors()  {
@@ -224,7 +189,7 @@ void Agent::handleVertexBehaviors() {
       // Repel this vertex from it's partner's centroid especially
       //auto pos = glm::vec2(partner->getCentroid().x, partner->getCentroid().y);
       auto pos = data->targetPos;
-      v->addRepulsionForce(pos.x, pos.y, vertexRepulsionWeight * 15);
+      v->addRepulsionForce(pos.x, pos.y, maxRepulsionWeight);
       
       // Reset repulsion parameter on the vertex.
       data->applyRepulsion = false;
@@ -235,7 +200,7 @@ void Agent::handleVertexBehaviors() {
       auto data = reinterpret_cast<VertexData*>(v->getData());
       auto pos = glm::vec2(data->targetPos.x, data->targetPos.y);
       //auto pos = data->targetPos;
-      v->addAttractionPoint({pos.x, pos.y}, attractionWeight * 20);
+      v->addAttractionPoint({pos.x, pos.y}, maxAttractionWeight);
       
       // Reset repulsion parameter on the vertex.
       data->applyAttraction = false;
@@ -248,7 +213,7 @@ void Agent::handleRepulsion() {
   // Go through all the vertices.
   // Get the data and check if it has.
   if (applyRepulsion) {
-    repulsionWeight = ofLerp (repulsionWeight, vertexRepulsionWeight, 0.1);
+    repulsionWeight = ofLerp (repulsionWeight, maxRepulsionWeight, 0.1);
     for (auto &v : vertices) {
       auto data = reinterpret_cast<VertexData*>(v->getData());
       if (data->hasInterAgentJoint) {
@@ -258,7 +223,7 @@ void Agent::handleRepulsion() {
     
     desireState = None;
     
-    if (vertexRepulsionWeight-repulsionWeight < vertexRepulsionWeight/2) {
+    if (maxRepulsionWeight-repulsionWeight < maxRepulsionWeight/2) {
       applyRepulsion = false;
       repulsionWeight = 0;
     }
@@ -287,7 +252,7 @@ void Agent::handleAttraction() {
     
     auto vertexPos = vertices[minIdx]->getPosition();
     auto d = glm::distance(partner->getCentroid(), glm::vec2(vertexPos.x, vertexPos.y)); // Distance till the centroid.
-    float newWeight = ofMap(d, desireRadius * 5, 0, attractionWeight, 0, true);
+    float newWeight = ofMap(d, desireRadius * 5, 0, maxRepulsionWeight, 0, true);
     auto pos = glm::vec2(partner->getCentroid().x, partner->getCentroid().y);
     vertices[minIdx]->addAttractionPoint({pos.x, pos.y}, newWeight);
   }
@@ -322,7 +287,7 @@ void Agent::handleTickle() {
     // Apply the tickle.
     for (auto &v: vertices) {
       glm::vec2 force = glm::vec2(ofRandom(-5, 5), ofRandom(-5, 5));
-      v -> addForce(force, tickleWeight);
+      v -> addForce(force, maxTickleWeight);
     }
     applyTickle = false;
   }
@@ -347,12 +312,11 @@ void Agent::repulseBondedVertices() {
   }
 }
 
-void Agent::setTickle(float avgForceWeight) {
+void Agent::tickle() {
   applyTickle = true;
-  tickleWeight = avgForceWeight;
 }
 
-void Agent::setStretch() {
+void Agent::stretch() {
   applyStretch = true;
 }
 
@@ -372,8 +336,41 @@ void Agent::setDesireState(DesireState newState) {
   }
 }
 
-
-  // Move it to individual figments.
-  // [BROKEN] Assign corner and boundary indices for applying forces on vertices.
-  // assignIndices(textureSize);
-
+void Agent::assignIndices(ofPoint textureSize) {
+//  // Store the corner indices in this array to access it when applying forces.
+//  auto rows = agentProps.meshDimensions.x; auto cols = agentProps.meshDimensions.y;
+//
+//  // Corners
+//  cornerIndices[0] = 0; cornerIndices[1] = (cols-1) + 0 * (cols-1);
+//  cornerIndices[2] = 0 + (rows-1) * (cols-1); cornerIndices[3] = (cols-1) + (rows-1) * (cols-1);
+//
+//  // Boundaries.
+//
+//  // TOP
+//  int x; int y = 0;
+//  for (x = 0; x < cols-1; x++) {
+//    int idx = x + y * (cols-1);
+//    boundaryIndices.push_back(idx);
+//  }
+//
+//  // BOTTOM
+//  y = rows-1;
+//  for (x = 0; x < cols-1; x++) {
+//    int idx = x + y * (cols-1);
+//    boundaryIndices.push_back(idx);
+//  }
+//
+//  // LEFT
+//  x = 0;
+//  for (y = 0; y < rows-1; y++) {
+//    int idx = x + y * (cols-1);
+//    boundaryIndices.push_back(idx);
+//  }
+//
+//  // RIGHT
+//  x = cols-1;
+//  for (y = 0; y < rows-1; y++) {
+//    int idx = x + y * (cols-1);
+//    boundaryIndices.push_back(idx);
+//  }
+}

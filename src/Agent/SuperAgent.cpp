@@ -60,7 +60,6 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
   
   if (joints.size() == 0) {
     shouldRemove = true;
-    SuperAgent::initJointMesh(); // Clear the mesh and reinitialize
   } else {
     // When it's a super agent, that means it's bonded.
     // Check if it's ready to swap messages.
@@ -141,6 +140,7 @@ ofMesh SuperAgent::jointMesh;
 int SuperAgent::curMeshIdx = 0;
 
 void SuperAgent::initJointMesh() {
+  cout << "Clearing the mesh" << endl; 
   SuperAgent::jointMesh.clear();
   SuperAgent::curMeshIdx = 0; 
   SuperAgent::jointMesh.setMode(OF_PRIMITIVE_LINES);

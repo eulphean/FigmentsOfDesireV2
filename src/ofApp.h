@@ -82,6 +82,12 @@ class ofApp : public ofBaseApp{
     ofParameter<float> aVertexRadius;
     ofParameter<float> aJointFrequency;
     ofParameter<float> aJointDamping;
+    // Weights.
+    ofParameter<float> aStretchWeight;
+    ofParameter<float> aRepulsionWeight;
+    ofParameter<float> aAttractionWeight;
+    ofParameter<float> aTickleWeight;
+    ofParameter<float> aVelocity;
   
     // Beta Agent GUI params.
     ofParameterGroup betaAgentParams;
@@ -96,7 +102,13 @@ class ofApp : public ofBaseApp{
     ofParameter<float> bCenterJointDamping;
     ofParameter<float> bSideJointFrequency;
     ofParameter<float> bSideJointDamping;
-    ofParameter<float> bSideJointOffset; 
+    ofParameter<float> bSideJointOffset;
+    // Weights.
+    ofParameter<float> bStretchWeight;
+    ofParameter<float> bRepulsionWeight;
+    ofParameter<float> bAttractionWeight;
+    ofParameter<float> bTickleWeight;
+    ofParameter<float> bVelocity;
   
     // InterAgentJoint GUI params.
     ofParameterGroup interAgentJointParams;
