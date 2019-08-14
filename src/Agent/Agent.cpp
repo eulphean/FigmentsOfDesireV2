@@ -68,7 +68,7 @@ void Agent::draw(bool debug, bool showTexture) {
  
  ofPushStyle();
   ofSetColor(ofColor::red);
-  mesh.drawVertices();
+  mesh.draw(OF_MESH_POINTS);
  ofPopStyle();
   
   if (showTexture) {
