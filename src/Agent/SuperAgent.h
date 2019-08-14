@@ -18,9 +18,15 @@ class SuperAgent {
     glm::vec2 getBodyPosition(b2Body *body);
     void createMemory();
   
+    // This is shared between all the SuperAgent instances to maintain.
+    static ofMesh jointMesh;
+    static void initJointMesh(); 
+    static void insertJointMesh(glm::vec3 v1, glm::vec3 v2);
+    static void drawJointMesh();
+  
     Agent *agentA;
     Agent *agentB;
-    std::vector<std::shared_ptr<ofxBox2dJoint>> joints;  // These are interAgent joints.
+    std::vector<std::shared_ptr<ofxBox2dJoint>> joints;
     bool shouldRemove = false;
   
     float curExchangeCounter;

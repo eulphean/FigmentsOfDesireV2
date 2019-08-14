@@ -1,5 +1,8 @@
 #include "SuperAgent.h"
 
+// Initialize the static variable
+ofMesh SuperAgent::jointMesh;
+
 void SuperAgent::setup(Agent *agent1, Agent *agent2, std::shared_ptr<ofxBox2dJoint> joint) {
   agentA = agent1;
   agentB = agent2;
@@ -85,13 +88,13 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
 }
 
 void SuperAgent::draw() {
-  for (auto j : joints) {
-    ofPushStyle();
-      ofSetColor(ofColor::red);
-      ofSetLineWidth(0.4);
-      j->draw();
-    ofPopStyle();
-  }
+//  for (auto j : joints) {
+//    ofPushStyle();
+//      ofSetColor(ofColor::red);
+//      ofSetLineWidth(0.4);
+//      j->draw();
+//    ofPopStyle();
+//  }
 }
 
 // Check if super body already exists. 
@@ -126,4 +129,22 @@ glm::vec2 SuperAgent::getBodyPosition(b2Body* body) {
   b2Vec2 b2Center = b2Mul(xf, pos);
   auto p = worldPtToscreenPt(b2Center);
   return glm::vec2(p.x, p.y);
+}
+
+void SuperAgent::initJointMesh() {
+  SuperAgent::jointMesh.clear();
+  SuperAgent::jointMesh.setMode(OF_PRIMITIVE_LINES);
+}
+
+void SuperAgent::insertJointMesh(glm::vec3 v1, glm::vec3 v2) {
+  // Get the bodies from the joint and add them in the mesh
+  SuperAgent::jointMesh.addVertex(v1);
+  SuperAgent::jointMesh.addVertex(v2);
+}
+
+void SuperAgent::drawJointMesh() {
+  ofPushStyle();
+    ofSetColor(ofColor::red);
+    SuperAgent::jointMesh.draw();
+  ofPopStyle(); 
 }

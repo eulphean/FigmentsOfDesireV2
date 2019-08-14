@@ -26,7 +26,7 @@
 		<Texture_Height>100</Texture_Height>
 		<Vertex_Density>1</Vertex_Density>
 		<Vertex_Bounce>0.1</Vertex_Bounce>
-		<Vertex_Friction>1</Vertex_Friction>
+		<Vertex_Friction>0.999872</Vertex_Friction>
 		<Vertex_Radius>2.5</Vertex_Radius>
 		<Center_Joint_Frequency>0.9</Center_Joint_Frequency>
 		<Center_Joint_Damping>0.5</Center_Joint_Damping>

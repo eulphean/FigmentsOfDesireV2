@@ -37,11 +37,10 @@ void ofApp::setup(){
   // Setup Kinect.
   kinect.setup();
   
-//  glPointSize(10);
   glEnable(GL_POINT_SMOOTH);
   
-  // [NOTE] Press w to create a new world after setting the bounds of the program
-  // in the extended monitor. 
+  // Init the joint mesh to start with.
+  SuperAgent::initJointMesh();
 }
 
 void ofApp::update(){
@@ -104,10 +103,11 @@ void ofApp::drawSequence() {
   }
 
   // Draw all what's inside the super agents.
-  for (auto sa: superAgents) {
-    sa.draw();
-  }
-
+//  for (auto sa: superAgents) {
+//    sa.draw();
+//  }
+  SuperAgent::drawJointMesh();
+  
   // Draw Agent is the virtual method for derived class.
   for (auto a: agents) {
     a->draw(debug, showTexture);
@@ -579,7 +579,8 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
             agentB->setDesireState(None);
           }
 
-          // Should the agents be evaluated for bonding?
+          // If agents can bond, evaluate the colliding bodies for collision.
+          // Along with the agents they both belong to.
           if (shouldBond) {
             evaluateBonding(e.a->GetBody(), e.b->GetBody(), agentA, agentB);
           }
@@ -591,7 +592,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
 
 // ------------------------------ Inter-Agent Bonding Routines ------------------------------------ //
 
-// Massive important function that determines when the 2 bodies actually bond.
+// Critical routine that evaluates when the 2 bodies should actually bond to each other.
 void ofApp::evaluateBonding(b2Body *bodyA, b2Body *bodyB, Agent *agentA, Agent *agentB) {
   collidingBodies.clear();
   
@@ -606,22 +607,9 @@ void ofApp::evaluateBonding(b2Body *bodyA, b2Body *bodyB, Agent *agentA, Agent *
 }
 
 bool ofApp::canVertexBond(b2Body* body, Agent *curAgent) {
-  // If it joins anything except itself, then it cannot join.
-  auto curEdge = body->GetJointList();
-  // Traverse the joint doubly linked list.
-  while (curEdge) {
-    // Other agent that this joint is joined to.
-    auto data = reinterpret_cast<VertexData*>(curEdge->other->GetUserData());
-    if (data != NULL) {
-      auto otherAgent = data->agent;
-      if (otherAgent != curAgent) {
-        return false;
-      }
-    }
-    curEdge = curEdge->next;
-  }
-
-  return true;
+  // Does it have an interAgent joint already? If it doesn, can't allow this body to create another joint.
+  auto data = reinterpret_cast<VertexData*>(body->GetUserData());
+  return !data->hasInterAgentJoint;
 }
 
 void ofApp::createSuperAgents() {
@@ -657,8 +645,6 @@ void ofApp::createSuperAgents() {
 
 std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Body *bodyB) {
     auto j = std::make_shared<ofxBox2dJoint>();
-//    float f = ofRandom(0.3, iJointFrequency);
-//    float d = ofRandom(1, iJointDamping);
     j->setup(box2d.getWorld(), bodyA, bodyB, iJointFrequency, iJointDamping); // Use the interAgentJoint props.
   
     // Joint length (determine with probability)
@@ -676,6 +662,10 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
     data = reinterpret_cast<VertexData*>(bodyB->GetUserData());
     data->hasInterAgentJoint = true;
     bodyB->SetUserData(data);
+  
+    // Insert these into mesh for the interAgent joints.
+    auto posA = getBodyPosition(bodyA); auto posB = getBodyPosition(bodyB);
+    SuperAgent::insertJointMesh(glm::vec3(posA.x, posA.y, 0), glm::vec3(posB.x, posB.y, 0));
   
     return j;
 }
