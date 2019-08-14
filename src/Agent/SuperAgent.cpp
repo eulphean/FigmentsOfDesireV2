@@ -1,8 +1,5 @@
 #include "SuperAgent.h"
 
-// Initialize the static variable
-ofMesh SuperAgent::jointMesh;
-
 void SuperAgent::setup(Agent *agent1, Agent *agent2, std::shared_ptr<ofxBox2dJoint> joint) {
   agentA = agent1;
   agentB = agent2;
@@ -14,25 +11,28 @@ void SuperAgent::setup(Agent *agent1, Agent *agent2, std::shared_ptr<ofxBox2dJoi
 void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool shouldBond) {
   // Max Force based on which the joint breaks.
   ofRemove(joints, [&](std::shared_ptr<ofxBox2dJoint> j) {
+    // Body A data.
+    auto bodyA = j->joint->GetBodyA();
+    auto dataA = reinterpret_cast<VertexData*>(bodyA->GetUserData());
+    glm::vec2 locA = getBodyPosition(bodyA);
+    
+    // Body B data.
+    auto bodyB = j->joint->GetBodyB();
+    auto dataB = reinterpret_cast<VertexData*>(bodyB->GetUserData());
+    glm::vec2 locB = getBodyPosition(bodyB);
+    
     if (!shouldBond) {
       box2d.getWorld()->DestroyJoint(j->joint);
-      // Get the bodies
-      auto bodyA = j->joint->GetBodyA();
-      auto bodyB = j->joint->GetBodyB();
 
       // Update bodyA's data.
-      auto data = reinterpret_cast<VertexData*>(bodyA->GetUserData());
-      data->hasInterAgentJoint = false;
-      bodyA->SetUserData(data);
+      dataA->hasInterAgentJoint = false;
+      bodyA->SetUserData(dataA);
 
       // Update bodyB's data.
-      data = reinterpret_cast<VertexData*>(bodyB->GetUserData());
-      data->hasInterAgentJoint = false;
-      bodyB->SetUserData(data);
+      dataB->hasInterAgentJoint = false;
+      bodyB->SetUserData(dataB);
       
       // Create a new memory object for each interAgentJoint and populate the vector.
-      glm::vec2 locA = getBodyPosition(bodyA);
-      glm::vec2 locB = getBodyPosition(bodyB);
       glm::vec2 avgLoc = (locA + locB)/2;
       
       Memory mem(box2d, avgLoc);
@@ -40,12 +40,27 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
 
       return true;
     } else {
+      // Update SuperAgent's jointMesh using the current positions of the vertices in the current joint.
+      auto idxA = dataA->jointMeshIdx;
+      auto idxB = dataB->jointMeshIdx;
+      
+      // Update vertex at idxA with body A's location
+      auto vertex = SuperAgent::jointMesh.getVertex(idxA);
+      vertex.x = locA.x; vertex.y = locA.y;
+      SuperAgent::jointMesh.setVertex(idxA, vertex);
+      
+      // Update vertex at idxB with body B's location
+      vertex = SuperAgent::jointMesh.getVertex(idxB);
+      vertex.x = locB.x; vertex.y = locB.y;
+      SuperAgent::jointMesh.setVertex(idxB, vertex);
+      
       return false;
     }
   });
   
   if (joints.size() == 0) {
     shouldRemove = true;
+    SuperAgent::initJointMesh(); // Clear the mesh and reinitialize
   } else {
     // When it's a super agent, that means it's bonded.
     // Check if it's ready to swap messages.
@@ -87,16 +102,6 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
   }
 }
 
-void SuperAgent::draw() {
-//  for (auto j : joints) {
-//    ofPushStyle();
-//      ofSetColor(ofColor::red);
-//      ofSetLineWidth(0.4);
-//      j->draw();
-//    ofPopStyle();
-//  }
-}
-
 // Check if super body already exists. 
 bool SuperAgent::contains(Agent *agent1, Agent *agent2) {
   if (agent1 == agentA) {
@@ -131,8 +136,13 @@ glm::vec2 SuperAgent::getBodyPosition(b2Body* body) {
   return glm::vec2(p.x, p.y);
 }
 
+// Initialize the static variable
+ofMesh SuperAgent::jointMesh;
+int SuperAgent::curMeshIdx = 0;
+
 void SuperAgent::initJointMesh() {
   SuperAgent::jointMesh.clear();
+  SuperAgent::curMeshIdx = 0; 
   SuperAgent::jointMesh.setMode(OF_PRIMITIVE_LINES);
 }
 

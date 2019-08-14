@@ -102,10 +102,7 @@ void ofApp::drawSequence() {
     bg.draw(debug);
   }
 
-  // Draw all what's inside the super agents.
-//  for (auto sa: superAgents) {
-//    sa.draw();
-//  }
+  // Draw all the interAgent joints. 
   SuperAgent::drawJointMesh();
   
   // Draw Agent is the virtual method for derived class.
@@ -656,12 +653,17 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
     // Update Body A
     auto data = reinterpret_cast<VertexData*>(bodyA->GetUserData());
     data->hasInterAgentJoint = true;
+    data->jointMeshIdx = SuperAgent::curMeshIdx;
     bodyA->SetUserData(data);
   
     // Update Body B
     data = reinterpret_cast<VertexData*>(bodyB->GetUserData());
     data->hasInterAgentJoint = true;
+    data->jointMeshIdx = SuperAgent::curMeshIdx + 1;
     bodyB->SetUserData(data);
+  
+    // Increment by 2 because it just served 2 bodies. 
+    SuperAgent::curMeshIdx += 2;
   
     // Insert these into mesh for the interAgent joints.
     auto posA = getBodyPosition(bodyA); auto posB = getBodyPosition(bodyB);

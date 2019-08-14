@@ -130,12 +130,17 @@ class VertexData {
       agent = ptr;
       applyRepulsion = false;
       applyAttraction = false;
-      hasInterAgentJoint = false; 
+      hasInterAgentJoint = false;
+      jointMeshIdx = -1;
     }
   
-    Agent * agent;
+    // Point to this bodies' agent.
+    Agent *agent;
     bool applyRepulsion;
-    bool hasInterAgentJoint;
     bool applyAttraction;
-    glm::vec2 targetPos; 
+  
+    bool hasInterAgentJoint;
+    int jointMeshIdx; // Idx for the mesh used to draw interAgent joints.
+  
+    glm::vec2 targetPos;
 };
