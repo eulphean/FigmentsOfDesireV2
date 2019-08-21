@@ -24,6 +24,7 @@ void ofApp::setup(){
   // Setup gui.
   setupGui();
   
+  isOccupied = false;
   showGui = false;
   debug = false;
   showTexture = true;
@@ -57,7 +58,11 @@ void ofApp::update(){
   // GUI props.
   updateAgentProps();
   
-  std::vector<ofMesh> meshes;
+  // Interaction variables update.
+  if (isOccupied) {
+    // Attract all the agents to this position.
+    attract(glm::vec2(ofGetMouseX(), ofGetMouseY()));
+  }
   
   // Update agents
   for (auto &a : agents) {
@@ -69,7 +74,7 @@ void ofApp::update(){
   
   // Update background
   if (bg.isAllocated()) {
-    bg.update(meshes);
+    bg.update();
   }
 
   // Update memories.
@@ -100,7 +105,7 @@ void ofApp::drawSequence() {
   if (bg.isAllocated()) {
     bg.draw(debug);
   }
-
+  
   // Draw all the interAgent joints. 
   SuperAgent::drawJointMesh();
   
@@ -128,17 +133,30 @@ void ofApp::drawSequence() {
     gui.draw();
   }
   
+  // Print a circle so we know where all the agents are being attracted to. 
+  if (isOccupied) {
+    ofPushStyle();
+      ofSetColor(ofColor::yellow);
+      ofDrawCircle(ofGetMouseX(), ofGetMouseY(), 5);
+    ofPopStyle();
+  }
+  
   // Draw Kinect content.
   kinect.draw(debug, showGui);
 }
 
+// ------------------ Interactive Gestures --------------------- //
+void ofApp::mouseEntered(int x, int y) {
+  isOccupied = true;
+}
+
+void ofApp::mouseExited(int x, int y) {
+  isOccupied = false;
+}
+
+
 void ofApp::keyPressed(int key){
   // ------------------ Interactive Gestures --------------------- //
-  
-  // Attract
-  if (key == 'a') {
-    attract();
-  }
   
   // Repel
   if (key == 'r') {
@@ -425,19 +443,17 @@ void ofApp::createAgents() {
   agents.push_back(agent);
 }
 
-void ofApp::attract() {
-  // Pick a random figment and enable attraction for that figment.
-  int randIdx = ofRandom(agents.size());
-  Agent *curAgent = agents[randIdx];
-
-  // Enable attraction in the figment.
-  curAgent->setDesireState(Attraction);
+void ofApp::attract(glm::vec2 targetPos) {
+  // Go through all the agents and start attracting them to this position.
+  for (auto &a : agents) {
+    a->setDesireState(Attraction, targetPos); 
+  }
 }
 
 void ofApp::repel() {
   // Repel each figment away from each other
   for (auto &a: agents) {
-    a->setDesireState(Repulsion);
+    a->setDesireState(Repulsion, glm::vec2(0, 0)); // TODO fix this.
   }
 }
 
@@ -584,7 +600,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
             }
           
             // Reset agent state to None on collision.
-            agentA->setDesireState(None);
+            agentA->setDesireState(None, glm::vec2(0, 0)); // TODO: Fix this. 
           }
           
           if (agentB->desireState == Attraction) {
@@ -601,7 +617,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
             }
             
             // Reset agent state to None on collision.
-            agentB->setDesireState(None);
+            agentB->setDesireState(None, glm::vec2(0, 0)); // TODO: Fix this.
           }
 
           // If agents can bond, evaluate the colliding bodies for collision.

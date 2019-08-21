@@ -24,6 +24,8 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
     void keyPressed(int key);
+    void mouseEntered(int x, int y);
+    void mouseExited(int x, int y); 
     void exit();
   
     // Public helpers.
@@ -33,7 +35,7 @@ class ofApp : public ofBaseApp{
     void updateAgentProps();
   
     // Behavior methods.
-    void attract();
+    void attract(glm::vec2 targetPos);
     void repel();
     void stretch();
     void enableBonding();
@@ -160,4 +162,6 @@ class ofApp : public ofBaseApp{
   
     // Kinect handle
     Kinect kinect;
+  
+    bool isOccupied;
 };

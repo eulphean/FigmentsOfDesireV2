@@ -45,13 +45,6 @@ NEST => They are making a nest, a structural, system, a rhizomatic system of con
 
 So, using this nest as the material for inspiration, I need to go and create a discourse around this. A web of connections. Is it the internet? The agents have a tendency to get together and start weaving a nest. A structure that maintains harmony, that keeps them going, or else they exhibit a wild behavior of uncertainty or uneasiness. How does the relation of this nest work in connection with humans who can be interrupting this nest? What kind of a relation am I creating here? 
 
-THINGS BROKEN
-- Partner logic
-- AssignIndices 
-- Handling Any Sort of Behavior except Stretch/Flick not working
-- No autonomy of agents currently
-- Background doesn't move with the agents (this makes us frop way too many frames. It's difficul
-
 Installation Notes
 Install the projector with the mirror and try to get it as rectangular as possible with keystoning. 
 Put some big object in the center of the projeted area. 
@@ -61,8 +54,21 @@ That's when both Kinect and Projector will be aligned to scan properly.
 Now, use the KinectParams in the app to set the max/min distance for detect object properly. 
 Align the Kinect and the projector so it's easier to set it up while installing. 
 
-Optimization
-Red texture ball to draw bodies
-Mesh to draw bonds 
-Limit number of bonds
-GUI to adjust forces on the agents
+THINGS BROKEN
+- Partner logic
+- AssignIndices 
+- Handling Any Sort of Behavior except Stretch/Flick not working
+- No autonomy of agents currently
+- Background doesn't move with the agents (this makes us frop way too many frames. It's difficul
+
+Things to do today (Wednesday, August 21, 2019)
+1: Add a flag in the GUI to change the probablity of creating agents
+2: Mouse input add attraction/repulsion for the agents
+3: Get the current position using the Kinect (from push/pop matrix to attract/repulse agents)
+4: Really nasty bug in creating the mesh vertices for the interagent joints (look at that)
+5: Background
+- Depth level 
+- Shader on interaction 
+- I'll go for a run tonight. 
+
+// After this I will think about prints (what works would I like to print and have a technological counterpart along with it. Biology. Think about it/ Research a little about / Genetic Evolution / Machine Learning maybe - That research paper by that artist - Object detector - Computer Vision on images) 

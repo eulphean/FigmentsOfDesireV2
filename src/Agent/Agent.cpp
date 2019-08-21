@@ -87,19 +87,6 @@ void Agent::draw(bool debug, bool showTexture) {
       ofPopStyle();
     }
   }
-
-  if (debug) {
-    auto centroid = mesh.getCentroid();
-    ofPushStyle();
-      ofPushMatrix();
-        ofTranslate(centroid);
-        ofNoFill();
-        ofSetColor(ofColor::white);
-          // BROKEN
-//        ofDrawCircle(0, 0, desireRadius);
-      ofPopMatrix();
-    ofPopStyle();
-  }
 }
 
 ofPoint Agent::getTextureSize() {
@@ -185,9 +172,9 @@ void Agent::applyBehaviors()  {
 void Agent::handleVertexBehaviors() {
   for (auto &v : vertices) {
     auto data = reinterpret_cast<VertexData*>(v->getData());
+    
+    // Repulsion.
     if (data->applyRepulsion) {
-      // Repel this vertex from it's partner's centroid especially
-      //auto pos = glm::vec2(partner->getCentroid().x, partner->getCentroid().y);
       auto pos = data->targetPos;
       v->addRepulsionForce(pos.x, pos.y, maxRepulsionWeight);
       
@@ -196,10 +183,9 @@ void Agent::handleVertexBehaviors() {
       v->setData(data);
     }
     
+    // Attraction.
     if (data->applyAttraction) {
-      auto data = reinterpret_cast<VertexData*>(v->getData());
-      auto pos = glm::vec2(data->targetPos.x, data->targetPos.y);
-      //auto pos = data->targetPos;
+      auto pos = data->targetPos;
       v->addAttractionPoint({pos.x, pos.y}, maxAttractionWeight);
       
       // Reset repulsion parameter on the vertex.
@@ -209,6 +195,7 @@ void Agent::handleVertexBehaviors() {
   }
 }
 
+// Unimplemented.
 void Agent::handleRepulsion() {
   // Go through all the vertices.
   // Get the data and check if it has.
@@ -217,7 +204,7 @@ void Agent::handleRepulsion() {
     for (auto &v : vertices) {
       auto data = reinterpret_cast<VertexData*>(v->getData());
       if (data->hasInterAgentJoint) {
-         v->addRepulsionForce(partner->getCentroid().x, partner->getCentroid().y, repulsionWeight);
+//         v->addRepulsionForce(partner->getCentroid().x, partner->getCentroid().y, repulsionWeight);
       }
     }
     
@@ -230,31 +217,31 @@ void Agent::handleRepulsion() {
   }
 }
 
+// Attraction.
 void Agent::handleAttraction() {
-  // Find the closest vertex from the boundary of indices and attract it to the
-  // centroid of the other mesh
+  // Find the closest vertex to the targetPos.
   if (applyAttraction) {
     float minD = 9999; int minIdx;
-    // Find minimum distance idx.
-    for (auto idx : boundaryIndices) {
+    for (int idx = 0; idx < vertices.size(); idx++) {
       auto v = vertices[idx];
       auto data = reinterpret_cast<VertexData*>(v->getData());
       
       // If it has a bond, don't add the attraction force.
       if (!data->hasInterAgentJoint) {
         auto p = glm::vec2(v->getPosition().x, v->getPosition().y);
-        auto d = glm::distance(p, partner->getCentroid());
+        auto d = glm::distance(p, targetPos);
         if (d < minD) {
           minD = d; minIdx = idx;
         }
       }
     }
     
+    // Vertex to apply force on.
     auto vertexPos = vertices[minIdx]->getPosition();
-    auto d = glm::distance(partner->getCentroid(), glm::vec2(vertexPos.x, vertexPos.y)); // Distance till the centroid.
-    float newWeight = ofMap(d, desireRadius * 5, 0, maxRepulsionWeight, 0, true);
-    auto pos = glm::vec2(partner->getCentroid().x, partner->getCentroid().y);
-    vertices[minIdx]->addAttractionPoint({pos.x, pos.y}, newWeight);
+    auto d = glm::distance(targetPos, glm::vec2(vertexPos.x, vertexPos.y)); // Distance between current vertex and the target position.
+    float weight = ofMap(d, 200, 0, maxAttractionWeight, 0, true); // TODO: Some max distance. What should be the max distance? 
+    vertices[minIdx]->addAttractionPoint(targetPos, weight);
+    applyAttraction = false;
   }
 }
 
@@ -320,8 +307,9 @@ void Agent::stretch() {
   applyStretch = true;
 }
 
-void Agent::setDesireState(DesireState newState) {
+void Agent::setDesireState(DesireState newState, glm::vec2 newPos) {
   desireState = newState;
+  targetPos = newPos;
   
   if (desireState == None) {
     applyAttraction = false;

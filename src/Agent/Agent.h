@@ -3,6 +3,7 @@
 #include "ofxBox2d.h"
 #include "ofxFilterLibrary.h"
 
+// State of the agent. 
 enum DesireState {
   None,
   Attraction,
@@ -63,7 +64,7 @@ class Agent {
     // Helpers
     glm::vec2 getCentroid();
     ofMesh& getMesh();
-    void setDesireState(DesireState state);
+    void setDesireState(DesireState state, glm::vec2 pos);
   
     // Vertices and Joints
     std::vector<std::shared_ptr<ofxBox2dCircle>> vertices; // Every vertex in the mesh is a circle.
@@ -77,11 +78,7 @@ class Agent {
     std::vector<Message>::iterator curMsg;
     std::vector<Message> messages;
   
-    // Agent's partner
-    Agent *partner = NULL;
-  
-    // Desires. 
-    float desireRadius;
+    // State
     DesireState desireState;
 
   protected:
@@ -135,6 +132,9 @@ class Agent {
     vector<int> boundaryIndices;
   
     ofTrueTypeFont font;
+  
+    // Target position for desire states
+    glm::vec2 targetPos; 
 };
 
 // Data Structure to hold a pointer to the agent instance

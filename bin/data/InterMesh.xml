@@ -40,8 +40,8 @@
 		<Side_Joint_Length>0</Side_Joint_Length>
 		<Side_Joint_Offset>10</Side_Joint_Offset>
 		<Max_Stretch_Weight>1</Max_Stretch_Weight>
-		<Max_Repulsion_Weight>6</Max_Repulsion_Weight>
-		<Max_Attraction_Weight>1</Max_Attraction_Weight>
+		<Max_Repulsion_Weight>5</Max_Repulsion_Weight>
+		<Max_Attraction_Weight>0.01</Max_Attraction_Weight>
 		<Max_Tickle_Weight>0</Max_Tickle_Weight>
 		<Max_Velocity>10</Max_Velocity>
 	</Beta_Agent_Params>
