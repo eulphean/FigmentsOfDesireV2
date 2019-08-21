@@ -8,8 +8,8 @@
 	</Background_Params>
 	<Alpha_Agent_Params>
 		<Mesh_Rows>5</Mesh_Rows>
-		<Mesh_Columns>5</Mesh_Columns>
-		<Mesh_Width>100</Mesh_Width>
+		<Mesh_Columns>26</Mesh_Columns>
+		<Mesh_Width>91</Mesh_Width>
 		<Mesh_Height>100</Mesh_Height>
 		<Texture_Width>100</Texture_Width>
 		<Texture_Height>100</Texture_Height>
