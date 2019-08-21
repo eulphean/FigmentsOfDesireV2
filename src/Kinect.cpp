@@ -119,7 +119,23 @@ void Kinect::initialize() {
   settings.add(contourParams);
   gui.setup(settings);
   
+  gui.setPosition(250, 20);
+  
   gui.loadFromFile("Kinect.xml");
+}
+
+std::vector<glm::vec2> Kinect::getBodyCentroids() {
+  std::vector<glm::vec2> centroids;
+  
+  // Master matrix
+  ofMatrix4x4 scaleMatrix = ofMatrix4x4::newScaleMatrix(ofVec3f(scaleVariables.x, scaleVariables.y, 0));
+  for (int i = 0; i < contourFinder.size(); i++) {
+    auto center = ofxCv::toOf(contourFinder.getCenter(i));
+    auto newPoint = ofVec3f(center.x, center.y, 0) * scaleMatrix;
+    centroids.push_back(glm::vec2(newPoint.x, newPoint.y));
+  }
+  
+  return centroids;
 }
 
 void Kinect::drawContent() {

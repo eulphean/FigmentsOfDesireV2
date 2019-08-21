@@ -58,10 +58,17 @@ void ofApp::update(){
   // GUI props.
   updateAgentProps();
   
-  // Interaction variables update.
+  // Are there any bodies in the kinect zone?
+  auto newPoints = kinect.getBodyCentroids();
+  if (newPoints.size() > 0) {
+    isOccupied = true;
+  } else {
+    isOccupied = false;
+  }
+  
   if (isOccupied) {
-    // Attract all the agents to this position.
-    attract(glm::vec2(ofGetMouseX(), ofGetMouseY()));
+    repel(newPoints);
+    // attract(newPoints);
   }
   
   // Update agents
@@ -133,7 +140,7 @@ void ofApp::drawSequence() {
     gui.draw();
   }
   
-  // Print a circle so we know where all the agents are being attracted to. 
+  // Print a circle so we know where all the agents are being attracted to.
   if (isOccupied) {
     ofPushStyle();
       ofSetColor(ofColor::yellow);
@@ -143,6 +150,12 @@ void ofApp::drawSequence() {
   
   // Draw Kinect content.
   kinect.draw(debug, showGui);
+//  for (auto p : newPoints) {
+//    ofPushStyle();
+//      ofSetColor(ofColor::red);
+//      ofDrawCircle(p, 5);
+//    ofPopStyle();
+//  }
 }
 
 // ------------------ Interactive Gestures --------------------- //
@@ -157,11 +170,6 @@ void ofApp::mouseExited(int x, int y) {
 
 void ofApp::keyPressed(int key){
   // ------------------ Interactive Gestures --------------------- //
-  
-  // Repel
-  if (key == 'r') {
-    repel();
-  }
   
   // Stretch
   if (key == 's') {
@@ -258,8 +266,7 @@ void ofApp::createWorld(bool createBounds) {
   }
   
   cout << "Create new background." << endl;
-  // Store params (must) and create background.
-  bg.setParams(bgParams);
+  // Create background
   bg.setup();
 }
 
@@ -267,12 +274,9 @@ void ofApp::setupGui() {
     gui.setup();
     settings.setName("The Nest GUI");
   
-    // Background GUI parameters.
-    bgParams.setName("Background Params");
-    bgParams.add(bgAttraction.set("Attraction", 20, -200, 200));
-    bgParams.add(bgRepulsion.set("Repulsion", -20, -200, 200));
-    bgAttraction.addListener(this, &ofApp::bgUpdateParams);
-    bgRepulsion.addListener(this, &ofApp::bgUpdateParams);
+    // General settings
+    generalParams.setName("General Parameters");
+    generalParams.add(alphaAgentProbability.set("Alpha Agent Probability", 0.1, 0, 0.9));
   
     // Alpha Agent GUI parameters
     alphaAgentParams.setName("Alpha Agent Params");
@@ -323,7 +327,7 @@ void ofApp::setupGui() {
     interAgentJointParams.add(iMinJointLength.set("Min Joint Length", 250, 50, 600));
     interAgentJointParams.add(iMaxJointLength.set("Max Joint Length", 300, 50, 600));
 
-    settings.add(bgParams);
+    settings.add(generalParams);
     settings.add(alphaAgentParams);
     settings.add(betaAgentParams);
     settings.add(interAgentJointParams);
@@ -432,7 +436,7 @@ void ofApp::createAgents() {
   ofPoint origin = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
   Agent *agent;
   // Based on a probablity, create a new agent.
-  if (ofRandom(1) < 0.1) {
+  if (ofRandom(1) <= alphaAgentProbability) {
     alphaAgentProps.meshOrigin = origin;
     agent = new Alpha(box2d, alphaAgentProps);
   } else {
@@ -443,17 +447,18 @@ void ofApp::createAgents() {
   agents.push_back(agent);
 }
 
-void ofApp::attract(glm::vec2 targetPos) {
+void ofApp::attract(std::vector<glm::vec2> targets) {
   // Go through all the agents and start attracting them to this position.
   for (auto &a : agents) {
-    a->setDesireState(Attraction, targetPos); 
+    // TODO: Handle multiple targets.
+    a->setDesireState(Attraction, targets[0]);
   }
 }
 
-void ofApp::repel() {
+void ofApp::repel(std::vector<glm::vec2> targets) {
   // Repel each figment away from each other
   for (auto &a: agents) {
-    a->setDesireState(Repulsion, glm::vec2(0, 0)); // TODO fix this.
+    a->setDesireState(Repulsion, targets[0]); // TODO fix this.
   }
 }
 
@@ -523,12 +528,6 @@ void ofApp::clearScreen() {
   agents.clear();
 
   box2d.enableEvents();
-}
-
-// ------------------------------ Background Parameter Update Routine ------------------------------- // 
-
-void ofApp::bgUpdateParams(int & newVal) {
-  bg.setParams(bgParams);
 }
 
 // ------------------------------ Agent Body Contact Routines --------------------------------------- //

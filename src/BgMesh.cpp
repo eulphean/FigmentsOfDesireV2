@@ -1,9 +1,5 @@
 #include "BgMesh.h"
 
-void BgMesh::setParams(ofParameterGroup params) {
-    bgParams = params;
-}
-
 bool BgMesh::isAllocated() {
   return mainFbo.isAllocated();
 }

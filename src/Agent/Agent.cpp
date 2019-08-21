@@ -197,21 +197,18 @@ void Agent::handleVertexBehaviors() {
 
 // Unimplemented.
 void Agent::handleRepulsion() {
-  // Go through all the vertices.
-  // Get the data and check if it has.
   if (applyRepulsion) {
-    repulsionWeight = ofLerp (repulsionWeight, maxRepulsionWeight, 0.1);
+    repulsionWeight = ofLerp(repulsionWeight, maxRepulsionWeight, 0.1);
     for (auto &v : vertices) {
       auto data = reinterpret_cast<VertexData*>(v->getData());
-      if (data->hasInterAgentJoint) {
-//         v->addRepulsionForce(partner->getCentroid().x, partner->getCentroid().y, repulsionWeight);
+      if (!data->hasInterAgentJoint) {
+         v->addRepulsionForce(targetPos.x, targetPos.y, repulsionWeight);
       }
     }
     
-    desireState = None;
+    applyRepulsion = false;
     
     if (maxRepulsionWeight-repulsionWeight < maxRepulsionWeight/2) {
-      applyRepulsion = false;
       repulsionWeight = 0;
     }
   }
@@ -239,7 +236,7 @@ void Agent::handleAttraction() {
     // Vertex to apply force on.
     auto vertexPos = vertices[minIdx]->getPosition();
     auto d = glm::distance(targetPos, glm::vec2(vertexPos.x, vertexPos.y)); // Distance between current vertex and the target position.
-    float weight = ofMap(d, 200, 0, maxAttractionWeight, 0, true); // TODO: Some max distance. What should be the max distance? 
+    float weight = ofMap(d, 200, 0, maxAttractionWeight, 0, true); // TODO: Some max distance. What should be the max distance?
     vertices[minIdx]->addAttractionPoint(targetPos, weight);
     applyAttraction = false;
   }

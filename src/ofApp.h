@@ -35,8 +35,8 @@ class ofApp : public ofBaseApp{
     void updateAgentProps();
   
     // Behavior methods.
-    void attract(glm::vec2 targetPos);
-    void repel();
+    void attract(std::vector<glm::vec2> targets);
+    void repel(std::vector<glm::vec2> targets);
     void stretch();
     void enableBonding();
   
@@ -65,10 +65,15 @@ class ofApp : public ofBaseApp{
     // Screengrab fbo
     ofFbo screenGrabFbo;
     int screenCaptureIdx = 0;
+
   
     // GUI
     ofxPanel gui;
     ofParameterGroup settings;
+  
+    // General settings
+    ofParameterGroup generalParams;
+    ofParameter<float> alphaAgentProbability; 
   
     // Alpha Agent Group params. 
     ofParameterGroup alphaAgentParams;
@@ -119,11 +124,6 @@ class ofApp : public ofBaseApp{
     ofParameter<int> iMinJointLength;
     ofParameter<int> iMaxJointLength; 
   
-    // Background GUI params.
-    ofParameterGroup bgParams;
-    ofParameter<int> bgAttraction;
-    ofParameter<int> bgRepulsion;
-    void bgUpdateParams(int & newVal); // For attraction/repulsion
   
   private:
   

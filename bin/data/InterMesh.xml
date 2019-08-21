@@ -7,20 +7,20 @@
 		<Repulsion>-55</Repulsion>
 	</Background_Params>
 	<Alpha_Agent_Params>
-		<Mesh_Rows>5</Mesh_Rows>
-		<Mesh_Columns>26</Mesh_Columns>
-		<Mesh_Width>91</Mesh_Width>
-		<Mesh_Height>100</Mesh_Height>
+		<Mesh_Rows>10</Mesh_Rows>
+		<Mesh_Columns>10</Mesh_Columns>
+		<Mesh_Width>80</Mesh_Width>
+		<Mesh_Height>80</Mesh_Height>
 		<Texture_Width>100</Texture_Width>
 		<Texture_Height>100</Texture_Height>
 		<Vertex_Density>1</Vertex_Density>
 		<Vertex_Bounce>0.1</Vertex_Bounce>
 		<Vertex_Friction>1</Vertex_Friction>
-		<Vertex_Radius>3</Vertex_Radius>
+		<Vertex_Radius>5</Vertex_Radius>
 		<Joint_Frequency>5</Joint_Frequency>
 		<Joint_Damping>1</Joint_Damping>
 		<Max_Stretch_Weight>1</Max_Stretch_Weight>
-		<Max_Repulsion_Weight>0</Max_Repulsion_Weight>
+		<Max_Repulsion_Weight>0.01</Max_Repulsion_Weight>
 		<Max_Attraction_Weight>0</Max_Attraction_Weight>
 		<Max_Tickle_Weight>0</Max_Tickle_Weight>
 		<Max_Velocity>5</Max_Velocity>
@@ -40,7 +40,7 @@
 		<Side_Joint_Length>0</Side_Joint_Length>
 		<Side_Joint_Offset>10</Side_Joint_Offset>
 		<Max_Stretch_Weight>1</Max_Stretch_Weight>
-		<Max_Repulsion_Weight>5</Max_Repulsion_Weight>
+		<Max_Repulsion_Weight>0.02</Max_Repulsion_Weight>
 		<Max_Attraction_Weight>0.01</Max_Attraction_Weight>
 		<Max_Tickle_Weight>0</Max_Tickle_Weight>
 		<Max_Velocity>10</Max_Velocity>
@@ -51,4 +51,7 @@
 		<Min_Joint_Length>400</Min_Joint_Length>
 		<Max_Joint_Length>500</Max_Joint_Length>
 	</InterAgentJoint_Params>
+	<General_Parameters>
+		<Alpha_Agent_Probability>0.546429</Alpha_Agent_Probability>
+	</General_Parameters>
 </The_Nest_GUI>
