@@ -9,7 +9,7 @@ Message::Message(glm::vec2 loc, ofColor col, float s) {
   size = s;
 }
 
-void Message::draw(ofTrueTypeFont font) {
+void Message::draw() {
   ofPushMatrix();
     ofTranslate(location);
       ofPushStyle();
@@ -43,6 +43,13 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   
   // Current desire state. 
   desireState = None;
+  
+  // Some initial force values.
+  repulsionWeight = 0;
+  stretchWeight = 0;
+  attractionWeight = 0;
+  coolDown = 0;
+  maxCoolDown = 200; // Wait time before the agent actually is ready to take more forces. 
 }
 
 void Agent::update(AgentProps alphaProps, AgentProps betaProps) {
@@ -141,7 +148,7 @@ void Agent::createTexture(ofPoint textureSize) {
   
     // Draw assigned messages.
     for (auto m : messages) {
-      m.draw(font);
+      m.draw();
     }
 
   firstFbo.end();
@@ -167,6 +174,11 @@ void Agent::applyBehaviors()  {
   
   // Behavior of individual bodies on the agent (all circles mostly)
   handleVertexBehaviors();
+  
+  // Should the agent be cooling down?
+  if (coolDown > 0) {
+    coolDown--;
+  }
 }
 
 void Agent::handleVertexBehaviors() {
@@ -217,28 +229,34 @@ void Agent::handleRepulsion() {
 // Attraction.
 void Agent::handleAttraction() {
   // Find the closest vertex to the targetPos.
-  if (applyAttraction) {
-    float minD = 9999; int minIdx;
-    for (int idx = 0; idx < vertices.size(); idx++) {
-      auto v = vertices[idx];
-      auto data = reinterpret_cast<VertexData*>(v->getData());
-      
-      // If it has a bond, don't add the attraction force.
-      if (!data->hasInterAgentJoint) {
-        auto p = glm::vec2(v->getPosition().x, v->getPosition().y);
-        auto d = glm::distance(p, targetPos);
-        if (d < minD) {
-          minD = d; minIdx = idx;
+  if (applyAttraction && coolDown == 0) {
+      float minD = 9999; int minIdx;
+      for (int idx = 0; idx < vertices.size(); idx++) {
+        auto v = vertices[idx];
+        auto data = reinterpret_cast<VertexData*>(v->getData());
+
+        // If it has a bond, don't add the attraction force.
+        if (!data->hasInterAgentJoint) {
+          auto p = glm::vec2(v->getPosition().x, v->getPosition().y);
+          auto d = glm::distance(p, targetPos);
+          if (d < minD) {
+            minD = d; minIdx = idx;
+          }
         }
       }
-    }
     
-    // Vertex to apply force on.
-    auto vertexPos = vertices[minIdx]->getPosition();
-    auto d = glm::distance(targetPos, glm::vec2(vertexPos.x, vertexPos.y)); // Distance between current vertex and the target position.
-    float weight = ofMap(d, 200, 0, maxAttractionWeight, 0, true); // TODO: Some max distance. What should be the max distance?
-    vertices[minIdx]->addAttractionPoint(targetPos, weight);
-    applyAttraction = false;
+      // This weight is 100 times less than the maxAttraction weight because it
+      // acts successively on only one vertex. Also, this force is lerped so the
+      // creature has a stretch/bacteria like feeling. The force is still applied
+      // on the closest vertex from the person. 
+      float newMaxWeight = maxAttractionWeight/100;
+      attractionWeight = ofLerp(attractionWeight, newMaxWeight, 0.01);
+      vertices[minIdx]->addAttractionPoint(targetPos, attractionWeight);
+      if (newMaxWeight - attractionWeight <= 0.01) {
+        applyAttraction = false;
+        attractionWeight = 0;
+        coolDown = maxCoolDown;
+      }
   }
 }
 

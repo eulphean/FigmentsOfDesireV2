@@ -62,10 +62,6 @@ THINGS BROKEN
 - Background doesn't move with the agents (this makes us frop way too many frames. It's difficul
 
 Things to do today (Wednesday, August 21, 2019)
-1: Add a flag in the GUI to change the probablity of creating agents
-2: Mouse input add attraction/repulsion for the agents
-3: Get the current position using the Kinect (from push/pop matrix to attract/repulse agents)
-4: Really nasty bug in creating the mesh vertices for the interagent joints (look at that)
 5: Background
 - Depth level 
 - Shader on interaction 

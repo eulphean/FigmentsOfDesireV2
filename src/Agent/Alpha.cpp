@@ -11,9 +11,6 @@ Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
               ofColor::fromHex(0x0BF6CD)
   };
   
-  // Lerped weights.
-  repulsionWeight = 0;
-  stretchWeight = 0;
   updateWeights(agentProps);
 
   // Create Mesh

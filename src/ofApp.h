@@ -33,6 +33,7 @@ class ofApp : public ofBaseApp{
     void createAgents();
     void clearAgents();
     void updateAgentProps();
+    void handleInteraction(); 
   
     // Behavior methods.
     void attract(std::vector<glm::vec2> targets);

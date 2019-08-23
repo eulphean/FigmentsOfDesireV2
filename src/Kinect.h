@@ -12,6 +12,9 @@ class Kinect {
     void draw(bool isDebug, bool hideKinectGui);
     std::vector<glm::vec2> getBodyCentroids(); // TODO: This should be a vector
   
+    // Flags
+    bool kinectOpen;
+  
     // Kinect Gui.
     ofxPanel gui;
   
@@ -24,10 +27,7 @@ class Kinect {
     void drawTextureAtRowAndColumn(const std::string& title,
                                    const ofTexture& tex,
                                    int row, int column,
-                                   float width, float height); 
-  
-    // Flags
-    bool kinectOpen;
+                                   float width, float height);
 
     ofParameterGroup settings;
   

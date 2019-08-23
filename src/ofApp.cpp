@@ -58,18 +58,8 @@ void ofApp::update(){
   // GUI props.
   updateAgentProps();
   
-  // Are there any bodies in the kinect zone?
-  auto newPoints = kinect.getBodyCentroids();
-  if (newPoints.size() > 0) {
-    isOccupied = true;
-  } else {
-    isOccupied = false;
-  }
-  
-  if (isOccupied) {
-    repel(newPoints);
-    // attract(newPoints);
-  }
+  // All the interaction logic.
+  handleInteraction();
   
   // Update agents
   for (auto &a : agents) {
@@ -150,12 +140,6 @@ void ofApp::drawSequence() {
   
   // Draw Kinect content.
   kinect.draw(debug, showGui);
-//  for (auto p : newPoints) {
-//    ofPushStyle();
-//      ofSetColor(ofColor::red);
-//      ofDrawCircle(p, 5);
-//    ofPopStyle();
-//  }
 }
 
 // ------------------ Interactive Gestures --------------------- //
@@ -165,6 +149,21 @@ void ofApp::mouseEntered(int x, int y) {
 
 void ofApp::mouseExited(int x, int y) {
   isOccupied = false;
+}
+
+void ofApp::handleInteraction() {
+  if (kinect.kinectOpen) {
+    if (isOccupied) {
+      auto people = kinect.getBodyCentroids();
+      attract(people);
+    }
+  } else {
+    if (isOccupied) {
+      std::vector<glm::vec2> people;
+      people.push_back(glm::vec2(ofGetMouseX(), ofGetMouseY()));
+      attract(people);
+    }
+  }
 }
 
 
@@ -448,9 +447,9 @@ void ofApp::createAgents() {
 }
 
 void ofApp::attract(std::vector<glm::vec2> targets) {
-  // Go through all the agents and start attracting them to this position.
+  // Find the closest agent to this position.
+  // Put an attraction flag on that agent.
   for (auto &a : agents) {
-    // TODO: Handle multiple targets.
     a->setDesireState(Attraction, targets[0]);
   }
 }

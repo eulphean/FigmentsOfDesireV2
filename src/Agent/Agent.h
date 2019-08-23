@@ -17,7 +17,7 @@ enum DesireState {
 class Message {
   public:
     Message(glm::vec2 loc, ofColor col, float size);
-    void draw(ofTrueTypeFont font);
+    void draw();
   
     glm::vec2 location;
     ofColor color;
@@ -97,6 +97,7 @@ class Agent {
     // These weights are lerped. 
     float stretchWeight;
     float repulsionWeight;
+    float attractionWeight; 
   
     // Each derived class will override these methods as they define their own
     // meshes and soft bodies.
@@ -131,10 +132,12 @@ class Agent {
     int cornerIndices[4];
     vector<int> boundaryIndices;
   
-    ofTrueTypeFont font;
-  
     // Target position for desire states
-    glm::vec2 targetPos; 
+    glm::vec2 targetPos;
+  
+    // Wait time before being able to be applied with another force. 
+    long coolDown;
+    int maxCoolDown;
 };
 
 // Data Structure to hold a pointer to the agent instance
