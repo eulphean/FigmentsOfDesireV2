@@ -142,7 +142,7 @@ void ofApp::drawSequence() {
   kinect.draw(debug, showGui);
 }
 
-// ------------------ Interactive Gestures --------------------- //
+// ------------------ Activate Agent Behaviors With Audience Interaction --------------------- //
 void ofApp::mouseEntered(int x, int y) {
   isOccupied = true;
 }
@@ -155,25 +155,70 @@ void ofApp::handleInteraction() {
   if (kinect.kinectOpen) {
     if (isOccupied) {
       auto people = kinect.getBodyCentroids();
+      // Activate all the possible behaviors on the agents.
       attract(people);
+      tickle(people);
     }
   } else {
     if (isOccupied) {
       std::vector<glm::vec2> people;
       people.push_back(glm::vec2(ofGetMouseX(), ofGetMouseY()));
+      // Activate all the possible behaviors on the agents.
       attract(people);
+      tickle(people);
     }
   }
 }
 
+void ofApp::attract(std::vector<glm::vec2> targets) {
+  // Closest agent (centroid wise)
+  for (auto t: targets) {
+    auto closestAgent = getClosestAgent(t);
+    if (closestAgent != NULL) {
+      closestAgent->setDesireState(Attraction, t);
+    }
+  }
+}
+
+void ofApp::tickle(std::vector<glm::vec2> targets) {
+  for (auto t: targets) {
+    for (auto &a : agents) {
+      auto d = glm::distance(t, a->getCentroid());
+      if (d <= a->visibilityRadius) {
+        a->tickle();
+      }
+    }
+  }
+}
+
+void ofApp::stretch(std::vector<glm::vec2> targets) {
+  // Not implemented currently.
+}
+
+void ofApp::repel(std::vector<glm::vec2> targets) {
+  // Repel each figment away from each other
+  for (auto &a: agents) {
+    a->setDesireState(Repulsion, targets[0]); // TODO fix this.
+  }
+}
+
+Agent* ofApp::getClosestAgent(glm::vec2 targetPos) {
+  auto minD = 9999;
+  Agent *minAgent = NULL;
+  for (auto &a : agents) {
+    auto d = glm::distance(targetPos, a->getCentroid());
+    if (d < minD) {
+      minD = d;
+      minAgent = a;
+    }
+  }
+  return minAgent;
+}
+
+
 
 void ofApp::keyPressed(int key){
   // ------------------ Interactive Gestures --------------------- //
-  
-  // Stretch
-  if (key == 's') {
-    stretch();
-  }
   
   // Enable/Disable Bonding
   if (key == 'b') {
@@ -446,50 +491,6 @@ void ofApp::createAgents() {
   agents.push_back(agent);
 }
 
-void ofApp::attract(std::vector<glm::vec2> targets) {
-  // Closest agent (centroid wise)
-  for (auto t : targets) {
-    auto closestAgent = getClosestAgent(t);
-    closestAgent->setDesireState(Attraction, t);
-  }
-}
-
-void ofApp::repel(std::vector<glm::vec2> targets) {
-  // Repel each figment away from each other
-  for (auto &a: agents) {
-    a->setDesireState(Repulsion, targets[0]); // TODO fix this.
-  }
-}
-
-Agent* ofApp::getClosestAgent(glm::vec2 targetPos) {
-  auto minD = 9999;
-  Agent *minAgent;
-  for (auto &a : agents) {
-    auto d = glm::distance(targetPos, a->getCentroid());
-    if (d < minD) {
-      minD = d;
-      minAgent = a;
-    }
-  }
-  return minAgent;
-}
-
-void ofApp::stretch() {
-  // Either one or all the agents stretch based on a probability.
-  if (ofRandom(1) < 0.5) {
-    // Pick a random agent and make stretch.
-    int randIdx = ofRandom(agents.size());
-    auto agent = agents[randIdx];
-    agent->stretch();
-  } else {
-    // Stretch them all.
-    for (auto &a : agents) {
-      if (a->desireState != Repulsion) {
-        a->stretch();
-      }
-    }
-  }
-}
 
 void ofApp::removeJoints() {
   box2d.disableEvents();

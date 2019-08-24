@@ -11,6 +11,9 @@ Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
               ofColor::fromHex(0x0BF6CD)
   };
   
+  // Visibility range around the agent
+  visibilityRadius = agentProps.meshSize.x/2; 
+  
   updateWeights(agentProps);
 
   // Create Mesh

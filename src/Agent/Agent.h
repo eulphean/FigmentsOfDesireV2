@@ -80,6 +80,9 @@ class Agent {
   
     // State
     DesireState desireState;
+  
+    // Visibility Radius
+    float visibilityRadius; 
 
   protected:
     // Derived class needs to have access to these. 

@@ -10,9 +10,7 @@ Beta::Beta(ofxBox2d &box2d, BetaAgentProperties agentProps) {
               ofColor::fromHex(0xC0F60B)
   };
   
-  // Lerped weights.
-  repulsionWeight = 0;
-  stretchWeight = 0;
+  visibilityRadius = agentProps.meshRadius; 
   
   updateWeights(agentProps);
   

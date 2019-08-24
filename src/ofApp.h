@@ -38,7 +38,8 @@ class ofApp : public ofBaseApp{
     // Behavior methods.
     void attract(std::vector<glm::vec2> targets);
     void repel(std::vector<glm::vec2> targets);
-    void stretch();
+    void stretch(std::vector<glm::vec2> targets);
+    void tickle(std::vector<glm::vec2> targets)
     void enableBonding();
   
     // Contact listening callbacks.
@@ -124,7 +125,6 @@ class ofApp : public ofBaseApp{
     ofParameter<float> iJointDamping;
     ofParameter<int> iMinJointLength;
     ofParameter<int> iMaxJointLength; 
-  
   
   private:
   
