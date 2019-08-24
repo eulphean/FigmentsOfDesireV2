@@ -153,19 +153,27 @@ void ofApp::mouseExited(int x, int y) {
 
 void ofApp::handleInteraction() {
   if (kinect.kinectOpen) {
+    // Is the area occupied?
+    auto people = kinect.getBodyCentroids();
+    isOccupied = people.size() > 0;
     if (isOccupied) {
-      auto people = kinect.getBodyCentroids();
       // Activate all the possible behaviors on the agents.
       attract(people);
+      shouldBond = true;
       tickle(people);
+    } else {
+      clearInterAgentBonds();
     }
-  } else {
+  } else { // Test Routine
     if (isOccupied) {
+      shouldBond = true;
       std::vector<glm::vec2> people;
       people.push_back(glm::vec2(ofGetMouseX(), ofGetMouseY()));
       // Activate all the possible behaviors on the agents.
       attract(people);
       tickle(people);
+    } else {
+      clearInterAgentBonds();
     }
   }
 }
@@ -184,7 +192,7 @@ void ofApp::tickle(std::vector<glm::vec2> targets) {
   for (auto t: targets) {
     for (auto &a : agents) {
       auto d = glm::distance(t, a->getCentroid());
-      if (d <= a->visibilityRadius) {
+      if (d <= a->visibilityRadius*2) {
         a->tickle();
       }
     }
@@ -199,6 +207,13 @@ void ofApp::repel(std::vector<glm::vec2> targets) {
   // Repel each figment away from each other
   for (auto &a: agents) {
     a->setDesireState(Repulsion, targets[0]); // TODO fix this.
+  }
+}
+
+void ofApp::clearInterAgentBonds() {
+  shouldBond = false;
+  if (superAgents.size() == 0) {
+    SuperAgent::initJointMesh(); // Clear the mesh and reinitialize
   }
 }
 
@@ -218,21 +233,6 @@ Agent* ofApp::getClosestAgent(glm::vec2 targetPos) {
 
 
 void ofApp::keyPressed(int key){
-  // ------------------ Interactive Gestures --------------------- //
-  
-  // Enable/Disable Bonding
-  if (key == 'b') {
-    enableBonding();
-  }
-  
-  // Tickle the agents.
-  if (key == 'f') {
-    // Apply a random force
-    for (auto &a: agents) {
-      a->tickle();
-    }
-  }
-  
   // ------------------ Interactive Gestures --------------------- //
   
   if (key == 'd') {
@@ -506,13 +506,6 @@ void ofApp::removeJoints() {
   box2d.enableEvents();
 }
 
-void ofApp::enableBonding() {
-  shouldBond = !shouldBond;
-  
-  if (!shouldBond) {
-    SuperAgent::initJointMesh(); // Clear the mesh and reinitialize
-  }
-}
 
 void ofApp::removeUnbonded() {
   ofRemove(agents, [&](Agent *a) {

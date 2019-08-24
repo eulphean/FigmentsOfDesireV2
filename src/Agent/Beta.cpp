@@ -44,8 +44,8 @@ void Beta::createMesh(BetaAgentProperties agentProps) {
   // TOOD: This meshPoints can be subtracted by 1 for sure here ----> Right now, it's just packed with circles
 
   // Add vertices around the center to form a circle.
-  for(int i = 1; i < numMeshPoints; i++){
-    float n = ofMap(i, 1, numMeshPoints-1, 0.0, TWO_PI, true); // Calculate angle at each boundary point.
+  for(int i = 0; i < numMeshPoints; i++){
+    float n = ofMap(i, 0, numMeshPoints, 0.0, TWO_PI, true); // Calculate angle at each boundary point.
     float x = cos(n);
     float y = sin(n);
     
@@ -70,12 +70,7 @@ void Beta::createSoftBody(ofxBox2d &box2d, BetaAgentProperties agentProps) {
   for (int i = 0; i < mesh.getVertices().size(); i++) {
     auto vertex = std::make_shared<ofxBox2dCircle>();
     vertex -> setPhysics(agentProps.vertexPhysics.x, agentProps.vertexPhysics.y, agentProps.vertexPhysics.y); // bounce, density, friction
-    
-    if (i == 0) { // This is the 0th vertex.
-      vertex->setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius + 2);
-    } else {
-      vertex->setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius);
-    }
+    vertex->setup(box2d.getWorld(), meshVertices[i].x, meshVertices[i].y, agentProps.vertexRadius);
     
     // Other properties. 
     vertex->setFixedRotation(true);
@@ -87,7 +82,7 @@ void Beta::createSoftBody(ofxBox2d &box2d, BetaAgentProperties agentProps) {
   // Connect center vertex to all the vertices.
   // Start from 1st vertex because the 0th vertex (center) is connected other vertices on the boundary.
   // We go 1 less than the mesh points because last point in the mesh is the same as the second point (after center).
-  for(auto i=1; i< vertices.size(); i++) {
+  for(auto i=1; i<vertices.size(); i++) {
     auto joint = std::make_shared<ofxBox2dJoint>();
     joint->setup(box2d.getWorld(), vertices[0] -> body, vertices[i] -> body, agentProps.centerJointPhysics.x, agentProps.centerJointPhysics.y);
     joint->setLength(agentProps.meshRadius);
@@ -95,7 +90,7 @@ void Beta::createSoftBody(ofxBox2d &box2d, BetaAgentProperties agentProps) {
   }
   
   // Connect joints with each other.
-  for(auto i=1; i < vertices.size(); i++) {
+  for(auto i=1; i <vertices.size(); i++) {
     auto joint = std::make_shared<ofxBox2dJoint>();
 
     // At last index, make a spring back to 0.
@@ -110,15 +105,9 @@ void Beta::createSoftBody(ofxBox2d &box2d, BetaAgentProperties agentProps) {
 }
 
 void Beta::updateMesh() {
- for (int i = 0; i < numMeshPoints; i++) {
+ for (int i = 0; i < mesh.getVertices().size() ; i++) {
     // Get ith circle's position.
-    glm::vec2 pos;
-   
-    if (i == numMeshPoints - 1) {
-      pos = vertices[1] -> getPosition();
-    } else {
-      pos = vertices[i] -> getPosition();
-    }
+    glm::vec2 pos = vertices[i] -> getPosition();
   
     // Update ith mesh vertex's position.
     auto vertex = mesh.getVertices()[i];

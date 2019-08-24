@@ -233,15 +233,10 @@ void Agent::handleAttraction() {
       float minD = 9999; int minIdx;
       for (int idx = 0; idx < vertices.size(); idx++) {
         auto v = vertices[idx];
-        auto data = reinterpret_cast<VertexData*>(v->getData());
-
-        // If it has a bond, don't add the attraction force.
-        if (!data->hasInterAgentJoint) {
-          auto p = glm::vec2(v->getPosition().x, v->getPosition().y);
-          auto d = glm::distance(p, targetPos);
-          if (d < minD) {
-            minD = d; minIdx = idx;
-          }
+        auto p = glm::vec2(v->getPosition().x, v->getPosition().y);
+        auto d = glm::distance(p, targetPos);
+        if (d < minD) {
+          minD = d; minIdx = idx;
         }
       }
     
@@ -272,7 +267,7 @@ void Agent::handleStretch() {
         } else {
           v->addRepulsionForce(mesh.getCentroid().x, mesh.getCentroid().y, stretchWeight);
         }
-        v->setRotation(ofRandom(150));
+//        v->setRotation(ofRandom(150));
       }
     }
     
@@ -288,7 +283,7 @@ void Agent::handleTickle() {
   if (applyTickle == true) {
     // Apply the tickle.
     for (auto &v: vertices) {
-      glm::vec2 force = glm::vec2(ofRandom(-5, 5), ofRandom(-5, 5));
+      glm::vec2 force = glm::vec2(ofRandom(-2, 2), ofRandom(-2, 2));
       v -> addForce(force, maxTickleWeight);
     }
     applyTickle = false;

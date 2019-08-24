@@ -129,7 +129,7 @@ void SuperAgent::clean(ofxBox2d &box2d) {
 
 glm::vec2 SuperAgent::getBodyPosition(b2Body* body) {
   auto xf = body->GetTransform();
-  b2Vec2 pos      = body->GetLocalCenter();
+  b2Vec2 pos = body->GetLocalCenter();
   b2Vec2 b2Center = b2Mul(xf, pos);
   auto p = worldPtToscreenPt(b2Center);
   return glm::vec2(p.x, p.y);
@@ -140,7 +140,6 @@ ofMesh SuperAgent::jointMesh;
 int SuperAgent::curMeshIdx = 0;
 
 void SuperAgent::initJointMesh() {
-  cout << "Clearing the mesh" << endl; 
   SuperAgent::jointMesh.clear();
   SuperAgent::curMeshIdx = 0; 
   SuperAgent::jointMesh.setMode(OF_PRIMITIVE_LINES);

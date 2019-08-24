@@ -39,8 +39,8 @@ class ofApp : public ofBaseApp{
     void attract(std::vector<glm::vec2> targets);
     void repel(std::vector<glm::vec2> targets);
     void stretch(std::vector<glm::vec2> targets);
-    void tickle(std::vector<glm::vec2> targets)
-    void enableBonding();
+    void tickle(std::vector<glm::vec2> targets);
+    void clearInterAgentBonds(); 
   
     // Contact listening callbacks.
     void contactStart(ofxBox2dContactArgs &e);
