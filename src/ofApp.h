@@ -136,6 +136,7 @@ class ofApp : public ofBaseApp{
     void drawSequence();
     glm::vec2 getBodyPosition(b2Body* body);
     void createWorld(bool createBonds);
+    Agent *getClosestAgent(glm::vec2 targetPos); 
   
     std::vector<Memory> memories;
     std::vector<b2Body *> collidingBodies;

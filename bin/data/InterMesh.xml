@@ -21,7 +21,7 @@
 		<Joint_Damping>0.5</Joint_Damping>
 		<Max_Stretch_Weight>1</Max_Stretch_Weight>
 		<Max_Repulsion_Weight>3</Max_Repulsion_Weight>
-		<Max_Attraction_Weight>3</Max_Attraction_Weight>
+		<Max_Attraction_Weight>4</Max_Attraction_Weight>
 		<Max_Tickle_Weight>0</Max_Tickle_Weight>
 		<Max_Velocity>5</Max_Velocity>
 	</Alpha_Agent_Params>
@@ -33,15 +33,15 @@
 		<Vertex_Bounce>0.1</Vertex_Bounce>
 		<Vertex_Friction>0.999872</Vertex_Friction>
 		<Vertex_Radius>2.5</Vertex_Radius>
-		<Center_Joint_Frequency>0.9</Center_Joint_Frequency>
+		<Center_Joint_Frequency>1.5</Center_Joint_Frequency>
 		<Center_Joint_Damping>0.5</Center_Joint_Damping>
 		<Side_Joint_Frequency>1.5</Side_Joint_Frequency>
 		<Side_Joint_Damping>5</Side_Joint_Damping>
 		<Side_Joint_Length>0</Side_Joint_Length>
 		<Side_Joint_Offset>10</Side_Joint_Offset>
 		<Max_Stretch_Weight>1</Max_Stretch_Weight>
-		<Max_Repulsion_Weight>2</Max_Repulsion_Weight>
-		<Max_Attraction_Weight>2</Max_Attraction_Weight>
+		<Max_Repulsion_Weight>3</Max_Repulsion_Weight>
+		<Max_Attraction_Weight>3</Max_Attraction_Weight>
 		<Max_Tickle_Weight>1</Max_Tickle_Weight>
 		<Max_Velocity>10</Max_Velocity>
 	</Beta_Agent_Params>
@@ -52,6 +52,6 @@
 		<Max_Joint_Length>500</Max_Joint_Length>
 	</InterAgentJoint_Params>
 	<General_Parameters>
-		<Alpha_Agent_Probability>0.808163</Alpha_Agent_Probability>
+		<Alpha_Agent_Probability>0.9</Alpha_Agent_Probability>
 	</General_Parameters>
 </The_Nest_GUI>

@@ -447,10 +447,10 @@ void ofApp::createAgents() {
 }
 
 void ofApp::attract(std::vector<glm::vec2> targets) {
-  // Find the closest agent to this position.
-  // Put an attraction flag on that agent.
-  for (auto &a : agents) {
-    a->setDesireState(Attraction, targets[0]);
+  // Closest agent (centroid wise)
+  for (auto t : targets) {
+    auto closestAgent = getClosestAgent(t);
+    closestAgent->setDesireState(Attraction, t);
   }
 }
 
@@ -459,6 +459,19 @@ void ofApp::repel(std::vector<glm::vec2> targets) {
   for (auto &a: agents) {
     a->setDesireState(Repulsion, targets[0]); // TODO fix this.
   }
+}
+
+Agent* ofApp::getClosestAgent(glm::vec2 targetPos) {
+  auto minD = 9999;
+  Agent *minAgent;
+  for (auto &a : agents) {
+    auto d = glm::distance(targetPos, a->getCentroid());
+    if (d < minD) {
+      minD = d;
+      minAgent = a;
+    }
+  }
+  return minAgent;
 }
 
 void ofApp::stretch() {
