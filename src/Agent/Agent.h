@@ -42,7 +42,7 @@ struct AgentProps {
 class Agent {
   public:
     void setup(ofxBox2d &box2d, ofPoint textureSize);
-    void draw(bool debug, bool showTexture);
+    void draw(bool showVisibilityRadius, bool showTexture);
     virtual void update(AgentProps alphaProps, AgentProps betaProps);
   
     // Clean the agent

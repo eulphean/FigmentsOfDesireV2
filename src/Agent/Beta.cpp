@@ -10,7 +10,7 @@ Beta::Beta(ofxBox2d &box2d, BetaAgentProperties agentProps) {
               ofColor::fromHex(0xC0F60B)
   };
   
-  visibilityRadius = agentProps.meshRadius; 
+  visibilityRadius = agentProps.meshRadius * 2; 
   
   updateWeights(agentProps);
   

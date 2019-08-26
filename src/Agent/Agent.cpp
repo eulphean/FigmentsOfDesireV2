@@ -49,7 +49,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   stretchWeight = 0;
   attractionWeight = 0;
   coolDown = 0;
-  maxCoolDown = 200; // Wait time before the agent actually is ready to take more forces. 
+  maxCoolDown = 100; // Wait time before the agent actually is ready to take more forces. 
 }
 
 void Agent::update(AgentProps alphaProps, AgentProps betaProps) {
@@ -67,7 +67,7 @@ void Agent::update(AgentProps alphaProps, AgentProps betaProps) {
   applyBehaviors();
 }
 
-void Agent::draw(bool debug, bool showTexture) {
+void Agent::draw(bool showVisibilityRadius, bool showTexture) {
  // Draw the mesh vertices as soft bodies
  // Get the radius of the soft body and change the size.
  auto bodyRadius = this->vertices[0]->getRadius();
@@ -93,6 +93,14 @@ void Agent::draw(bool debug, bool showTexture) {
       }
       ofPopStyle();
     }
+  }
+  
+  if (showVisibilityRadius) {
+    ofPushStyle();
+      ofNoFill();
+      ofSetColor(ofColor::yellow);
+      ofDrawCircle(getCentroid(), visibilityRadius);
+    ofPopStyle();
   }
 }
 

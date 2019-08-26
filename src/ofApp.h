@@ -54,6 +54,7 @@ class ofApp : public ofBaseApp{
     bool showTexture;
     bool drawFbo; // For saving frames.
     bool shouldBond;
+    bool showVisibilityRadius;
   
     // Box2d world handle.
     ofxBox2d box2d;

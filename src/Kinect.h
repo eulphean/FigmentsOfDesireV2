@@ -9,7 +9,7 @@ class Kinect {
   public:
     void setup();
     void update();
-    void draw(bool isDebug, bool hideKinectGui);
+    void draw();
     std::vector<glm::vec2> getBodyCentroids(); // TODO: This should be a vector
   
     // Flags

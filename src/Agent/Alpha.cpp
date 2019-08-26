@@ -12,7 +12,7 @@ Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
   };
   
   // Visibility range around the agent
-  visibilityRadius = agentProps.meshSize.x/2; 
+  visibilityRadius = (agentProps.meshSize.x/2) * 5; 
   
   updateWeights(agentProps);
 

@@ -45,7 +45,7 @@ void ofApp::setup(){
 }
 
 void ofApp::update(){
-//  processOsc();
+  //  processOsc();
   box2d.update();
   kinect.update();
   
@@ -108,7 +108,7 @@ void ofApp::drawSequence() {
   
   // Draw Agent is the virtual method for derived class.
   for (auto a: agents) {
-    a->draw(debug, showTexture);
+    a->draw(showVisibilityRadius, showTexture);
   }
 
   // Draw memories
@@ -125,29 +125,50 @@ void ofApp::drawSequence() {
     ofPopStyle();
   ofPopMatrix();
   
-  // Health parameters
-  if (showGui) {
-    gui.draw();
-  }
-  
-  // Print a circle so we know where all the agents are being attracted to.
-  if (isOccupied) {
-    ofPushStyle();
-      ofSetColor(ofColor::yellow);
-      ofDrawCircle(ofGetMouseX(), ofGetMouseY(), 5);
-    ofPopStyle();
-  }
-  
-  // Draw Kinect content.
-  kinect.draw(debug, showGui);
-  
+  // All debug logic.
   if (debug) {
+    kinect.draw(); // Kinect debug code.
+    // Alignment lines
     ofPushStyle();
       ofSetColor(ofColor::red);
       ofSetLineWidth(10);
       ofDrawLine(0, ofGetHeight()/2, ofGetWidth(), ofGetHeight()/2); // Horizontal
       ofDrawLine(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
     ofPopStyle();
+  }
+  
+  // Visibility radius of the body
+  if (showVisibilityRadius) {
+    // Draw the visibility radius around agents as well as users
+    auto people = kinect.getBodyCentroids();
+    ofPushStyle();
+      ofNoFill();
+      for (auto p : people) {
+        ofSetColor(ofColor::red);
+        ofDrawCircle(p, 200);
+      }
+    ofPopStyle();
+  }
+  
+  // Show mouse cursor if the kinect didn't open. That means there was
+  // no Kinect connected. 
+  if (!kinect.kinectOpen) {
+    ofPushStyle();
+      ofSetColor(ofColor::yellow);
+      ofDrawCircle(ofGetMouseX(), ofGetMouseY(), 5);
+    
+      if (showVisibilityRadius) {
+        ofNoFill();
+        ofSetColor(ofColor::red);
+        ofDrawCircle(ofGetMouseX(), ofGetMouseY(), 200);
+      }
+    ofPopStyle();
+  }
+  
+  
+  // Health parameters
+  if (showGui) {
+    gui.draw();
   }
 }
 
@@ -243,6 +264,10 @@ Agent* ofApp::getClosestAgent(glm::vec2 targetPos) {
 
 void ofApp::keyPressed(int key){
   // ------------------ Interactive Gestures --------------------- //
+  
+  if (key == 'v') {
+    showVisibilityRadius = !showVisibilityRadius;
+  }
   
   if (key == 'd') {
     debug = !debug;
