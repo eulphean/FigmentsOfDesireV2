@@ -10,7 +10,7 @@ Beta::Beta(ofxBox2d &box2d, BetaAgentProperties agentProps) {
               ofColor::fromHex(0xC0F60B)
   };
   
-  visibilityRadius = agentProps.meshRadius * 2; 
+  visibilityRadius = agentProps.meshRadius * agentProps.visibilityRadiusFactor;
   
   updateWeights(agentProps);
   
@@ -118,17 +118,21 @@ void Beta::updateMesh() {
 }
 
 
-void Beta::update(AgentProps alphaProps, AgentProps betaProps) {
+void Beta::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
   // Update local mesh.
   updateMesh();
   
+  // Weights
   updateWeights(betaProps);
+  
+  // Update visibility radius with factor from GUI. 
+  visibilityRadius = betaProps.meshRadius * betaProps.visibilityRadiusFactor;
   
   // Call base class's update method.
   Agent::update(alphaProps, betaProps);
 }
 
-void Beta::updateWeights(AgentProps agentProps) {
+void Beta::updateWeights(BetaAgentProperties agentProps) {
   maxStretchWeight = agentProps.stretchWeight;
   maxRepulsionWeight = agentProps.repulsionWeight;
   maxAttractionWeight = agentProps.attractionWeight; // Can this be changed when the other agent is trying to attack me?

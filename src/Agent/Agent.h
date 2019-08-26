@@ -24,7 +24,7 @@ class Message {
     float size;
 };
 
-// Common Agent Props
+// Agent Props.
 struct AgentProps {
   ofPoint meshOrigin;
   ofPoint textureSize; // w, h of the texture that gets mapped.
@@ -36,6 +36,21 @@ struct AgentProps {
   float attractionWeight;
   float tickleWeight;
   float velocity;
+  // Radius
+  float visibilityRadiusFactor; 
+};
+
+struct AlphaAgentProperties : public AgentProps {
+  ofPoint meshSize; // w, h of the mesh.
+  ofPoint meshRowsColumns; // row, columns of the mesh.
+  ofPoint jointPhysics;
+};
+
+struct BetaAgentProperties : public AgentProps {
+  float meshRadius;
+  float sideJointOffset;
+  ofPoint centerJointPhysics;
+  ofPoint sideJointPhysics;
 };
 
 // Subsection body that is torn apart from the actual texture and falls on the ground. 
@@ -43,7 +58,7 @@ class Agent {
   public:
     void setup(ofxBox2d &box2d, ofPoint textureSize);
     void draw(bool showVisibilityRadius, bool showTexture);
-    virtual void update(AgentProps alphaProps, AgentProps betaProps);
+    virtual void update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps);
   
     // Clean the agent
     void clean(ofxBox2d &box2d);

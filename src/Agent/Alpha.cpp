@@ -12,7 +12,7 @@ Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
   };
   
   // Visibility range around the agent
-  visibilityRadius = (agentProps.meshSize.x/2) * 5; 
+  visibilityRadius = (agentProps.meshSize.x/2) * agentProps.visibilityRadiusFactor; 
   
   updateWeights(agentProps);
 
@@ -136,17 +136,21 @@ void Alpha::updateMesh() {
   }
 }
 
-void Alpha::update(AgentProps alphaProps, AgentProps betaProps) {
+void Alpha::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
   // Update local mesh. 
   updateMesh();
   
-  updateWeights(alphaProps); 
+  // Weights
+  updateWeights(alphaProps);
+  
+  // Visibility Radius update from the GUI.
+  visibilityRadius = (alphaProps.meshSize.x/2) * alphaProps.visibilityRadiusFactor;
   
   // Call base class's update method.
   Agent::update(alphaProps, betaProps);
 }
 
-void Alpha::updateWeights(AgentProps agentProps) {
+void Alpha::updateWeights(AlphaAgentProperties agentProps) {
   maxStretchWeight = agentProps.stretchWeight;
   maxRepulsionWeight = agentProps.repulsionWeight;
   maxAttractionWeight = agentProps.attractionWeight; // Can this be changed when the other agent is trying to attack me?

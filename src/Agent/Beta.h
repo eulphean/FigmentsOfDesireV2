@@ -4,13 +4,6 @@
 #include "ofMain.h"
 #include "Agent.h"
 
-struct BetaAgentProperties : public AgentProps {
-  float meshRadius;
-  float sideJointOffset; 
-  ofPoint centerJointPhysics;
-  ofPoint sideJointPhysics;
-};
-
 class Beta : public Agent {
   public:
     Beta(ofxBox2d &box2d, BetaAgentProperties agentProps);
@@ -19,7 +12,9 @@ class Beta : public Agent {
     void updateMesh();
     void createMesh(BetaAgentProperties softBodyProperties);
     void createSoftBody(ofxBox2d &box2d, BetaAgentProperties softBodyProperties);
-    void updateWeights(AgentProps betaProps);
+    void updateWeights(BetaAgentProperties betaProps);
+  
+    void update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps);
   
     int numMeshPoints;
     void update(AgentProps alphaProps, AgentProps betaProps);

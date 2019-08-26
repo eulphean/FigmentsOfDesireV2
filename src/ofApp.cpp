@@ -137,7 +137,8 @@ void ofApp::drawSequence() {
     ofPopStyle();
   }
   
-  // Visibility radius of the body
+  // Visibility radius of the Kinect body.
+  // TODO: Comes from the GUI. 
   if (showVisibilityRadius) {
     // Draw the visibility radius around agents as well as users
     auto people = kinect.getBodyCentroids();
@@ -145,7 +146,7 @@ void ofApp::drawSequence() {
       ofNoFill();
       for (auto p : people) {
         ofSetColor(ofColor::red);
-        ofDrawCircle(p, 200);
+        ofDrawCircle(p, audienceVisibilityRadius);
       }
     ofPopStyle();
   }
@@ -160,7 +161,7 @@ void ofApp::drawSequence() {
       if (showVisibilityRadius) {
         ofNoFill();
         ofSetColor(ofColor::red);
-        ofDrawCircle(ofGetMouseX(), ofGetMouseY(), 200);
+        ofDrawCircle(ofGetMouseX(), ofGetMouseY(), audienceVisibilityRadius);
       }
     ofPopStyle();
   }
@@ -355,9 +356,11 @@ void ofApp::setupGui() {
     // General settings
     generalParams.setName("General Parameters");
     generalParams.add(alphaAgentProbability.set("Alpha Agent Probability", 0.1, 0, 0.9));
+    generalParams.add(audienceVisibilityRadius.set("Audience Visibility Radius", 100, 50, 200)); 
   
     // Alpha Agent GUI parameters
     alphaAgentParams.setName("Alpha Agent Params");
+    alphaAgentParams.add(aVisibilityRadiusFactor.set("Visibility Radius Factor", 2, 1, 5));
     alphaAgentParams.add(aMeshRows.set("Mesh Rows", 5, 5, 100));
     alphaAgentParams.add(aMeshColumns.set("Mesh Columns", 5, 5, 100));
     alphaAgentParams.add(aMeshWidth.set("Mesh Width", 50, 10, 300));
@@ -379,6 +382,7 @@ void ofApp::setupGui() {
 
     // Beta Agent GUI parameters
     betaAgentParams.setName("Beta Agent Params");
+    betaAgentParams.add(bVisibilityRadiusFactor.set("Visibility Radius Factor", 2, 1, 5)); 
     betaAgentParams.add(bMeshRadius.set("Mesh Radius", 5, 5, 100));
     betaAgentParams.add(bTextureWidth.set("Texture Width", 50, 10, 300));
     betaAgentParams.add(bTextureHeight.set("Texture Height", 50, 10, 300));
@@ -428,6 +432,7 @@ void ofApp::updateAgentProps() {
   alphaAgentProps.attractionWeight = aAttractionWeight;
   alphaAgentProps.tickleWeight = aTickleWeight;
   alphaAgentProps.velocity = aVelocity;
+  alphaAgentProps.visibilityRadiusFactor = aVisibilityRadiusFactor;
   
   // Beta Agent GUI param payload.
   betaAgentProps.meshRadius = bMeshRadius;
@@ -443,6 +448,7 @@ void ofApp::updateAgentProps() {
   betaAgentProps.attractionWeight = bAttractionWeight;
   betaAgentProps.tickleWeight = bTickleWeight;
   betaAgentProps.velocity = bVelocity;
+  betaAgentProps.visibilityRadiusFactor = bVisibilityRadiusFactor;
 }
 
 void ofApp::processOsc() {

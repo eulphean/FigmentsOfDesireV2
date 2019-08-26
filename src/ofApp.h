@@ -76,10 +76,12 @@ class ofApp : public ofBaseApp{
   
     // General settings
     ofParameterGroup generalParams;
-    ofParameter<float> alphaAgentProbability; 
+    ofParameter<float> alphaAgentProbability;
+    ofParameter<float> audienceVisibilityRadius; 
   
     // Alpha Agent Group params. 
     ofParameterGroup alphaAgentParams;
+    ofParameter<float> aVisibilityRadiusFactor;
     ofParameter<int> aMeshColumns;
     ofParameter<int> aMeshRows;
     ofParameter<int> aMeshWidth;
@@ -92,6 +94,7 @@ class ofApp : public ofBaseApp{
     ofParameter<float> aVertexRadius;
     ofParameter<float> aJointFrequency;
     ofParameter<float> aJointDamping;
+
     // Weights.
     ofParameter<float> aStretchWeight;
     ofParameter<float> aRepulsionWeight;
@@ -101,6 +104,7 @@ class ofApp : public ofBaseApp{
   
     // Beta Agent GUI params.
     ofParameterGroup betaAgentParams;
+    ofParameter<float> bVisibilityRadiusFactor; 
     ofParameter<int> bTextureWidth;
     ofParameter<int> bTextureHeight;
     ofParameter<float> bMeshRadius;

@@ -52,7 +52,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   maxCoolDown = 100; // Wait time before the agent actually is ready to take more forces. 
 }
 
-void Agent::update(AgentProps alphaProps, AgentProps betaProps) {
+void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
   // Print the velocity of vertices.
   for (auto &v : vertices) {
     auto vel = v->getVelocity().length();
