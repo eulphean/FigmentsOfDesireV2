@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <Kinect_Params>
 	<Distance_Thresholds>
-		<minDistance>760.284</minDistance>
-		<maxDistance>2237.32</maxDistance>
+		<minDistance>0</minDistance>
+		<maxDistance>1592.08</maxDistance>
 	</Distance_Thresholds>
 	<Image_Params>
 		<Blur>0</Blur>
 		<Threshold>0</Threshold>
-		<Erode>17</Erode>
-		<Dilate>0</Dilate>
+		<Erode>9</Erode>
+		<Dilate>9</Dilate>
 	</Image_Params>
 	<Contour_Finder>
-		<Min_Area>27.1627</Min_Area>
-		<Max_Area>224.792</Max_Area>
-		<Threshold>128</Threshold>
+		<Min_Area>8.06156</Min_Area>
+		<Max_Area>365.017</Max_Area>
+		<Threshold>169</Threshold>
 	</Contour_Finder>
 </Kinect_Params>
 <group />

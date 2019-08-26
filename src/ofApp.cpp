@@ -140,6 +140,15 @@ void ofApp::drawSequence() {
   
   // Draw Kinect content.
   kinect.draw(debug, showGui);
+  
+  if (debug) {
+    ofPushStyle();
+      ofSetColor(ofColor::red);
+      ofSetLineWidth(10);
+      ofDrawLine(0, ofGetHeight()/2, ofGetWidth(), ofGetHeight()/2); // Horizontal
+      ofDrawLine(ofGetWidth()/2, 0, ofGetWidth()/2, ofGetHeight());
+    ofPopStyle();
+  }
 }
 
 // ------------------ Activate Agent Behaviors With Audience Interaction --------------------- //

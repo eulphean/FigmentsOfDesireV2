@@ -64,13 +64,15 @@ void Kinect::draw(bool isDebug, bool hideKinectGui) {
     if (kinectOpen) {
       // Kinect debug view.
       if (isDebug) {
+          drawContent();
+          
           // Use the texture width, height as the baseline to draw all the 4 debug screens.
           auto w = texDepth.getWidth(); auto h = texDepth.getHeight();
         
-          drawTextureAtRowAndColumn("RGB Pixels", texRGB, 1, 1, w, h);
-          drawTextureAtRowAndColumn("RGB Pixels, Registered", texRGBRegistered, 1, 0, w, h);
           drawTextureAtRowAndColumn("Depth Pixels, Mapped", texDepth, 0, 0, w, h);
           drawTextureAtRowAndColumn("IR Pixels, Mapped", texIR, 0, 1, w, h);
+          drawTextureAtRowAndColumn("RGB Pixels, Registered", texRGBRegistered, 1, 0, w, h);
+          drawTextureAtRowAndColumn("RGB Pixels", texRGB, 1, 1, w, h);
         
           // Draw contours on top of the depth pixels with Age, Label.
           ofPushMatrix();
@@ -85,8 +87,18 @@ void Kinect::draw(bool isDebug, bool hideKinectGui) {
               }
             ofPopStyle();
           ofPopMatrix();
-      } else {
-        drawContent();
+        
+          // Draw the X line and Y line at the center of the depth pixels
+          ofPushStyle();
+            ofSetColor(ofColor::red);
+            // 1st Panel (Depth Pixels)
+            ofDrawLine(0, h/2, w, h/2); // Horizontal center
+            ofDrawLine(w/2, 0, w/2, h); // Vertical center
+        
+            // 2nd Panel (IR Pixels)
+            ofDrawLine(0, 3*h/2, w, 3*h/2);
+            ofDrawLine(w/2, h, w/2, 2*h);
+          ofPopStyle();
       }
     }
   
@@ -147,7 +159,7 @@ void Kinect::drawContent() {
           auto center = ofxCv::toOf(contourFinder.getCenter(i));
           ofTranslate(center);
           ofPushStyle();
-            ofSetColor(0, 255, 0);
+            ofSetColor(ofColor::green);
             ofDrawCircle(0, 0, 5);
           ofPopStyle();
         ofPopMatrix();
