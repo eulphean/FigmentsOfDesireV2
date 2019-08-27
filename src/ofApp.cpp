@@ -178,13 +178,6 @@ void ofApp::drawSequence() {
 }
 
 // ------------------ Activate Agent Behaviors With Audience Interaction --------------------- //
-void ofApp::mouseEntered(int x, int y) {
-  isOccupied = true;
-}
-
-void ofApp::mouseExited(int x, int y) {
-  isOccupied = false;
-}
 
 void ofApp::mousePressed(int x, int y, int button) {
   if (button == 2) { // Right click.
@@ -216,6 +209,7 @@ void ofApp::handleInteraction() {
       clearInterAgentBonds();
     }
   } else { // Test Routine
+    isOccupied = testPeople.size() > 0;
     if (isOccupied) {
       shouldBond = true;
       // Activate all the possible behaviors on the agents.

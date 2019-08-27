@@ -25,8 +25,6 @@ class ofApp : public ofBaseApp{
 		void draw();
     void keyPressed(int key);
     void mousePressed(int x, int y, int button);
-    void mouseEntered(int x, int y);
-    void mouseExited(int x, int y); 
     void exit();
   
     // Public helpers.
