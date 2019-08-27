@@ -202,18 +202,29 @@ void ofApp::handleInteraction() {
       // Agents can bond now.
       shouldBond = true;
       setBehavior(people);
+      specialRepelTimer = ofRandom(150, 200);
     } else {
-      seek();
-      clearInterAgentBonds();
+      if (specialRepelTimer > 0) {
+        enableRepelBeforeBreak();
+      } else {
+        wasteTime();
+        clearInterAgentBonds();
+      }
     }
   } else { // Test Routine
     isOccupied = testPeople.size() > 0;
     if (isOccupied) {
       shouldBond = true;
       setBehavior(testPeople);
+      specialRepelTimer = ofRandom(250, 350);
     } else {
-      seek();
-      clearInterAgentBonds();
+      if (specialRepelTimer > 0) {
+        enableRepelBeforeBreak();
+      } else {
+        // Do other silly things
+        wasteTime();
+        clearInterAgentBonds();
+      }
     }
   }
 }
@@ -225,7 +236,7 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
     
     // Apply stretch on visible agents
     for (auto &a : visibleAgents) {
-      a->setBehavior(Behavior::Stretch);
+      a->setBehavior(Behavior::Stretch, {}, true);
     }
   }
   
@@ -241,13 +252,30 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
   }
 }
 
-void ofApp::seek() {
+void ofApp::wasteTime() {
   for (auto &a : agents) {
     auto target = glm::vec2(ofRandom(50, ofGetWidth()-50), ofRandom(50, ofGetHeight()-50));
-    if (ofRandom(1) < 0.5) {
+    if (ofRandom(1) < 0.3) { // Low priority for seeking targets. Lower the movement.
       a->setBehavior(Behavior::Attract, { target });
     } else {
       a->setBehavior(Behavior::Shock); 
+    }
+  }
+}
+
+void ofApp::enableRepelBeforeBreak() {
+  if (superAgents.size() > 0) {
+    // Keep tracking time.
+    if (specialRepelTimer > 0) {
+      specialRepelTimer--;
+    }
+    
+    // Enable special repel. 
+    for (auto &sa : superAgents) {
+      auto agentA = sa.agentA;
+      auto agentB = sa.agentB;
+      agentA->setBehavior(Behavior::SpecialRepel, { agentB->getCentroid() });
+      agentB->setBehavior(Behavior::SpecialRepel, { agentA->getCentroid() });
     }
   }
 }
@@ -559,6 +587,8 @@ void ofApp::createAgents() {
     agent = new Alpha(box2d, alphaAgentProps);
     agents.push_back(agent);
   }
+  
+  cout << "Total Agents: " << agents.size() << endl; 
 }
 
 
@@ -805,3 +835,24 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
 //
 //  return invisibleAgents;
 //}
+
+//    for (auto &sa : superAgents) {
+//      auto joints = sa.joints;
+//      for (auto &j : joints) {
+//        auto bodyA = j->joint->GetBodyA();
+//        auto dataA = reinterpret_cast<VertexData*>(j->joint->GetBodyA()->GetUserData());
+//
+//        auto bodyB = j->joint->GetBodyB();
+//        auto dataB = reinterpret_cast<VertexData*>(j->joint->GetBodyB()->GetUserData());
+//
+//        // Enable repulsion on bodyA
+//        dataA->targetPos = getBodyPosition(bodyB);
+//        dataA->applyRepulsion = true;
+//        bodyA->SetUserData(dataA);
+//
+//        // Enable repulsion on bodyB
+//        dataB->targetPos = getBodyPosition(bodyA);
+//        dataB->applyRepulsion = true;
+//        bodyB->SetUserData(dataB);
+//      }
+//    }

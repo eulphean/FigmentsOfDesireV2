@@ -8,6 +8,7 @@ enum Behavior {
   None,
   Attract,
   Repel,
+  SpecialRepel,
   Stretch,
   Shock
 };
@@ -69,6 +70,7 @@ class Agent {
     void handleBehaviors();
     void handleAttraction();
     void handleRepulsion();
+    void handleSpecialRepulsion(); 
     void handleStretch();
     void handleShock();
     void handleVertexBehaviors();
@@ -79,7 +81,7 @@ class Agent {
     // Helpers
     glm::vec2 getCentroid();
     ofMesh& getMesh();
-    void setBehavior(Behavior behavior, std::vector<glm::vec2> pos = {});
+    void setBehavior(Behavior behavior, std::vector<glm::vec2> pos = {}, bool overrideCoolDown = false);
   
     // Vertices and Joints
     std::vector<std::shared_ptr<ofxBox2dCircle>> vertices; // Every vertex in the mesh is a circle.

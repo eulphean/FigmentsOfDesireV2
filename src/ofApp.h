@@ -141,7 +141,9 @@ class ofApp : public ofBaseApp{
     Agent *getClosestAgent(std::vector<Agent *> targetAgents, glm::vec2 targetPos);
     std::vector<Agent *> getVisibleAgents(glm::vec2 person);
     std::vector<glm::vec2> getInvisibleTargets(std::vector<glm::vec2> targets, Agent* a);
-    void seek(); 
+    void wasteTime();
+    void enableRepelBeforeBreak();
+    int specialRepelTimer; // Keeps track of the repelling. 
   
     std::vector<Memory> memories;
     std::vector<b2Body *> collidingBodies;

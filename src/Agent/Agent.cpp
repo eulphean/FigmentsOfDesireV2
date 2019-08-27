@@ -171,6 +171,7 @@ void Agent::handleBehaviors() {
   // Handle the current behavior.
   handleStretch();
   handleRepulsion();
+  handleSpecialRepulsion();
   handleAttraction();
   handleShock();
   
@@ -221,6 +222,27 @@ void Agent::handleRepulsion() {
         repulsionWeight = 0;
         coolDown = maxCoolDown;
         currentBehavior = Behavior::None; // Reset desire state.
+      }
+    }
+  }
+}
+
+void Agent::handleSpecialRepulsion() {
+  if (currentBehavior==Behavior::SpecialRepel && coolDown == 0) {
+    for (auto targetPos : targetPositions) {
+      float newMaxWeight = maxRepulsionWeight/100;
+      repulsionWeight = ofLerp(repulsionWeight, newMaxWeight, 0.01);
+      for (auto &v : vertices) {
+        auto data = reinterpret_cast<VertexData*>(v->getData());
+        if (data->hasInterAgentJoint) {
+          v->addRepulsionForce(targetPos.x, targetPos.y, repulsionWeight);
+        }
+      }
+      
+      if (newMaxWeight - repulsionWeight <= 0.01) {
+        repulsionWeight = 0;
+        coolDown = maxCoolDown;
+        currentBehavior = Behavior::None; 
       }
     }
   }
@@ -295,22 +317,12 @@ ofMesh& Agent::getMesh() {
   return mesh;
 }
 
-// Repulse the vertices constantly
-void Agent::repulseBondedVertices() {
-  for (auto &v : vertices) {
-    auto data = reinterpret_cast<VertexData*>(v->getData());
-    if (data->hasInterAgentJoint) {
-      data->applyRepulsion = true;
-      v->setData(data);
+void Agent::setBehavior(Behavior newBehavior, std::vector<glm::vec2> newTargets, bool overrideCoolDown) {
+  // Override the cool down if that flag is true. 
+  if (overrideCoolDown || (coolDown == 0 && currentBehavior == Behavior::None)) {
+    if (overrideCoolDown == true) {
+      coolDown = 0;
     }
-  }
-}
-
-void Agent::setBehavior(Behavior newBehavior, std::vector<glm::vec2> newTargets) {
-  // Don't wait for the agent to cool down if the behavior is Stretch.
-  if (newBehavior == Behavior::Stretch) {
-    currentBehavior = newBehavior;
-  } else if (coolDown == 0 && currentBehavior == Behavior::None) {
     currentBehavior = newBehavior;
     targetPositions = newTargets;
   }
