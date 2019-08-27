@@ -42,14 +42,14 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   applyRepulsion = false; 
   
   // Current desire state. 
-  desireState = None;
+  currentBehavior = None;
   
   // Some initial force values.
   repulsionWeight = 0;
   stretchWeight = 0;
   attractionWeight = 0;
   coolDown = 0;
-  maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
+  maxCoolDown = ofRandom(150, 250); // Wait time before the agent actually is ready to take more forces.
 }
 
 void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
@@ -215,23 +215,22 @@ void Agent::handleVertexBehaviors() {
   }
 }
 
-// Unimplemented.
 void Agent::handleRepulsion() {
-//  if (applyRepulsion) {
-//    repulsionWeight = ofLerp(repulsionWeight, maxRepulsionWeight, 0.1);
-//    for (auto &v : vertices) {
-//      auto data = reinterpret_cast<VertexData*>(v->getData());
-//      if (!data->hasInterAgentJoint) {
-//         v->addRepulsionForce(targetPos.x, targetPos.y, repulsionWeight);
-//      }
-//    }
-//
-//    applyRepulsion = false;
-//
-//    if (maxRepulsionWeight-repulsionWeight < maxRepulsionWeight/2) {
-//      repulsionWeight = 0;
-//    }
-//  }
+  if (applyRepulsion && coolDown == 0) {
+    for (auto targetPos : targetPositions) {
+      float newMaxWeight = maxRepulsionWeight/100;
+      repulsionWeight = ofLerp(repulsionWeight, newMaxWeight, 0.01);
+      // Pick a random vertex and repel it away from the target position
+      auto randIdx = ofRandom(vertices.size());
+      vertices[randIdx]->addRepulsionForce(targetPos.x, targetPos.y, newMaxWeight);
+      if (newMaxWeight - repulsionWeight <= 0.01) {
+        applyRepulsion = false;
+        repulsionWeight = 0;
+        coolDown = maxCoolDown;
+        currentBehavior = None; // Reset desire state.
+      }
+    }
+  }
 }
 
 // Attraction.
@@ -260,6 +259,7 @@ void Agent::handleAttraction() {
             applyAttraction = false;
             attractionWeight = 0;
             coolDown = maxCoolDown;
+            currentBehavior = None; // Reset desire state.
           }
       }
   }
@@ -330,20 +330,23 @@ void Agent::stretch() {
   applyStretch = true;
 }
 
-void Agent::setDesireState(DesireState newState, std::vector<glm::vec2> newTargets) {
-  desireState = newState;
-  targetPositions = newTargets;
-  
-  if (desireState == None) {
-    applyAttraction = false;
-  }
-  
-  if (desireState == Attraction) {
-    applyAttraction = true;
-  }
-  
-  if (desireState == Repulsion) {
-    applyRepulsion = true;
+void Agent::setBehavior(Behavior newBehavior, std::vector<glm::vec2> newTargets) {
+  // Reset the behavior only once the agent has cooled down.
+  if (coolDown == 0 && currentBehavior == None) {
+    currentBehavior = newBehavior;
+    targetPositions = newTargets;
+    
+    if (currentBehavior == None) {
+      applyAttraction = false;
+    }
+    
+    if (currentBehavior == Attraction) {
+      applyAttraction = true;
+    }
+    
+    if (currentBehavior == Repulsion) {
+      applyRepulsion = true;
+    }
   }
 }
 

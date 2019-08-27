@@ -3,8 +3,8 @@
 #include "ofxBox2d.h"
 #include "ofxFilterLibrary.h"
 
-// State of the agent. 
-enum DesireState {
+// Current behavior of the agent.
+enum Behavior {
   None,
   Attraction,
   Repulsion
@@ -79,7 +79,7 @@ class Agent {
     // Helpers
     glm::vec2 getCentroid();
     ofMesh& getMesh();
-    void setDesireState(DesireState state, std::vector<glm::vec2> pos = {});
+    void setBehavior(Behavior behavior, std::vector<glm::vec2> pos = {});
   
     // Vertices and Joints
     std::vector<std::shared_ptr<ofxBox2dCircle>> vertices; // Every vertex in the mesh is a circle.
@@ -93,8 +93,8 @@ class Agent {
     std::vector<Message>::iterator curMsg;
     std::vector<Message> messages;
   
-    // State
-    DesireState desireState;
+    // Current behavior of the agent.
+    Behavior currentBehavior;
   
     // Visibility Radius
     float visibilityRadius; 
@@ -150,7 +150,7 @@ class Agent {
     int cornerIndices[4];
     vector<int> boundaryIndices;
   
-    // Target position for desire states
+    // Target position for behaviors
     std::vector<glm::vec2> targetPositions;
   
     // Wait time before being able to be applied with another force. 

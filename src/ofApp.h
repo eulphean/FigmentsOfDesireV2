@@ -170,7 +170,7 @@ class ofApp : public ofBaseApp{
   
     // Kinect handle
     Kinect kinect;
-  
+    
     bool isOccupied;
   
     std::vector<glm::vec2> testPeople; 
