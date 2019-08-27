@@ -17,8 +17,8 @@
 		<Vertex_Bounce>0.1</Vertex_Bounce>
 		<Vertex_Friction>1</Vertex_Friction>
 		<Vertex_Radius>4</Vertex_Radius>
-		<Joint_Frequency>0.8</Joint_Frequency>
-		<Joint_Damping>0.7</Joint_Damping>
+		<Joint_Frequency>0.9</Joint_Frequency>
+		<Joint_Damping>1</Joint_Damping>
 		<Max_Stretch_Weight>0.2</Max_Stretch_Weight>
 		<Max_Repulsion_Weight>3</Max_Repulsion_Weight>
 		<Max_Attraction_Weight>3</Max_Attraction_Weight>

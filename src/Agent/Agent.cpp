@@ -230,7 +230,7 @@ void Agent::handleRepulsion() {
 void Agent::handleSpecialRepulsion() {
   if (currentBehavior==Behavior::SpecialRepel && coolDown == 0) {
     for (auto targetPos : targetPositions) {
-      float newMaxWeight = maxRepulsionWeight/100;
+      float newMaxWeight = maxRepulsionWeight/70;
       repulsionWeight = ofLerp(repulsionWeight, newMaxWeight, 0.01);
       for (auto &v : vertices) {
         auto data = reinterpret_cast<VertexData*>(v->getData());

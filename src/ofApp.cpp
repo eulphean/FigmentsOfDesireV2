@@ -202,7 +202,7 @@ void ofApp::handleInteraction() {
       // Agents can bond now.
       shouldBond = true;
       setBehavior(people);
-      specialRepelTimer = ofRandom(150, 200);
+      specialRepelTimer = ofRandom(300, 400);
     } else {
       if (specialRepelTimer > 0) {
         enableRepelBeforeBreak();
