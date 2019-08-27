@@ -203,7 +203,7 @@ void ofApp::handleInteraction() {
       shouldBond = true;
       setBehavior(people);
     } else {
-      // No more bonding now.
+      seek();
       clearInterAgentBonds();
     }
   } else { // Test Routine
@@ -212,6 +212,7 @@ void ofApp::handleInteraction() {
       shouldBond = true;
       setBehavior(testPeople);
     } else {
+      seek();
       clearInterAgentBonds();
     }
   }
@@ -236,6 +237,17 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
       a->setBehavior(Behavior::Attract, invisibleTargets);
     } else {
       a->setBehavior(Behavior::Repel, invisibleTargets);
+    }
+  }
+}
+
+void ofApp::seek() {
+  for (auto &a : agents) {
+    auto target = glm::vec2(ofRandom(50, ofGetWidth()-50), ofRandom(50, ofGetHeight()-50));
+    if (ofRandom(1) < 0.5) {
+      a->setBehavior(Behavior::Attract, { target });
+    } else {
+      a->setBehavior(Behavior::Shock); 
     }
   }
 }

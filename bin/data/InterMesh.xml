@@ -21,8 +21,8 @@
 		<Joint_Damping>0.7</Joint_Damping>
 		<Max_Stretch_Weight>0.2</Max_Stretch_Weight>
 		<Max_Repulsion_Weight>3</Max_Repulsion_Weight>
-		<Max_Attraction_Weight>5</Max_Attraction_Weight>
-		<Max_Tickle_Weight>0.4</Max_Tickle_Weight>
+		<Max_Attraction_Weight>3</Max_Attraction_Weight>
+		<Max_Tickle_Weight>0.8</Max_Tickle_Weight>
 		<Max_Velocity>10</Max_Velocity>
 		<Visibility_Radius_Factor>3</Visibility_Radius_Factor>
 	</Alpha_Agent_Params>
@@ -56,5 +56,6 @@
 	<General_Parameters>
 		<Alpha_Agent_Probability>0.9</Alpha_Agent_Probability>
 		<Audience_Visibility_Radius>104.337</Audience_Visibility_Radius>
+		<Num_Agents_To_Create>5</Num_Agents_To_Create>
 	</General_Parameters>
 </The_Nest_GUI>

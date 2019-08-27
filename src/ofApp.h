@@ -140,7 +140,8 @@ class ofApp : public ofBaseApp{
     void createWorld(bool createBonds);
     Agent *getClosestAgent(std::vector<Agent *> targetAgents, glm::vec2 targetPos);
     std::vector<Agent *> getVisibleAgents(glm::vec2 person);
-    std::vector<glm::vec2> getInvisibleTargets(std::vector<glm::vec2> targets, Agent* a); 
+    std::vector<glm::vec2> getInvisibleTargets(std::vector<glm::vec2> targets, Agent* a);
+    void seek(); 
   
     std::vector<Memory> memories;
     std::vector<b2Body *> collidingBodies;

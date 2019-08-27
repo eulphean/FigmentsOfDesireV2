@@ -36,7 +36,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   curMsg = messages.begin(); // Need the message to draw
   
   // Current desire state. 
-  currentBehavior = Stretch;
+  currentBehavior = Behavior::None;
   
   // Some initial force values.
   repulsionWeight = 0;
@@ -274,7 +274,7 @@ void Agent::handleStretch() {
 
 void Agent::handleShock() {
   // Does the agent want to tickle? Check with counter conditions.
-  if (currentBehavior==Behavior::Stretch && coolDown == 0) {
+  if (currentBehavior==Behavior::Shock && coolDown == 0) {
     // Apply the tickle.
     for (auto &v: vertices) {
       glm::vec2 force = glm::vec2(ofRandom(-2, 2), ofRandom(-2, 2));
@@ -307,6 +307,7 @@ void Agent::repulseBondedVertices() {
 }
 
 void Agent::setBehavior(Behavior newBehavior, std::vector<glm::vec2> newTargets) {
+  // Don't wait for the agent to cool down if the behavior is Stretch.
   if (newBehavior == Behavior::Stretch) {
     currentBehavior = newBehavior;
   } else if (coolDown == 0 && currentBehavior == Behavior::None) {
