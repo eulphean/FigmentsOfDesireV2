@@ -202,7 +202,7 @@ void ofApp::handleInteraction() {
       // Agents can bond now.
       shouldBond = true;
       setBehavior(people);
-      specialRepelTimer = ofRandom(300, 400);
+      specialRepelTimer = ofRandom(200, 300);
     } else {
       if (specialRepelTimer > 0) {
         enableRepelBeforeBreak();
@@ -216,7 +216,7 @@ void ofApp::handleInteraction() {
     if (isOccupied) {
       shouldBond = true;
       setBehavior(testPeople);
-      specialRepelTimer = ofRandom(250, 350);
+      specialRepelTimer = ofRandom(200, 300);
     } else {
       if (specialRepelTimer > 0) {
         enableRepelBeforeBreak();
@@ -396,7 +396,7 @@ void ofApp::createWorld(bool createBounds) {
   if (createBounds) {
     cout << "Creating new bounds." << endl;
     // Bounds
-    bounds.x = -100; bounds.y = -100;
+    bounds.x = -150; bounds.y = -150;
     bounds.width = ofGetWidth() + (-1) * bounds.x * 2; bounds.height = ofGetHeight() + (-1) * 2 * bounds.y;
     box2d.createBounds(bounds);
     
