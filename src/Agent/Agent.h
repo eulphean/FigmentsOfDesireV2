@@ -6,8 +6,10 @@
 // Current behavior of the agent.
 enum Behavior {
   None,
-  Attraction,
-  Repulsion
+  Attract,
+  Repel,
+  Stretch,
+  Shock
 };
 
 // Every agent is inscribed with certain messages. Right now they are just
@@ -64,16 +66,14 @@ class Agent {
     void clean(ofxBox2d &box2d);
   
     // Behaviors
-    void applyBehaviors();
-    void handleRepulsion();
+    void handleBehaviors();
     void handleAttraction();
+    void handleRepulsion();
     void handleStretch();
+    void handleShock();
     void handleVertexBehaviors();
-    void handleTickle();
   
     // Enabling behaviors
-    void tickle();
-    void stretch();
     void repulseBondedVertices();
   
     // Helpers
@@ -126,22 +126,7 @@ class Agent {
     ofMesh mesh;
     
   private:
-    void assignIndices(ofPoint textureSize);
-  
     // ----------------- Data members -------------------
-  
-    // Tickle.
-    bool applyTickle;
-  
-    // Stretch out.
-    bool applyStretch;
-  
-    // Attraction.
-    bool applyAttraction;
-  
-    // Repulsion
-    bool applyRepulsion;
-  
     // Texture
     ofFbo firstFbo;
     ofFbo secondFbo;
@@ -154,7 +139,7 @@ class Agent {
     std::vector<glm::vec2> targetPositions;
   
     // Wait time before being able to be applied with another force. 
-    long coolDown;
+    int coolDown;
     int maxCoolDown;
 };
 

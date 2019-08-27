@@ -35,10 +35,7 @@ class ofApp : public ofBaseApp{
     void handleInteraction(); 
   
     // Behavior methods.
-    void attract(std::vector<glm::vec2> targets);
-    void repel(std::vector<glm::vec2> targets);
-    void stretch(std::vector<glm::vec2> targets);
-    void tickle(std::vector<glm::vec2> targets);
+    void setBehavior(std::vector<glm::vec2> people);
     void clearInterAgentBonds(); 
   
     // Contact listening callbacks.
@@ -142,7 +139,7 @@ class ofApp : public ofBaseApp{
     void createWorld(bool createBonds);
     Agent *getClosestAgent(std::vector<Agent *> targetAgents, glm::vec2 targetPos);
     std::vector<Agent *> getVisibleAgents(glm::vec2 person);
-    std::vector<Agent *> getInvisibleAgents(glm::vec2 person); 
+    std::vector<glm::vec2> getInvisibleTargets(std::vector<glm::vec2> targets, Agent* a); 
   
     std::vector<Memory> memories;
     std::vector<b2Body *> collidingBodies;

@@ -35,21 +35,15 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   createTexture(textureSize);
   curMsg = messages.begin(); // Need the message to draw
   
-  // Behaviors. 
-  applyStretch = true;
-  applyTickle = false;
-  applyAttraction = false;
-  applyRepulsion = false; 
-  
   // Current desire state. 
-  currentBehavior = None;
+  currentBehavior = Stretch;
   
   // Some initial force values.
   repulsionWeight = 0;
   stretchWeight = 0;
   attractionWeight = 0;
   coolDown = 0;
-  maxCoolDown = ofRandom(150, 250); // Wait time before the agent actually is ready to take more forces.
+  maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
 }
 
 void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
@@ -64,7 +58,7 @@ void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProp
     }
   }
   
-  applyBehaviors();
+  handleBehaviors();
 }
 
 void Agent::draw(bool showVisibilityRadius, bool showTexture) {
@@ -173,17 +167,17 @@ void Agent::createTexture(ofPoint textureSize) {
   }
 }
 
-void Agent::applyBehaviors()  {
-  // ----Current actions/behaviors---
+void Agent::handleBehaviors() {
+  // Handle the current behavior.
   handleStretch();
   handleRepulsion();
   handleAttraction();
-  handleTickle();
+  handleShock();
   
   // Behavior of individual bodies on the agent (all circles mostly)
   handleVertexBehaviors();
   
-  // Should the agent be cooling down?
+  // Cool the agent if need be.
   if (coolDown > 0) {
     coolDown--;
   }
@@ -216,7 +210,7 @@ void Agent::handleVertexBehaviors() {
 }
 
 void Agent::handleRepulsion() {
-  if (applyRepulsion && coolDown == 0) {
+  if (currentBehavior==Behavior::Repel && coolDown == 0) {
     for (auto targetPos : targetPositions) {
       float newMaxWeight = maxRepulsionWeight/100;
       repulsionWeight = ofLerp(repulsionWeight, newMaxWeight, 0.01);
@@ -224,18 +218,16 @@ void Agent::handleRepulsion() {
       auto randIdx = ofRandom(vertices.size());
       vertices[randIdx]->addRepulsionForce(targetPos.x, targetPos.y, newMaxWeight);
       if (newMaxWeight - repulsionWeight <= 0.01) {
-        applyRepulsion = false;
         repulsionWeight = 0;
         coolDown = maxCoolDown;
-        currentBehavior = None; // Reset desire state.
+        currentBehavior = Behavior::None; // Reset desire state.
       }
     }
   }
 }
 
-// Attraction.
 void Agent::handleAttraction() {
-  if (applyAttraction && coolDown == 0) {
+  if (currentBehavior==Behavior::Attract && coolDown == 0) {
     for (auto targetPos : targetPositions) {
           // Find the closest vertex to the targetPos.
           float minD = 9999; int minIdx;
@@ -256,10 +248,9 @@ void Agent::handleAttraction() {
           attractionWeight = ofLerp(attractionWeight, newMaxWeight, 0.01);
           vertices[minIdx]->addAttractionPoint(targetPos, attractionWeight);
           if (newMaxWeight - attractionWeight <= 0.01) {
-            applyAttraction = false;
             attractionWeight = 0;
             coolDown = maxCoolDown;
-            currentBehavior = None; // Reset desire state.
+            currentBehavior = Behavior::None; // Reset desire state.
           }
       }
   }
@@ -267,39 +258,32 @@ void Agent::handleAttraction() {
 
 void Agent::handleStretch() {
   // Check for counter.
-  if (applyStretch) { // Time to apply a stretch.
-    stretchWeight = ofLerp(stretchWeight, maxStretchWeight, 0.05);
+  if (currentBehavior==Behavior::Stretch) { // Time to apply a stretch.
+    stretchWeight = ofLerp(stretchWeight, maxStretchWeight, 0.005);
     for (auto &v : vertices) {
-      auto data = reinterpret_cast<VertexData*>(v->getData());
-//      if (!data->hasInterAgentJoint) {
-        if (ofRandom(1) < 0.1) {
-          v->addAttractionPoint({mesh.getCentroid().x, mesh.getCentroid().y}, stretchWeight);
-        } else {
-          v->addRepulsionForce(mesh.getCentroid().x, mesh.getCentroid().y, stretchWeight);
-        }
-        v->setRotation(ofRandom(150));
-//      }
+      v->addRepulsionForce(mesh.getCentroid().x, mesh.getCentroid().y, stretchWeight);
     }
     
-    if (maxStretchWeight - stretchWeight < 0.5) {
+    if (maxStretchWeight - stretchWeight <= maxStretchWeight/2) {
       stretchWeight = 0;
-      applyStretch = false;
     }
+    
+    currentBehavior = Behavior::None;
   }
 }
 
-void Agent::handleTickle() {
+void Agent::handleShock() {
   // Does the agent want to tickle? Check with counter conditions.
-  if (applyTickle == true) {
-    // Stop any sort of attraction. 
-    applyAttraction = false;
-    
+  if (currentBehavior==Behavior::Stretch && coolDown == 0) {
     // Apply the tickle.
     for (auto &v: vertices) {
       glm::vec2 force = glm::vec2(ofRandom(-2, 2), ofRandom(-2, 2));
       v -> addForce(force, maxTickleWeight);
     }
-    applyTickle = false;
+    
+    // Reset state.
+    currentBehavior = Behavior::None;
+    coolDown = maxCoolDown;
   }
 }
 
@@ -322,69 +306,11 @@ void Agent::repulseBondedVertices() {
   }
 }
 
-void Agent::tickle() {
-  applyTickle = true;
-}
-
-void Agent::stretch() {
-  applyStretch = true;
-}
-
 void Agent::setBehavior(Behavior newBehavior, std::vector<glm::vec2> newTargets) {
-  // Reset the behavior only once the agent has cooled down.
-  if (coolDown == 0 && currentBehavior == None) {
+  if (newBehavior == Behavior::Stretch) {
+    currentBehavior = newBehavior;
+  } else if (coolDown == 0 && currentBehavior == Behavior::None) {
     currentBehavior = newBehavior;
     targetPositions = newTargets;
-    
-    if (currentBehavior == None) {
-      applyAttraction = false;
-    }
-    
-    if (currentBehavior == Attraction) {
-      applyAttraction = true;
-    }
-    
-    if (currentBehavior == Repulsion) {
-      applyRepulsion = true;
-    }
   }
-}
-
-void Agent::assignIndices(ofPoint textureSize) {
-//  // Store the corner indices in this array to access it when applying forces.
-//  auto rows = agentProps.meshDimensions.x; auto cols = agentProps.meshDimensions.y;
-//
-//  // Corners
-//  cornerIndices[0] = 0; cornerIndices[1] = (cols-1) + 0 * (cols-1);
-//  cornerIndices[2] = 0 + (rows-1) * (cols-1); cornerIndices[3] = (cols-1) + (rows-1) * (cols-1);
-//
-//  // Boundaries.
-//
-//  // TOP
-//  int x; int y = 0;
-//  for (x = 0; x < cols-1; x++) {
-//    int idx = x + y * (cols-1);
-//    boundaryIndices.push_back(idx);
-//  }
-//
-//  // BOTTOM
-//  y = rows-1;
-//  for (x = 0; x < cols-1; x++) {
-//    int idx = x + y * (cols-1);
-//    boundaryIndices.push_back(idx);
-//  }
-//
-//  // LEFT
-//  x = 0;
-//  for (y = 0; y < rows-1; y++) {
-//    int idx = x + y * (cols-1);
-//    boundaryIndices.push_back(idx);
-//  }
-//
-//  // RIGHT
-//  x = cols-1;
-//  for (y = 0; y < rows-1; y++) {
-//    int idx = x + y * (cols-1);
-//    boundaryIndices.push_back(idx);
-//  }
 }

@@ -13,7 +13,7 @@
 		<Mesh_Height>50</Mesh_Height>
 		<Texture_Width>300</Texture_Width>
 		<Texture_Height>300</Texture_Height>
-		<Vertex_Density>1</Vertex_Density>
+		<Vertex_Density>0.986607</Vertex_Density>
 		<Vertex_Bounce>0.1</Vertex_Bounce>
 		<Vertex_Friction>1</Vertex_Friction>
 		<Vertex_Radius>4</Vertex_Radius>
@@ -24,7 +24,7 @@
 		<Max_Attraction_Weight>5</Max_Attraction_Weight>
 		<Max_Tickle_Weight>0.4</Max_Tickle_Weight>
 		<Max_Velocity>10</Max_Velocity>
-		<Visibility_Radius_Factor>5</Visibility_Radius_Factor>
+		<Visibility_Radius_Factor>3</Visibility_Radius_Factor>
 	</Alpha_Agent_Params>
 	<Beta_Agent_Params>
 		<Mesh_Radius>60</Mesh_Radius>
@@ -55,6 +55,6 @@
 	</InterAgentJoint_Params>
 	<General_Parameters>
 		<Alpha_Agent_Probability>0.9</Alpha_Agent_Probability>
-		<Audience_Visibility_Radius>154.082</Audience_Visibility_Radius>
+		<Audience_Visibility_Radius>104.337</Audience_Visibility_Radius>
 	</General_Parameters>
 </The_Nest_GUI>

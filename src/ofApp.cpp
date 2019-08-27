@@ -201,9 +201,7 @@ void ofApp::handleInteraction() {
     if (isOccupied) {
       // Agents can bond now.
       shouldBond = true;
-      // Activate all possible behaviors on the agents.
-      attract(people);
-      tickle(people);
+      setBehavior(people);
     } else {
       // No more bonding now.
       clearInterAgentBonds();
@@ -212,62 +210,34 @@ void ofApp::handleInteraction() {
     isOccupied = testPeople.size() > 0;
     if (isOccupied) {
       shouldBond = true;
-      // Activate all the possible behaviors on the agents.
-      attract(testPeople);
-      tickle(testPeople);
+      setBehavior(testPeople);
     } else {
       clearInterAgentBonds();
     }
   }
 }
 
-void ofApp::attract(std::vector<glm::vec2> people) {
-  for (auto &a : agents) {
-    // Get attracted to all the invisible targets
-    std::vector<glm::vec2> invisibleTargets;
-    for (auto p : people) {
-      auto d = glm::distance(a->getCentroid(), p);
-      if (d > audienceVisibilityRadius + a->visibilityRadius) {
-        invisibleTargets.push_back(p);
-      }
-    }
-    
-    if (ofRandom(1) < 0.5) {
-      a->setBehavior(Attraction, invisibleTargets);
-    } else {
-      a->setBehavior(Repulsion, invisibleTargets);
-    }
-  }
-
-//  for (auto p : people) {
-//    auto invisibleAgents = getInvisibleAgents(p);
-//    for (auto &a : invisibleAgents) {
-//      a->setDesireState(Attraction, p);
-//    }
-//  }
-}
-
-void ofApp::tickle(std::vector<glm::vec2> people) {
-  // Find all the agents that intersect with the visibility radius.
-  // Tickle them all.
-  // What is the logic for 2 circles to intersect?
+void ofApp::setBehavior(std::vector<glm::vec2> people) {
+  // Get all visible and invisble agents for each target
   for (auto p : people) {
     auto visibleAgents = getVisibleAgents(p);
+    
+    // Apply stretch on visible agents
     for (auto &a : visibleAgents) {
-      a->stretch();
+      a->setBehavior(Behavior::Stretch);
     }
   }
-}
-
-void ofApp::stretch(std::vector<glm::vec2> targets) {
-  // Not implemented currently.
-}
-
-void ofApp::repel(std::vector<glm::vec2> targets) {
-  // Repel each figment away from each other
-//  for (auto &a: agents) {
-//    a->setDesireState(Repulsion, targets[0]); // TODO fix this.
-//  }
+  
+   // Toss a coin on the invisible targets for each agent
+  // to attract or repel from the people.
+  for (auto &a : agents) {
+    auto invisibleTargets = getInvisibleTargets(people, a);
+    if (ofRandom(1) < 0.5) {
+      a->setBehavior(Behavior::Attract, invisibleTargets);
+    } else {
+      a->setBehavior(Behavior::Repel, invisibleTargets);
+    }
+  }
 }
 
 void ofApp::clearInterAgentBonds() {
@@ -290,6 +260,18 @@ Agent* ofApp::getClosestAgent(std::vector<Agent *> targetAgents, glm::vec2 targe
   return minAgent;
 }
 
+std::vector<glm::vec2> ofApp::getInvisibleTargets(std::vector<glm::vec2> people, Agent* a) {
+  std::vector<glm::vec2> invisibleTargets;
+  for (auto p : people) {
+    auto d = glm::distance(a->getCentroid(), p);
+    if (d > audienceVisibilityRadius + a->visibilityRadius) {
+      invisibleTargets.push_back(p);
+    }
+  }
+  
+  return invisibleTargets;
+}
+
 std::vector<Agent *> ofApp::getVisibleAgents(glm::vec2 target) {
   std::vector<Agent *> visibleAgents;
   // Find the closest agents to the target
@@ -299,21 +281,8 @@ std::vector<Agent *> ofApp::getVisibleAgents(glm::vec2 target) {
       visibleAgents.push_back(a);
     }
   }
-  
-  return visibleAgents;
-}
 
-std::vector<Agent *> ofApp::getInvisibleAgents(glm::vec2 target) {
-  std::vector<Agent *> invisibleAgents;
-  // Find the closest agents to the target
-  for (auto &a : agents) {
-    auto d = glm::distance(a->getCentroid(), target);
-    if (d > a->visibilityRadius + audienceVisibilityRadius) {
-      invisibleAgents.push_back(a);
-    }
-  }
-  
-  return invisibleAgents;
+  return visibleAgents;
 }
 
 
@@ -387,7 +356,7 @@ void ofApp::createWorld(bool createBounds) {
   if (createBounds) {
     cout << "Creating new bounds." << endl;
     // Bounds
-    bounds.x = -20; bounds.y = -20;
+    bounds.x = -100; bounds.y = -100;
     bounds.width = ofGetWidth() + (-1) * bounds.x * 2; bounds.height = ofGetHeight() + (-1) * 2 * bounds.y;
     box2d.createBounds(bounds);
     
@@ -656,9 +625,8 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
           dataB->targetPos = pos;
           
           // Desire state is NONE! Repel the vertices from each
-          // other.
           if (agentA->currentBehavior == None) {
-            if (ofRandom(1) < 0.7) {
+            if (ofRandom(1) < 0.90) {
               dataA->applyRepulsion = true;
               e.a->GetBody()->SetUserData(dataA);
             } else {
@@ -668,7 +636,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
           }
           
           if (agentB->currentBehavior == None) {
-            if (ofRandom(1) < 0.7) {
+            if (ofRandom(1) < 0.90) {
               dataA->applyRepulsion = true;
               e.a->GetBody()->SetUserData(dataA);
             } else {
@@ -774,6 +742,7 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
 }
 
 
+// Unused code. Don't need this for now.
 //          // Desire state is ATTRACTION!
 //          // Repel the other agent.
 //          if (agentA->desireState == Attraction) {
@@ -809,3 +778,19 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
 //            // Reset agent state to None on collision.
 //            agentB->setDesireState(None); // TODO: Fix this.
 //          }
+
+
+//
+//
+//std::vector<glm::vec2> ofApp::getInvisibleTargets(glm::vec2 target) {
+//  std::vector<Agent *> invisibleAgents;
+//  // Find the closest agents to the target
+//  for (auto &a : agents) {
+//    auto d = glm::distance(a->getCentroid(), target);
+//    if (d > a->visibilityRadius + audienceVisibilityRadius) {
+//      invisibleAgents.push_back(a);
+//    }
+//  }
+//
+//  return invisibleAgents;
+//}
