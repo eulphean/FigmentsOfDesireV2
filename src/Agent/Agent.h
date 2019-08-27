@@ -79,7 +79,7 @@ class Agent {
     // Helpers
     glm::vec2 getCentroid();
     ofMesh& getMesh();
-    void setDesireState(DesireState state, glm::vec2 pos);
+    void setDesireState(DesireState state, std::vector<glm::vec2> pos = {});
   
     // Vertices and Joints
     std::vector<std::shared_ptr<ofxBox2dCircle>> vertices; // Every vertex in the mesh is a circle.
@@ -151,7 +151,7 @@ class Agent {
     vector<int> boundaryIndices;
   
     // Target position for desire states
-    glm::vec2 targetPos;
+    std::vector<glm::vec2> targetPositions;
   
     // Wait time before being able to be applied with another force. 
     long coolDown;

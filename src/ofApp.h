@@ -24,6 +24,7 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
     void keyPressed(int key);
+    void mousePressed(int x, int y, int button);
     void mouseEntered(int x, int y);
     void mouseExited(int x, int y); 
     void exit();
@@ -141,7 +142,9 @@ class ofApp : public ofBaseApp{
     void drawSequence();
     glm::vec2 getBodyPosition(b2Body* body);
     void createWorld(bool createBonds);
-    Agent *getClosestAgent(glm::vec2 targetPos); 
+    Agent *getClosestAgent(std::vector<Agent *> targetAgents, glm::vec2 targetPos);
+    std::vector<Agent *> getVisibleAgents(glm::vec2 person);
+    std::vector<Agent *> getInvisibleAgents(glm::vec2 person); 
   
     std::vector<Memory> memories;
     std::vector<b2Body *> collidingBodies;
@@ -171,4 +174,6 @@ class ofApp : public ofBaseApp{
     Kinect kinect;
   
     bool isOccupied;
+  
+    std::vector<glm::vec2> testPeople; 
 };

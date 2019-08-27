@@ -11,19 +11,19 @@
 		<Mesh_Columns>7</Mesh_Columns>
 		<Mesh_Width>30</Mesh_Width>
 		<Mesh_Height>30</Mesh_Height>
-		<Texture_Width>100</Texture_Width>
-		<Texture_Height>100</Texture_Height>
+		<Texture_Width>300</Texture_Width>
+		<Texture_Height>300</Texture_Height>
 		<Vertex_Density>1</Vertex_Density>
 		<Vertex_Bounce>0.1</Vertex_Bounce>
 		<Vertex_Friction>1</Vertex_Friction>
 		<Vertex_Radius>4</Vertex_Radius>
-		<Joint_Frequency>0.7</Joint_Frequency>
+		<Joint_Frequency>0.8</Joint_Frequency>
 		<Joint_Damping>0.7</Joint_Damping>
-		<Max_Stretch_Weight>1</Max_Stretch_Weight>
-		<Max_Repulsion_Weight>3</Max_Repulsion_Weight>
+		<Max_Stretch_Weight>0.8</Max_Stretch_Weight>
+		<Max_Repulsion_Weight>5</Max_Repulsion_Weight>
 		<Max_Attraction_Weight>5</Max_Attraction_Weight>
 		<Max_Tickle_Weight>0.4</Max_Tickle_Weight>
-		<Max_Velocity>5</Max_Velocity>
+		<Max_Velocity>10</Max_Velocity>
 		<Visibility_Radius_Factor>5</Visibility_Radius_Factor>
 	</Alpha_Agent_Params>
 	<Beta_Agent_Params>
@@ -48,13 +48,13 @@
 		<Visibility_Radius_Factor>1.38776</Visibility_Radius_Factor>
 	</Beta_Agent_Params>
 	<InterAgentJoint_Params>
-		<Joint_Frequency>1</Joint_Frequency>
+		<Joint_Frequency>0.5</Joint_Frequency>
 		<Joint_Damping>1</Joint_Damping>
-		<Min_Joint_Length>400</Min_Joint_Length>
-		<Max_Joint_Length>500</Max_Joint_Length>
+		<Min_Joint_Length>500</Min_Joint_Length>
+		<Max_Joint_Length>800</Max_Joint_Length>
 	</InterAgentJoint_Params>
 	<General_Parameters>
-		<Alpha_Agent_Probability>0.7</Alpha_Agent_Probability>
-		<Audience_Visibility_Radius>100</Audience_Visibility_Radius>
+		<Alpha_Agent_Probability>0.9</Alpha_Agent_Probability>
+		<Audience_Visibility_Radius>154.082</Audience_Visibility_Radius>
 	</General_Parameters>
 </The_Nest_GUI>

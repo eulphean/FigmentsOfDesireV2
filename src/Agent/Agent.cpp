@@ -49,7 +49,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   stretchWeight = 0;
   attractionWeight = 0;
   coolDown = 0;
-  maxCoolDown = 100; // Wait time before the agent actually is ready to take more forces. 
+  maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
 }
 
 void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
@@ -217,48 +217,50 @@ void Agent::handleVertexBehaviors() {
 
 // Unimplemented.
 void Agent::handleRepulsion() {
-  if (applyRepulsion) {
-    repulsionWeight = ofLerp(repulsionWeight, maxRepulsionWeight, 0.1);
-    for (auto &v : vertices) {
-      auto data = reinterpret_cast<VertexData*>(v->getData());
-      if (!data->hasInterAgentJoint) {
-         v->addRepulsionForce(targetPos.x, targetPos.y, repulsionWeight);
-      }
-    }
-    
-    applyRepulsion = false;
-    
-    if (maxRepulsionWeight-repulsionWeight < maxRepulsionWeight/2) {
-      repulsionWeight = 0;
-    }
-  }
+//  if (applyRepulsion) {
+//    repulsionWeight = ofLerp(repulsionWeight, maxRepulsionWeight, 0.1);
+//    for (auto &v : vertices) {
+//      auto data = reinterpret_cast<VertexData*>(v->getData());
+//      if (!data->hasInterAgentJoint) {
+//         v->addRepulsionForce(targetPos.x, targetPos.y, repulsionWeight);
+//      }
+//    }
+//
+//    applyRepulsion = false;
+//
+//    if (maxRepulsionWeight-repulsionWeight < maxRepulsionWeight/2) {
+//      repulsionWeight = 0;
+//    }
+//  }
 }
 
 // Attraction.
 void Agent::handleAttraction() {
-  // Find the closest vertex to the targetPos.
   if (applyAttraction && coolDown == 0) {
-      float minD = 9999; int minIdx;
-      for (int idx = 0; idx < vertices.size(); idx++) {
-        auto v = vertices[idx];
-        auto p = glm::vec2(v->getPosition().x, v->getPosition().y);
-        auto d = glm::distance(p, targetPos);
-        if (d < minD) {
-          minD = d; minIdx = idx;
-        }
-      }
-    
-      // This weight is 100 times less than the maxAttraction weight because it
-      // acts successively on only one vertex. Also, this force is lerped so the
-      // creature has a stretch/bacteria like feeling. The force is still applied
-      // on the closest vertex from the person. 
-      float newMaxWeight = maxAttractionWeight/100;
-      attractionWeight = ofLerp(attractionWeight, newMaxWeight, 0.01);
-      vertices[minIdx]->addAttractionPoint(targetPos, attractionWeight);
-      if (newMaxWeight - attractionWeight <= 0.01) {
-        applyAttraction = false;
-        attractionWeight = 0;
-        coolDown = maxCoolDown;
+    for (auto targetPos : targetPositions) {
+          // Find the closest vertex to the targetPos.
+          float minD = 9999; int minIdx;
+          for (int idx = 0; idx < vertices.size(); idx++) {
+            auto v = vertices[idx];
+            auto p = glm::vec2(v->getPosition().x, v->getPosition().y);
+            auto d = glm::distance(p, targetPos);
+            if (d < minD) {
+              minD = d; minIdx = idx;
+            }
+          }
+      
+          // This weight is 100 times less than the maxAttraction weight because it
+          // acts successively on only one vertex. Also, this force is lerped so the
+          // creature has a stretch/bacteria like feeling. The force is still applied
+          // on the closest vertex from the person.
+          float newMaxWeight = maxAttractionWeight/100;
+          attractionWeight = ofLerp(attractionWeight, newMaxWeight, 0.01);
+          vertices[minIdx]->addAttractionPoint(targetPos, attractionWeight);
+          if (newMaxWeight - attractionWeight <= 0.01) {
+            applyAttraction = false;
+            attractionWeight = 0;
+            coolDown = maxCoolDown;
+          }
       }
   }
 }
@@ -266,17 +268,17 @@ void Agent::handleAttraction() {
 void Agent::handleStretch() {
   // Check for counter.
   if (applyStretch) { // Time to apply a stretch.
-    stretchWeight = ofLerp(stretchWeight, maxStretchWeight, 0.1);
+    stretchWeight = ofLerp(stretchWeight, maxStretchWeight, 0.05);
     for (auto &v : vertices) {
       auto data = reinterpret_cast<VertexData*>(v->getData());
-      if (!data->hasInterAgentJoint) {
-        if (ofRandom(1) < 0.2 ) {
+//      if (!data->hasInterAgentJoint) {
+        if (ofRandom(1) < 0.1) {
           v->addAttractionPoint({mesh.getCentroid().x, mesh.getCentroid().y}, stretchWeight);
         } else {
           v->addRepulsionForce(mesh.getCentroid().x, mesh.getCentroid().y, stretchWeight);
         }
-//        v->setRotation(ofRandom(150));
-      }
+        v->setRotation(ofRandom(150));
+//      }
     }
     
     if (maxStretchWeight - stretchWeight < 0.5) {
@@ -289,6 +291,9 @@ void Agent::handleStretch() {
 void Agent::handleTickle() {
   // Does the agent want to tickle? Check with counter conditions.
   if (applyTickle == true) {
+    // Stop any sort of attraction. 
+    applyAttraction = false;
+    
     // Apply the tickle.
     for (auto &v: vertices) {
       glm::vec2 force = glm::vec2(ofRandom(-2, 2), ofRandom(-2, 2));
@@ -325,9 +330,9 @@ void Agent::stretch() {
   applyStretch = true;
 }
 
-void Agent::setDesireState(DesireState newState, glm::vec2 newPos) {
+void Agent::setDesireState(DesireState newState, std::vector<glm::vec2> newTargets) {
   desireState = newState;
-  targetPos = newPos;
+  targetPositions = newTargets;
   
   if (desireState == None) {
     applyAttraction = false;

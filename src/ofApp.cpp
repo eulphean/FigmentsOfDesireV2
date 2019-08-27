@@ -156,12 +156,16 @@ void ofApp::drawSequence() {
   if (!kinect.kinectOpen) {
     ofPushStyle();
       ofSetColor(ofColor::yellow);
-      ofDrawCircle(ofGetMouseX(), ofGetMouseY(), 5);
+      for (auto p : testPeople) {
+        ofDrawCircle(p, 5); 
+      }
     
       if (showVisibilityRadius) {
         ofNoFill();
         ofSetColor(ofColor::red);
-        ofDrawCircle(ofGetMouseX(), ofGetMouseY(), audienceVisibilityRadius);
+        for (auto p : testPeople) {
+          ofDrawCircle(p, audienceVisibilityRadius);
+        }
       }
     ofPopStyle();
   }
@@ -182,50 +186,76 @@ void ofApp::mouseExited(int x, int y) {
   isOccupied = false;
 }
 
+void ofApp::mousePressed(int x, int y, int button) {
+  if (button == 2) { // Right click.
+    if (testPeople.size() > 0) {
+        // Trim the array
+        auto randIdx = (int) ofRandom(testPeople.size());
+        auto iterator = testPeople.begin();
+        testPeople.erase(iterator + randIdx);
+        testPeople.shrink_to_fit();
+      }
+    } else if (button == 0) { // Left click.
+      testPeople.push_back(glm::vec2(x, y));
+    }
+}
+
 void ofApp::handleInteraction() {
   if (kinect.kinectOpen) {
     // Is the area occupied?
     auto people = kinect.getBodyCentroids();
     isOccupied = people.size() > 0;
     if (isOccupied) {
-      // Activate all the possible behaviors on the agents.
-      attract(people);
+      // Agents can bond now.
       shouldBond = true;
+      // Activate all possible behaviors on the agents.
+      attract(people);
       tickle(people);
     } else {
+      // No more bonding now.
       clearInterAgentBonds();
     }
   } else { // Test Routine
     if (isOccupied) {
       shouldBond = true;
-      std::vector<glm::vec2> people;
-      people.push_back(glm::vec2(ofGetMouseX(), ofGetMouseY()));
       // Activate all the possible behaviors on the agents.
-      attract(people);
-      tickle(people);
+      attract(testPeople);
+      tickle(testPeople);
     } else {
       clearInterAgentBonds();
     }
   }
 }
 
-void ofApp::attract(std::vector<glm::vec2> targets) {
-  // Closest agent (centroid wise)
-  for (auto t: targets) {
-    auto closestAgent = getClosestAgent(t);
-    if (closestAgent != NULL) {
-      closestAgent->setDesireState(Attraction, t);
+void ofApp::attract(std::vector<glm::vec2> people) {
+  for (auto &a : agents) {
+    // Get attracted to all the invisible targets
+    std::vector<glm::vec2> invisibleTargets;
+    for (auto p : people) {
+      auto d = glm::distance(a->getCentroid(), p);
+      if (d > audienceVisibilityRadius + a->visibilityRadius) {
+        invisibleTargets.push_back(p);
+      }
     }
+    a->setDesireState(Attraction, invisibleTargets);
   }
+
+//  for (auto p : people) {
+//    auto invisibleAgents = getInvisibleAgents(p);
+//    for (auto &a : invisibleAgents) {
+//      a->setDesireState(Attraction, p);
+//    }
+//  }
 }
 
-void ofApp::tickle(std::vector<glm::vec2> targets) {
-  for (auto t: targets) {
-    for (auto &a : agents) {
-      auto d = glm::distance(t, a->getCentroid());
-      if (d <= a->visibilityRadius*2) {
-        a->tickle();
-      }
+void ofApp::tickle(std::vector<glm::vec2> people) {
+  // Find all the agents that intersect with the visibility radius.
+  // Tickle them all.
+  // What is the logic for 2 circles to intersect?
+  for (auto p : people) {
+    auto visibleAgents = getVisibleAgents(p);
+    for (auto &a : visibleAgents) {
+      a->stretch();
     }
   }
 }
@@ -236,9 +266,9 @@ void ofApp::stretch(std::vector<glm::vec2> targets) {
 
 void ofApp::repel(std::vector<glm::vec2> targets) {
   // Repel each figment away from each other
-  for (auto &a: agents) {
-    a->setDesireState(Repulsion, targets[0]); // TODO fix this.
-  }
+//  for (auto &a: agents) {
+//    a->setDesireState(Repulsion, targets[0]); // TODO fix this.
+//  }
 }
 
 void ofApp::clearInterAgentBonds() {
@@ -248,10 +278,10 @@ void ofApp::clearInterAgentBonds() {
   }
 }
 
-Agent* ofApp::getClosestAgent(glm::vec2 targetPos) {
+Agent* ofApp::getClosestAgent(std::vector<Agent *> targetAgents, glm::vec2 targetPos) {
   auto minD = 9999;
   Agent *minAgent = NULL;
-  for (auto &a : agents) {
+  for (auto &a : targetAgents) {
     auto d = glm::distance(targetPos, a->getCentroid());
     if (d < minD) {
       minD = d;
@@ -261,6 +291,31 @@ Agent* ofApp::getClosestAgent(glm::vec2 targetPos) {
   return minAgent;
 }
 
+std::vector<Agent *> ofApp::getVisibleAgents(glm::vec2 target) {
+  std::vector<Agent *> visibleAgents;
+  // Find the closest agents to the target
+  for (auto &a : agents) {
+    auto d = glm::distance(a->getCentroid(), target);
+    if (d <= a->visibilityRadius + audienceVisibilityRadius) {
+      visibleAgents.push_back(a);
+    }
+  }
+  
+  return visibleAgents;
+}
+
+std::vector<Agent *> ofApp::getInvisibleAgents(glm::vec2 target) {
+  std::vector<Agent *> invisibleAgents;
+  // Find the closest agents to the target
+  for (auto &a : agents) {
+    auto d = glm::distance(a->getCentroid(), target);
+    if (d > a->visibilityRadius + audienceVisibilityRadius) {
+      invisibleAgents.push_back(a);
+    }
+  }
+  
+  return invisibleAgents;
+}
 
 
 void ofApp::keyPressed(int key){
@@ -406,8 +461,8 @@ void ofApp::setupGui() {
     interAgentJointParams.setName("InterAgentJoint Params");
     interAgentJointParams.add(iJointFrequency.set("Joint Frequency", 2, 0, 20));
     interAgentJointParams.add(iJointDamping.set("Joint Damping", 1, 0, 10));
-    interAgentJointParams.add(iMinJointLength.set("Min Joint Length", 250, 50, 600));
-    interAgentJointParams.add(iMaxJointLength.set("Max Joint Length", 300, 50, 600));
+    interAgentJointParams.add(iMinJointLength.set("Min Joint Length", 250, 100, 1000));
+    interAgentJointParams.add(iMaxJointLength.set("Max Joint Length", 300, 100, 1000));
 
     settings.add(generalParams);
     settings.add(alphaAgentParams);
@@ -517,18 +572,13 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 // ------------------------------ Interactive Routines --------------------------------------- //
 
 void ofApp::createAgents() {
-  ofPoint origin = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
-  Agent *agent;
-  // Based on a probablity, create a new agent.
-  if (ofRandom(1) <= alphaAgentProbability) {
+  for (int i = 0; i < 15; i++) {
+    ofPoint origin = ofPoint(ofRandom(50, ofGetWidth()-200), ofRandom(50, ofGetHeight()-200));
+    Agent *agent;
     alphaAgentProps.meshOrigin = origin;
     agent = new Alpha(box2d, alphaAgentProps);
-  } else {
-    betaAgentProps.meshOrigin = origin;
-    agent = new Beta(box2d, betaAgentProps);
+    agents.push_back(agent);
   }
-  
-  agents.push_back(agent);
 }
 
 
@@ -645,7 +695,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
             }
           
             // Reset agent state to None on collision.
-            agentA->setDesireState(None, glm::vec2(0, 0)); // TODO: Fix this. 
+            agentA->setDesireState(None); // TODO: Fix this.
           }
           
           if (agentB->desireState == Attraction) {
@@ -662,7 +712,7 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
             }
             
             // Reset agent state to None on collision.
-            agentB->setDesireState(None, glm::vec2(0, 0)); // TODO: Fix this.
+            agentB->setDesireState(None); // TODO: Fix this.
           }
 
           // If agents can bond, evaluate the colliding bodies for collision.
