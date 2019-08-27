@@ -380,6 +380,7 @@ void ofApp::setupGui() {
     generalParams.setName("General Parameters");
     generalParams.add(alphaAgentProbability.set("Alpha Agent Probability", 0.1, 0, 0.9));
     generalParams.add(audienceVisibilityRadius.set("Audience Visibility Radius", 100, 50, 200)); 
+    generalParams.add(numAgentsToCreate.set("Num Agents To Create", 1, 1, 10));
   
     // Alpha Agent GUI parameters
     alphaAgentParams.setName("Alpha Agent Params");
@@ -539,7 +540,7 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 // ------------------------------ Interactive Routines --------------------------------------- //
 
 void ofApp::createAgents() {
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < numAgentsToCreate; i++) {
     ofPoint origin = ofPoint(ofRandom(50, ofGetWidth()-200), ofRandom(50, ofGetHeight()-200));
     Agent *agent;
     alphaAgentProps.meshOrigin = origin;
@@ -716,8 +717,6 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
     // Joint length (determine with probability)
     int jointLength = ofRandom(iMinJointLength, iMaxJointLength);
     j->setLength(jointLength);
-  
-    // Enable interAgentJoint
   
     // Update Body A
     auto data = reinterpret_cast<VertexData*>(bodyA->GetUserData());

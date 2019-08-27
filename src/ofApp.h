@@ -73,7 +73,8 @@ class ofApp : public ofBaseApp{
     // General settings
     ofParameterGroup generalParams;
     ofParameter<float> alphaAgentProbability;
-    ofParameter<float> audienceVisibilityRadius; 
+    ofParameter<float> audienceVisibilityRadius;
+    ofParameter<int> numAgentsToCreate; 
   
     // Alpha Agent Group params. 
     ofParameterGroup alphaAgentParams;
