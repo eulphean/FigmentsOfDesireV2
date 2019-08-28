@@ -158,7 +158,8 @@ void Agent::createTexture(ofPoint textureSize) {
   
   textFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
   // Center the string
-  string msg = "Amazon Burns";
+  string msg = "AMAZON BURNS";
+  font.setLetterSpacing(2);
   auto sw = font.stringWidth(msg); auto sh = font.stringHeight(msg);
   auto xPos = (textureSize.x - sw)/2;
   auto yPos = (textureSize.y/2);
