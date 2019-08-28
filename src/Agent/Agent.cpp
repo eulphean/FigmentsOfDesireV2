@@ -23,7 +23,8 @@ void Message::draw() {
 // ------------------------------ Agent --------------------------------------- //
 
 void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
-  // Setup post-process filter for the texture.
+  // Load the font.
+  font.load("fonts/perfect.otf", 20);
   
   // ACTIVE filter
   filter = new PerlinPixellationFilter(textureSize.x, textureSize.y, 15.f);
@@ -155,6 +156,19 @@ void Agent::createTexture(ofPoint textureSize) {
 
   firstFbo.end();
   
+  textFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
+  // Center the string
+  string msg = "Amazon Burns";
+  auto sw = font.stringWidth(msg); auto sh = font.stringHeight(msg);
+  auto xPos = (textureSize.x - sw)/2;
+  auto yPos = (textureSize.y/2);
+  
+  textFbo.begin();
+    ofClear(0, 0, 0, 0);
+    ofSetColor(ofColor::black);
+    font.drawString(msg, xPos, yPos);
+  textFbo.end();
+  
   if (firstFbo.isAllocated()) {
     // Create 2nd fbo and draw with filter and postProcessing
     secondFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
@@ -163,6 +177,8 @@ void Agent::createTexture(ofPoint textureSize) {
       filter->begin();
         firstFbo.getTexture().drawSubsection(0, 0, textureSize.x, textureSize.y, 0, 0);
       filter->end();
+      ofSetColor(255, 255);
+      textFbo.draw(0, 0);
     secondFbo.end();
   }
 }

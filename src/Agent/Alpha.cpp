@@ -2,12 +2,12 @@
 
 Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {  
   // Assign a color palette
-  palette = { ofColor::fromHex(0x540D6E),
-              ofColor::fromHex(0x982A41),
+  palette = { ofColor::fromHex(0xB141DA),
+              ofColor::fromHex(0x45E645),
               ofColor::fromHex(0xFFEEB9),
               ofColor::fromHex(0x3BCEAC),
               ofColor::fromHex(0x0EAD69),
-              ofColor::fromHex(0xFF4A4A),
+              ofColor::fromHex(0xFF8080),
               ofColor::fromHex(0x0BF6CD)
   };
   

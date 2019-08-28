@@ -132,6 +132,8 @@ class Agent {
     // Texture
     ofFbo firstFbo;
     ofFbo secondFbo;
+    ofFbo textFbo;
+    ofTrueTypeFont font; 
   
     // Figment's corner indices
     int cornerIndices[4];
