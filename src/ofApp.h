@@ -143,8 +143,10 @@ class ofApp : public ofBaseApp{
     std::vector<glm::vec2> getInvisibleTargets(std::vector<glm::vec2> targets, Agent* a);
     void wasteTime();
     void enableRepelBeforeBreak();
-    int specialRepelTimer; // Keeps track of the repelling. 
+    void evaluateEntryExit(int peopleNum);
   
+  
+    int specialRepelTimer; // Keeps track of the repelling.
     std::vector<Memory> memories;
     std::vector<b2Body *> collidingBodies;
   
@@ -171,8 +173,10 @@ class ofApp : public ofBaseApp{
   
     // Kinect handle
     Kinect kinect;
-    
+  
+    // Occupied
     bool isOccupied;
+    int prevPeopleSize; 
   
     std::vector<glm::vec2> testPeople; 
 };

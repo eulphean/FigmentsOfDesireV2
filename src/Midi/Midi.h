@@ -11,21 +11,15 @@ class Midi {
     void exit();
   
     // Midi calls. 
-    void sendBondMakeMidi(int midiNote);
-    void sendBondBreakMidi(int midiNote);
-    void sendMidiControlChangeRotary(int device, float val);
+    void sendEntryExitMidi(bool isEntering);
+    void sendAgentStretchMidi(int midiNote);
     
     static Midi &instance();
     
   private:
     ofxMidiOut midiOut;
     static Midi m;
-    int bondMakeChannel, bondBreakChannel;
-    int channelLeftBack;
-    int channelLeftFront;
-    int channelRightBack;
-    int channelRightFront;
-    int channelRain;
-    int channelRightBackMix;
-    int channelLeftFrontMix;
+    int entryExitChannel;
+    int agentStretchChannel;
+    int bondBreakChannel;
 };

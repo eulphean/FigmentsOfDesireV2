@@ -42,6 +42,9 @@ void ofApp::setup(){
   
   // Init the joint mesh to start with.
   SuperAgent::initJointMesh();
+  
+  // Variable to keep track of who enters/exits the sapce
+  prevPeopleSize = 0;
 }
 
 void ofApp::update(){
@@ -198,6 +201,8 @@ void ofApp::handleInteraction() {
     // Is the area occupied?
     auto people = kinect.getBodyCentroids();
     isOccupied = people.size() > 0;
+    evaluateEntryExit(people.size()); // Hook for sound.
+    
     if (isOccupied) {
       // Agents can bond now.
       shouldBond = true;
@@ -213,6 +218,8 @@ void ofApp::handleInteraction() {
     }
   } else { // Test Routine
     isOccupied = testPeople.size() > 0;
+    evaluateEntryExit(testPeople.size()); // Hook for sound.
+    
     if (isOccupied) {
       shouldBond = true;
       setBehavior(testPeople);
@@ -227,6 +234,18 @@ void ofApp::handleInteraction() {
       }
     }
   }
+}
+
+void ofApp::evaluateEntryExit(int curPeopleSize) {
+    if (prevPeopleSize < curPeopleSize) {
+      // Somebody entered
+      Midi::instance().sendEntryExitMidi(true);
+    } else if (prevPeopleSize > curPeopleSize) {
+      // Somebody left
+      Midi::instance().sendEntryExitMidi(false);
+    }
+  
+    prevPeopleSize = curPeopleSize; 
 }
 
 void ofApp::setBehavior(std::vector<glm::vec2> people) {
@@ -530,41 +549,6 @@ void ofApp::processOsc() {
     if(m.getAddress() == "/new"){
       float val = m.getArgAsFloat(0);
       createAgents();
-    }
-    
-    if(m.getAddress() == "/leftBack"){
-      float val = m.getArgAsFloat(0);
-      Midi::instance().sendMidiControlChangeRotary(0, val);
-    }
-    
-    if(m.getAddress() == "/leftFront"){
-      float val = m.getArgAsFloat(0);
-      Midi::instance().sendMidiControlChangeRotary(1, val);
-    }
-    
-    if(m.getAddress() == "/rightBack"){
-      float val = m.getArgAsFloat(0);
-       Midi::instance().sendMidiControlChangeRotary(2, val);
-    }
-    
-    if(m.getAddress() == "/rightFront"){
-      float val = m.getArgAsFloat(0);
-        Midi::instance().sendMidiControlChangeRotary(3, val);
-    }
-    
-    if(m.getAddress() == "/rain"){
-      float val = m.getArgAsFloat(0);
-       Midi::instance().sendMidiControlChangeRotary(4, val);
-    }
-    
-    if(m.getAddress() == "/rightBackMix"){
-      float val = m.getArgAsFloat(0);
-       Midi::instance().sendMidiControlChangeRotary(5, val);
-    }
-    
-    if(m.getAddress() == "/leftFrontMix"){
-      float val = m.getArgAsFloat(0);
-       Midi::instance().sendMidiControlChangeRotary(6, val);
     }
   }
 }

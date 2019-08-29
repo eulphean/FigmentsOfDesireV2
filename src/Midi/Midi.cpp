@@ -3,81 +3,20 @@
 void Midi::setup() {
   // MIDI setup.
   midiOut.openVirtualPort("ofxMidiOut"); // open a virtual port
-  channelLeftBack = 2;
-  channelLeftFront = 3;
-  channelRightBack = 4;
-  channelRightFront = 5;
-  channelRain = 6;
-  channelRightBackMix = 7;
-  channelLeftFrontMix = 8;
+  entryExitChannel = 1;
+  agentStretchChannel = 2;
+  bondBreakChannel = 1; 
+} 
+
+void Midi::sendEntryExitMidi(bool hasEntered) {
+  int midiNote = hasEntered ? 48 : 60;
+  midiOut.sendNoteOn(entryExitChannel, midiNote, 64);
 }
 
-void Midi::sendMidiControlChangeRotary(int device, float val) {
-  //if (currentScene == 2 || currentScene == 3) { // Or any scene during which I want to use the dishes, put it here.
-    // Map rotary values to Midi signals.
-    float midiVal = ofMap(val, 0, 1, 0, 127, true);
-
-    switch (device) {
-      case 0: {
-        // Channel, control, midi value
-        cout << midiVal << endl;
-        midiOut.sendControlChange(channelLeftBack, 10, midiVal);
-        break;
-      }
-      
-      case 1: {
-        // Channel, control, midi value
-        midiOut.sendControlChange(channelLeftFront, 11, midiVal);
-        break;
-      }
-      
-      case 2: {
-        // Channel, control, midi value
-        midiOut.sendControlChange(channelRightBack, 12, midiVal);
-        break;
-      }
-      
-      case 3: {
-        // Channel, control, midi value
-        midiOut.sendControlChange(channelRightFront, 13, midiVal);
-        break;
-      }
-      
-      case 4: {
-        // Channel, control, midi value
-        midiOut.sendControlChange(channelRain, 14, midiVal);
-        break;
-      }
-      
-      case 5: {
-        // Channel, control, midi value
-        midiOut.sendControlChange(channelRightBackMix, 15, midiVal);
-        break;
-      }
-      
-      case 6: {
-        // Channel, control, midi value
-        midiOut.sendControlChange(channelLeftFrontMix, 16, midiVal);
-        break;
-      }
-      default:
-        break;
-    }
-  //}
+// Every agent will get a unique midi note.
+void Midi::sendAgentStretchMidi(int midiNote) {
+  midiOut.sendNoteOn(agentStretchChannel, midiNote);
 }
-
-// ROtary controls (Midi)
-void Midi::sendBondMakeMidi(int midiNote) {
-  // Constant velocity
-  midiOut.sendNoteOn(bondMakeChannel, midiNote, 64);
-}
-
-void Midi::sendBondBreakMidi(int midiNote) {
-  // Constant velocity
-  midiOut.sendNoteOn(bondBreakChannel, midiNote, 64);
-  //midiOut.sendNoteOff(bondMakeChannel, midiNote, 64);
-}
-
 
 void Midi::exit() {
   midiOut.closePort();
