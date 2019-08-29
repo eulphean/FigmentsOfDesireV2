@@ -2,6 +2,7 @@
 #include "ofMain.h"
 #include "ofxBox2d.h"
 #include "ofxFilterLibrary.h"
+#include "Midi.h"
 
 // Current behavior of the agent.
 enum Behavior {
@@ -133,7 +134,8 @@ class Agent {
     ofFbo firstFbo;
     ofFbo secondFbo;
     ofFbo textFbo;
-    ofTrueTypeFont font; 
+    ofTrueTypeFont font;
+    int midiNote; 
   
     // Figment's corner indices
     int cornerIndices[4];

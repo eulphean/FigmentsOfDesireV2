@@ -10,9 +10,12 @@ class Midi {
     void setup();
     void exit();
   
+    // Midi note assignment for Stretch
+    int assignMidiNote();
+  
     // Midi calls. 
     void sendEntryExitMidi(bool isEntering);
-    void sendAgentStretchMidi(int midiNote);
+    void sendAgentStretchMidi(int midiNote, bool isOn);
     
     static Midi &instance();
     
@@ -22,4 +25,7 @@ class Midi {
     int entryExitChannel;
     int agentStretchChannel;
     int bondBreakChannel;
+    
+    std::vector<int> stretchMidiNotes;
+    std::vector<int> assignedMidiNotes;
 };

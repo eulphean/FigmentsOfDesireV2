@@ -26,6 +26,9 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   // Load the font.
   font.load("fonts/perfect.otf", 20);
   
+  // Get a midi note from the Midi instance.
+  midiNote = Midi::instance().assignMidiNote();
+  
   // ACTIVE filter
   filter = new PerlinPixellationFilter(textureSize.x, textureSize.y, 15.f);
   
@@ -298,6 +301,7 @@ void Agent::handleAttraction() {
 void Agent::handleStretch() {
   // Check for counter.
   if (currentBehavior==Behavior::Stretch) { // Time to apply a stretch.
+    // Sound Hook
     stretchWeight = ofLerp(stretchWeight, maxStretchWeight, 0.005);
     for (auto &v : vertices) {
       v->addRepulsionForce(mesh.getCentroid().x, mesh.getCentroid().y, stretchWeight);
@@ -306,7 +310,6 @@ void Agent::handleStretch() {
     if (maxStretchWeight - stretchWeight <= maxStretchWeight/2) {
       stretchWeight = 0;
     }
-    
     currentBehavior = Behavior::None;
   }
 }

@@ -259,7 +259,7 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
     }
   }
   
-   // Toss a coin on the invisible targets for each agent
+  // Toss a coin on the invisible targets for each agent
   // to attract or repel from the people.
   for (auto &a : agents) {
     auto invisibleTargets = getInvisibleTargets(people, a);
