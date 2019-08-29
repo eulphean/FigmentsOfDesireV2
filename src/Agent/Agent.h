@@ -75,6 +75,7 @@ class Agent {
     void handleStretch();
     void handleShock();
     void handleVertexBehaviors();
+    void enableStretchMidi(bool on);
   
     // Enabling behaviors
     void repulseBondedVertices();
@@ -147,6 +148,7 @@ class Agent {
     // Wait time before being able to be applied with another force. 
     int coolDown;
     int maxCoolDown;
+    bool isMidiOn; 
 };
 
 // Data Structure to hold a pointer to the agent instance

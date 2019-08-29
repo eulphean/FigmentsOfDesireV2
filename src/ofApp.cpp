@@ -209,6 +209,9 @@ void ofApp::handleInteraction() {
       setBehavior(people);
       specialRepelTimer = ofRandom(200, 300);
     } else {
+      for (auto &a : agents) {
+        a->enableStretchMidi(false); // It can happen here that targets disappear.
+      }
       if (specialRepelTimer > 0) {
         enableRepelBeforeBreak();
       } else {
@@ -225,6 +228,9 @@ void ofApp::handleInteraction() {
       setBehavior(testPeople);
       specialRepelTimer = ofRandom(200, 300);
     } else {
+      for (auto &a : agents) {
+        a->enableStretchMidi(false); // It can happen here that targets disappear.
+      }
       if (specialRepelTimer > 0) {
         enableRepelBeforeBreak();
       } else {
@@ -249,13 +255,14 @@ void ofApp::evaluateEntryExit(int curPeopleSize) {
 }
 
 void ofApp::setBehavior(std::vector<glm::vec2> people) {
-  // Get all visible and invisble agents for each target
+  // Get all visible agents.
   for (auto p : people) {
+    // Visible Agents.
     auto visibleAgents = getVisibleAgents(p);
-    
     // Apply stretch on visible agents
     for (auto &a : visibleAgents) {
-      a->setBehavior(Behavior::Stretch, {}, true);
+      a->setBehavior(Behavior::Stretch, {}, true); // All visible agents, turn on the note! They turn it off, as soon as they become invisible
+      a->enableStretchMidi(true); 
     }
   }
   
@@ -267,6 +274,12 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
       a->setBehavior(Behavior::Attract, invisibleTargets);
     } else {
       a->setBehavior(Behavior::Repel, invisibleTargets);
+    }
+    
+    // If no visible targets, turn off the midi. 
+    auto numVisibleTargets = people.size() - invisibleTargets.size();
+    if (numVisibleTargets == 0) {
+      a->enableStretchMidi(false);
     }
   }
 }
@@ -342,6 +355,19 @@ std::vector<Agent *> ofApp::getVisibleAgents(glm::vec2 target) {
   }
 
   return visibleAgents;
+}
+
+std::vector<Agent*> ofApp::getInvisibleAgents(glm::vec2 target) {
+  std::vector<Agent *> invisibleAgents;
+  // Find the closest agents to the target
+  for (auto &a : agents) {
+    auto d = glm::distance(a->getCentroid(), target);
+    if (d > a->visibilityRadius + audienceVisibilityRadius) {
+      invisibleAgents.push_back(a);
+    }
+  }
+
+  return invisibleAgents;
 }
 
 
@@ -803,22 +829,6 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
 //            // Reset agent state to None on collision.
 //            agentB->setDesireState(None); // TODO: Fix this.
 //          }
-
-
-//
-//
-//std::vector<glm::vec2> ofApp::getInvisibleTargets(glm::vec2 target) {
-//  std::vector<Agent *> invisibleAgents;
-//  // Find the closest agents to the target
-//  for (auto &a : agents) {
-//    auto d = glm::distance(a->getCentroid(), target);
-//    if (d > a->visibilityRadius + audienceVisibilityRadius) {
-//      invisibleAgents.push_back(a);
-//    }
-//  }
-//
-//  return invisibleAgents;
-//}
 
 //    for (auto &sa : superAgents) {
 //      auto joints = sa.joints;

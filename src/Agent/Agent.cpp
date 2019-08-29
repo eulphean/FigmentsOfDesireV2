@@ -28,7 +28,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   
   // Get a midi note from the Midi instance.
   midiNote = Midi::instance().assignMidiNote();
-  
+
   // ACTIVE filter
   filter = new PerlinPixellationFilter(textureSize.x, textureSize.y, 15.f);
   
@@ -48,6 +48,9 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   attractionWeight = 0;
   coolDown = 0;
   maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
+  
+  // By default no midi note is playing. 
+  isMidiOn = false;
 }
 
 void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
@@ -345,5 +348,19 @@ void Agent::setBehavior(Behavior newBehavior, std::vector<glm::vec2> newTargets,
     }
     currentBehavior = newBehavior;
     targetPositions = newTargets;
+  }
+}
+
+void Agent::enableStretchMidi(bool on) {
+  if (on) {
+    if (!isMidiOn) {
+        Midi::instance().sendAgentStretchMidi(midiNote, true);
+        isMidiOn = true;
+    }
+  } else {
+    if (isMidiOn) {
+      Midi::instance().sendAgentStretchMidi(midiNote, false);
+      isMidiOn = false;
+    }
   }
 }

@@ -140,6 +140,7 @@ class ofApp : public ofBaseApp{
     void createWorld(bool createBonds);
     Agent *getClosestAgent(std::vector<Agent *> targetAgents, glm::vec2 targetPos);
     std::vector<Agent *> getVisibleAgents(glm::vec2 person);
+    std::vector<Agent *> getInvisibleAgents(glm::vec2 person);
     std::vector<glm::vec2> getInvisibleTargets(std::vector<glm::vec2> targets, Agent* a);
     void wasteTime();
     void enableRepelBeforeBreak();
