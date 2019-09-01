@@ -185,7 +185,7 @@ void Agent::createTexture(ofPoint textureSize) {
         firstFbo.getTexture().drawSubsection(0, 0, textureSize.x, textureSize.y, 0, 0);
       filter->end();
       ofSetColor(255, 255);
-//      textFbo.draw(0, 0);
+      textFbo.draw(0, 0);
     secondFbo.end();
   }
 }
