@@ -164,8 +164,7 @@ void Agent::createTexture(ofPoint textureSize) {
   
   textFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
   // Retrieve a slogan and center it. 
-//  string msg = SloganFactory::instance().getSlogan();
-  string msg = "Amazon Burns"; 
+  string msg = SloganFactory::instance().getSlogan();
   font.setLetterSpacing(2);
   auto sw = font.stringWidth(msg); auto sh = font.stringHeight(msg);
   auto xPos = (textureSize.x - sw)/2;

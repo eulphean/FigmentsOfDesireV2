@@ -15,6 +15,8 @@ string SloganFactory::getSlogan() {
     
     // Push the obtained slogan back into the allocated strings.
     allocatedSlogans.push_back(s);
+    
+    return s; 
   } else {
     cout << "All Slogans Utilized. Returning the first Slogan in the collection" << endl;
     return slogans[0];
