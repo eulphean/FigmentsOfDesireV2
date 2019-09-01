@@ -13,6 +13,7 @@
 #include "Memory.h"
 #include "Midi.h"
 #include "SuperAgent.h"
+#include "SloganFactory.h"
 
 #define PORT 8000
 
@@ -51,6 +52,7 @@ class ofApp : public ofBaseApp{
     bool drawFbo; // For saving frames.
     bool shouldBond;
     bool showVisibilityRadius;
+    bool skipBgUpdate;
   
     // Box2d world handle.
     ofxBox2d box2d;

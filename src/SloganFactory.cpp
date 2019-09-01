@@ -18,9 +18,14 @@ string SloganFactory::getSlogan() {
     
     return s; 
   } else {
-    cout << "All Slogans Utilized. Returning the first Slogan in the collection" << endl;
+    cout << "All slogan allocated. Resetting allocated slogans array." << endl;
+    allocatedSlogans.clear();
     return slogans[0];
   }
+}
+
+void SloganFactory::clearAllocatedSlogans() {
+  allocatedSlogans.clear(); 
 }
 
 SloganFactory &SloganFactory::instance() {

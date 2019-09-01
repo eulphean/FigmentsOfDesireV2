@@ -2,6 +2,7 @@
 
 uniform float time; 
 uniform vec2 resolution; 
+uniform bool isOccupied; 
 
 // ------------------------------------------------------- //
 // Noise Helpers
@@ -38,23 +39,32 @@ float fbm( vec2 p )
 // ------------------------------------------------------- //
 void main(void)
 {    	
+	float newTime = time/1000; 
 	vec2 q = gl_FragCoord.xy / resolution.xy;
 	vec2 p = -1.0 + 1.5 * q;
 	vec2 m = -1.0 + 2.0 / resolution.xy;
 	m.y = -m.y;
 	p.y *= (resolution.x/resolution.y);
+	float f = fbm( 5.0*p+newTime*0.002 );
 
 	// Base and Top colors are mixed to create a background.
 	vec3 baseColor = vec3(0.662, 0.847, 0.917);
-	vec3 topColor = vec3(0.278, 0.729, 0.941); 
-
-	topColor.x = clamp(0.278 + 0.941*fbm(2.0*p + vec2(time*0.4, time*0.1)), 0, 1.0);
-	topColor.y = clamp(0.729 + 0.470*fbm(1.5*p + vec2(time*0.1, time*0.2)), 0, 1.0);
-	topColor.z = clamp(0.941 + 0.278*fbm(1.0*p + vec2(time*0.3, time*0.1)), 0, 1.0);
-
-	float f = fbm( 5.0*p+time*0.002 );
-	// float f = fbm(5.0*p + time*0.002);
-	baseColor = mix(baseColor, topColor, f);
-
-	gl_FragColor = vec4(baseColor,1.0);
+	vec3 occupiedColor; vec3 emptyColor; 
+	
+	if (isOccupied) {
+	   occupiedColor.x = 0.91 + 0.09*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
+	   occupiedColor.y = 0.18 + 0.82*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
+	   occupiedColor.z = 0.12 + 0.88*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
+	   gl_FragColor = vec4(occupiedColor,1.0);
+	} else {
+               emptyColor.x = 0.10 + 0.90*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
+	   emptyColor.y = 0.43 + 0.57*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
+	   emptyColor.z = 0.75 + 0.25*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
+	   gl_FragColor = vec4(emptyColor,1.0);
+	}
+	// baseColor = mix(baseColor, topColor, f);
 }
+		// Pure blue
+    //            emptyColor.x = 0.27 + 0.73*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
+	   // emptyColor.y = 0.72 + 0.28*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
+	   // emptyColor.z = 0.94 + 0.06*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));

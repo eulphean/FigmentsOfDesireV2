@@ -8,7 +8,8 @@ class SloganFactory {
     };
   
     string getSlogan();
-  
+    void clearAllocatedSlogans();
+    
     static SloganFactory &instance();
   
   private:

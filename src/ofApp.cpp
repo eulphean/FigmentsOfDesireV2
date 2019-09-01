@@ -30,7 +30,8 @@ void ofApp::setup(){
   showTexture = true;
   drawFbo = false;
   shouldBond = false;
-  hideKinectGui = false; 
+  hideKinectGui = false;
+  skipBgUpdate = false; 
   
   // Instantiate Midi.
   Midi::instance().setup();
@@ -74,7 +75,7 @@ void ofApp::update(){
   
   // Update background
   if (bg.isAllocated()) {
-    bg.update();
+    bg.update(skipBgUpdate, isOccupied);
   }
 
   // Update memories.
@@ -373,6 +374,9 @@ std::vector<Agent*> ofApp::getInvisibleAgents(glm::vec2 target) {
 
 void ofApp::keyPressed(int key){
   // ------------------ Interactive Gestures --------------------- //
+  if (key == 's') {
+    skipBgUpdate = !skipBgUpdate;
+  }
   
   if (key == 'v') {
     showVisibilityRadius = !showVisibilityRadius;
@@ -624,6 +628,8 @@ void ofApp::removeUnbonded() {
 }
 
 void ofApp::clearScreen() {
+  SloganFactory::instance().clearAllocatedSlogans();
+  
   // [WARNING] For some reason, these events are still fired when trying to clean things as one could be in the
   // middle of a step function. Disabling and renabling the events work as a good solution for now.
   box2d.disableEvents();

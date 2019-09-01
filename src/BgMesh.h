@@ -9,7 +9,7 @@ class BgMesh {
   
     // Core methods. 
     void setup();
-    void update();
+    void update(bool skipBgUpdate, bool isOccupied);
     void draw(bool debug);
     bool isAllocated();
     void destroy();
