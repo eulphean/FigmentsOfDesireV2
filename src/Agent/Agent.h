@@ -3,6 +3,7 @@
 #include "ofxBox2d.h"
 #include "ofxFilterLibrary.h"
 #include "Midi.h"
+#include "SloganFactory.h"
 
 // Current behavior of the agent.
 enum Behavior {
