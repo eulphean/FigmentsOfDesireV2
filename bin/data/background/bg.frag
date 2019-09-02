@@ -10,7 +10,7 @@ uniform bool isOccupied;
 float hash( float n )
 {
 	//return fract(sin(n)*43758.5453);
-	return fract(sin(n)); // By not multiplying with such a large factor, it fixes the clipping mac os mojave.  
+	return fract(sin(n+0.5) * 0.5); // By not multiplying with such a large factor, it fixes the clipping mac os mojave.  
 }
 
 float noise( in vec2 x )
