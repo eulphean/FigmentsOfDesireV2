@@ -23,9 +23,6 @@ void Message::draw() {
 // ------------------------------ Agent --------------------------------------- //
 
 void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
-  // Load the font.
-  font.load("fonts/perfect.otf", 20);
-  
   // Get a midi note from the Midi instance.
   midiNote = Midi::instance().assignMidiNote();
 
@@ -162,19 +159,25 @@ void Agent::createTexture(ofPoint textureSize) {
 
   firstFbo.end();
   
-  textFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
-  // Retrieve a slogan and center it. 
-  string msg = SloganFactory::instance().getSlogan();
-  font.setLetterSpacing(2);
-  auto sw = font.stringWidth(msg); auto sh = font.stringHeight(msg);
-  auto xPos = (textureSize.x - sw)/2;
-  auto yPos = (textureSize.y/2);
+  // Turn off the text fbo feature for now.
   
-  textFbo.begin();
-    ofClear(0, 0, 0, 0);
-    ofSetColor(ofColor::black);
-    font.drawString(msg, xPos, yPos);
-  textFbo.end();
+//  textFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
+//  // Retrieve a slogan and center it.
+//  auto slogan = SloganFactory::instance().getSlogan();
+//  string msg = slogan.msg;
+//  int fontSize = slogan.size;
+//  // Load the font.
+//  font.load("fonts/perfect.otf", fontSize);
+//  font.setLetterSpacing(2);
+//  auto sw = font.stringWidth(msg); auto sh = font.stringHeight(msg);
+//  auto xPos = (textureSize.x - sw)/2;
+//  auto yPos = (textureSize.y/2);
+  
+//  textFbo.begin();
+//    ofClear(0, 0, 0, 0);
+//    ofSetColor(ofColor::black);
+//    font.drawString(msg, xPos, yPos);
+//  textFbo.end();
   
   if (firstFbo.isAllocated()) {
     // Create 2nd fbo and draw with filter and postProcessing
@@ -184,8 +187,8 @@ void Agent::createTexture(ofPoint textureSize) {
       filter->begin();
         firstFbo.getTexture().drawSubsection(0, 0, textureSize.x, textureSize.y, 0, 0);
       filter->end();
-      ofSetColor(255, 255);
-      textFbo.draw(0, 0);
+//      ofSetColor(255, 255);
+//      textFbo.draw(0, 0);
     secondFbo.end();
   }
 }

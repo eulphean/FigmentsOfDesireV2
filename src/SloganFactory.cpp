@@ -1,22 +1,22 @@
 #pragma once
 #include "SloganFactory.h"
 
-string SloganFactory::getSlogan() {
+Slogan SloganFactory::getSlogan() {
     // Returns a slogan
   if (allocatedSlogans.size() < slogans.size()) {
     // Look for a random slogan.
     int randIdx = floor(ofRandom(slogans.size()));
-    string s = slogans[randIdx];
+    Slogan slogan = slogans[randIdx];
     
-    while(ofContains(allocatedSlogans, s)) {
+    while(ofContains(allocatedSlogans, slogan.msg)) {
       randIdx = floor(ofRandom(slogans.size()));
-      s = slogans[randIdx];
+      slogan = slogans[randIdx];
     }
     
     // Push the obtained slogan back into the allocated strings.
-    allocatedSlogans.push_back(s);
+    allocatedSlogans.push_back(slogan.msg);
     
-    return s; 
+    return slogan;
   } else {
     cout << "All slogan allocated. Resetting allocated slogans array." << endl;
     allocatedSlogans.clear();

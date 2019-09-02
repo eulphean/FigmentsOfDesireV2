@@ -1,13 +1,24 @@
 #pragma once
 #include "ofMain.h"
 
+struct Slogan {
+  public:
+    Slogan(string m, int s) {
+      msg = m;
+      size = s;
+    }
+  
+    string msg;
+    int size;
+};
+
 class SloganFactory {
   public:
     SloganFactory() {
     
     };
   
-    string getSlogan();
+    Slogan getSlogan();
     void clearAllocatedSlogans();
     
     static SloganFactory &instance();
@@ -15,42 +26,33 @@ class SloganFactory {
   private:
     static SloganFactory m;
     
-    std::vector<string> slogans = {
-      "Amazon Burns",
-      "Zero F*** Given",
-      "Water Crisis",
-      "Ban Artists",
-      "Digital Brainwash",
-      "F*** Solidarity",
-      "Starving Artist",
-      "Digital Revolution",
-      "Bulshit, Bulshit",
-      "Guns, Guns, Guns",
-      "Global Warming",
-      "Ghost Labor",
-      "Blue Whale Challenge",
-      "Libra != Bitcoin",
-      "Crypto Revolution",
-      "Digital Injustice"
-      "Digital Power",
-      "Blame Cellphones",
-      "Bots Agents Ghosts",
-      "Decntralization",
-      "Synthetic Intelligence",
-      "Bitcoin Farms",
-      "Click Farms",
-      "Black Money",
-      "Corruption",
-      "Inequality",
-      "Injustice",
-      "Child Abuse",
-      "Child Labour",
-      "Digital Criminals",
-      "Privacy Breach",
-      "Death Wish",
-      "Legal Guns",
-      "Selfie Culture",
-      "Millenial Shame"
+    std::vector<Slogan> slogans = {
+      Slogan("Amazon Burns", 20),
+      Slogan("Cambridge Analytica", 15),
+      Slogan("Privacy Breaach", 18),
+      Slogan("Global Warming", 18),
+      Slogan("Digital Injustice", 17),
+      Slogan("Bitcoin Farms", 17),
+      Slogan("Selfie Deaths", 17),
+      Slogan("Blue Whale", 17),
+      Slogan("Decentralization", 17),
+      Slogan("Social Inequality", 16),
+      Slogan("Black Money", 18),
+      Slogan("Starving Artist", 17),
+      Slogan("Human 2.0", 18),
+      Slogan("Lack of Trust", 17),
+      Slogan("Firewalls", 20),
+      Slogan("Digital Power", 18),
+      Slogan("Libra Token", 18),
+      Slogan("Racial Bias", 17),
+      Slogan("Crypto Revolution", 16),
+      Slogan("Server Farms", 17),
+      Slogan("Cyber Warfare", 17),
+      Slogan("Smart Weapons", 17),
+      Slogan("CRISPR", 20),
+      Slogan("Spam Agents", 18),
+      Slogan("Self Driving Cars", 15),
+      Slogan("Bitcoin", 20)
     };
   
     // These are populated when an agents gets a slogan.
