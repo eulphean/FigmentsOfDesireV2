@@ -63,6 +63,14 @@ float snoise(vec2 v){
   return 130.0 * dot(m, g);
 }
 
+float PHI = 1.61803398874989484820459 * 00000.1; // Golden Ratio   
+float PI  = 3.14159265358979323846264 * 00000.1; // PI
+float SQ2 = 1.41421356237309504880169 * 10000.0; // Square Root of Two
+
+float gold_noise(in vec2 coordinate, in float seed){
+    return fract(tan(distance(coordinate*(seed+PHI), vec2(PHI, PI)))*SQ2);
+}
+
 float fbmNew( vec2 p )
 {
 	float f = 0.0;
@@ -93,14 +101,14 @@ void main(void)
 	vec3 occupiedColor; vec3 emptyColor; 
 	
 	if (isOccupied) {
-	   occupiedColor.x = 0.91 + 0.09*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
-	   occupiedColor.y = 0.18 + 0.82*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
-	   occupiedColor.z = 0.12 + 0.88*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
+	   occupiedColor.x = 0.91 + 0.09*fbmNew(2.0*p + vec2(newTime*0.4, newTime*0.1));
+	   occupiedColor.y = 0.18 + 0.82*fbmNew(1.5*p + vec2(newTime*0.1, newTime*0.2));
+	   occupiedColor.z = 0.12 + 0.88*fbmNew(1.0*p + vec2(newTime*0.3, newTime*0.1));
 	   gl_FragColor = vec4(occupiedColor,1.0);
 	} else {
-               emptyColor.x = 0.10 + 0.90*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
-	   emptyColor.y = 0.43 + 0.57*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
-	   emptyColor.z = 0.75 + 0.25*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
+               emptyColor.x = 0.10 + 0.90*fbmNew(2.0*p + vec2(newTime*0.4, newTime*0.1));
+	   emptyColor.y = 0.43 + 0.57*fbmNew(1.5*p + vec2(newTime*0.1, newTime*0.2));
+	   emptyColor.z = 0.75 + 0.25*fbmNew(1.0*p + vec2(newTime*0.3, newTime*0.1));
 	   gl_FragColor = vec4(emptyColor,1.0);
 	}
 }
