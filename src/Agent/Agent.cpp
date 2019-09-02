@@ -2,7 +2,6 @@
 
 
 // ------------------------------ Message --------------------------------------- //
-
 Message::Message(glm::vec2 loc, ofColor col, float s) {
   location = loc;
   color = col;
@@ -307,7 +306,6 @@ void Agent::handleAttraction() {
 void Agent::handleStretch() {
   // Check for counter.
   if (currentBehavior==Behavior::Stretch) { // Time to apply a stretch.
-    // Sound Hook
     stretchWeight = ofLerp(stretchWeight, maxStretchWeight, 0.005);
     for (auto &v : vertices) {
       v->addRepulsionForce(mesh.getCentroid().x, mesh.getCentroid().y, stretchWeight);
