@@ -44,6 +44,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   attractionWeight = 0;
   coolDown = 0;
   maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
+  stretchCounter = 0;
   
   // By default no midi note is playing. 
   isMidiOn = false;
@@ -61,7 +62,11 @@ void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProp
     }
   }
   
+  // Agent behaviors
   handleBehaviors();
+  
+  // Agent explosion
+  handleExplosion(); 
 }
 
 void Agent::draw(bool showVisibilityRadius, bool showTexture) {
@@ -98,6 +103,17 @@ void Agent::draw(bool showVisibilityRadius, bool showTexture) {
       ofSetColor(ofColor::yellow);
       ofDrawCircle(getCentroid(), visibilityRadius);
     ofPopStyle();
+  }
+}
+
+void Agent::handleExplosion() {
+  if (stretchCounter > 100) {
+//    cout << "Exploding the agent" << endl;
+    // Explode the agent
+    //
+    // Delete this agent.
+    // Reset everything about it
+    // Remove this agent from the list. 
   }
 }
 
@@ -315,6 +331,8 @@ void Agent::handleStretch() {
       stretchWeight = 0;
     }
     currentBehavior = Behavior::None;
+    
+    stretchCounter++; // Stretched. 
   }
 }
 

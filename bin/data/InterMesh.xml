@@ -56,6 +56,6 @@
 	<General_Parameters>
 		<Alpha_Agent_Probability>0.9</Alpha_Agent_Probability>
 		<Audience_Visibility_Radius>104.337</Audience_Visibility_Radius>
-		<Num_Agents_To_Create>5</Num_Agents_To_Create>
+		<Num_Agents_To_Create>1</Num_Agents_To_Create>
 	</General_Parameters>
 </The_Nest_GUI>
