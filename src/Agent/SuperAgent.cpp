@@ -11,7 +11,7 @@ void SuperAgent::setup(Agent *agent1, Agent *agent2, std::shared_ptr<ofxBox2dJoi
 void SuperAgent::update(ofxBox2d &box2d,
                           std::vector<Memory> &memories,
                             std::vector<int> &removeVertices, bool shouldBond) {
-  auto cleanJoint = !shouldBond || agentA->stretchCounter>100 || agentB->stretchCounter>100;
+  auto cleanJoint = !shouldBond || agentA->canExplode() || agentB->canExplode();
 
   // Go through all the joints and delete them if shouldn't bond.
   ofRemove(joints, [&](std::shared_ptr<ofxBox2dJoint> j) {
@@ -65,7 +65,6 @@ void SuperAgent::update(ofxBox2d &box2d,
   });
   
   if (joints.size() == 0) {
-    cout << "Removing this Super Agent" << endl; 
     shouldRemove = true;
   }
 }

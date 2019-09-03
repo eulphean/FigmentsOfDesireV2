@@ -77,15 +77,13 @@ class Agent {
     void handleShock();
     void handleVertexBehaviors();
     void enableStretchMidi(bool on);
-    void handleExplosion(); 
-  
-    // Enabling behaviors
-    void repulseBondedVertices();
+    void handleExplosion();
   
     // Helpers
     glm::vec2 getCentroid();
     ofMesh& getMesh();
     void setBehavior(Behavior behavior, std::vector<glm::vec2> pos = {}, bool overrideCoolDown = false);
+    bool canExplode();
   
     // Vertices and Joints
     std::vector<std::shared_ptr<ofxBox2dCircle>> vertices; // Every vertex in the mesh is a circle.
@@ -106,7 +104,8 @@ class Agent {
     float visibilityRadius;
   
     // Counter to keep track of the time spent on each agent when interacting with it. 
-    float stretchCounter;
+    int stretchCounter;
+    int maxStretchCounter;
 
   protected:
     // Derived class needs to have access to these. 

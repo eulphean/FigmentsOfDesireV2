@@ -64,7 +64,7 @@ void ofApp::update(){
   // counter goes crazy.
   ofRemove(agents, [&](Agent *a) {
     a->update(alphaAgentProps, betaAgentProps);
-    if (a->stretchCounter > 100) {
+    if (a->canExplode()) {
       a->clean(box2d); // Clean all the vertices and joints.
       return true;
     }

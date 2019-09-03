@@ -45,6 +45,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   coolDown = 0;
   maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
   stretchCounter = 0;
+  maxStretchCounter = ofRandom(75, 175); 
   
   // By default no midi note is playing. 
   isMidiOn = false;
@@ -64,9 +65,6 @@ void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProp
   
   // Agent behaviors
   handleBehaviors();
-  
-  // Agent explosion
-  handleExplosion(); 
 }
 
 void Agent::draw(bool showVisibilityRadius, bool showTexture) {
@@ -106,15 +104,8 @@ void Agent::draw(bool showVisibilityRadius, bool showTexture) {
   }
 }
 
-void Agent::handleExplosion() {
-  if (stretchCounter > 100) {
-//    cout << "Exploding the agent" << endl;
-    // Explode the agent
-    //
-    // Delete this agent.
-    // Reset everything about it
-    // Remove this agent from the list. 
-  }
+bool Agent::canExplode() {
+  return stretchCounter > maxStretchCounter; 
 }
 
 ofPoint Agent::getTextureSize() {
