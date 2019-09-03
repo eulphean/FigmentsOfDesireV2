@@ -60,6 +60,17 @@ void ofApp::update(){
     return sa.shouldRemove;
   });
   
+  // Update agents and remove them if their stretch
+  // counter goes crazy.
+  ofRemove(agents, [&](Agent *a) {
+    a->update(alphaAgentProps, betaAgentProps);
+    if (a->stretchCounter > 100) {
+      a->clean(box2d); // Clean all the vertices and joints.
+      return true;
+    }
+    return false;
+  });
+  
   if (removeIndices.size() > 0) {
     // If I have removed something, update the mesh.
     SuperAgent::jointMesh.clear();
@@ -75,16 +86,6 @@ void ofApp::update(){
   // All the interaction logic.
   handleInteraction();
   
-  // Update agents and remove them if their stretch
-  // counter goes crazy.
-//  ofRemove(agents, [&](Agent *a) {
-//    a->update(alphaAgentProps, betaAgentProps);
-//    if (a->stretchCounter > 100) {
-//      a->clean(box2d); // Clean all the vertices and joints.
-//      return true;
-//    }
-//    return false;
-//  });
   
   // Update agents.
   for (auto &a : agents) {
