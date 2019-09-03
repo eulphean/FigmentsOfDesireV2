@@ -54,10 +54,31 @@ void ofApp::update(){
   kinect.update();
   
   // Update super agents
+  std::vector<int> removeIndices;
   ofRemove(superAgents, [&](SuperAgent &sa){
-    sa.update(box2d, memories, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
+    sa.update(box2d, memories, removeIndices, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
     return sa.shouldRemove;
   });
+  
+  // Update agents and remove them if their stretch
+  // counter goes crazy.
+  ofRemove(agents, [&](Agent *a) {
+    a->update(alphaAgentProps, betaAgentProps);
+    if (a->stretchCounter > 100) {
+      a->clean(box2d); // Clean all the vertices and joints.
+      return true;
+    }
+    return false;
+  });
+  
+  if (removeIndices.size() > 0) {
+    // If I have removed something, update the mesh.
+    SuperAgent::jointMesh.clear();
+    SuperAgent::curMeshIdx = 0;
+    for (auto &sa : superAgents) {
+      sa.updateMeshIdx(); 
+    }
+  }
   
   // GUI props.
   updateAgentProps();
@@ -65,11 +86,12 @@ void ofApp::update(){
   // All the interaction logic.
   handleInteraction();
   
-  // Update agents
+  
+  // Update agents.
   for (auto &a : agents) {
     a->update(alphaAgentProps, betaAgentProps);
   }
-  
+
   // Create super agents based on collision bodies.
   createSuperAgents();
   
@@ -281,6 +303,7 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
     auto numVisibleTargets = people.size() - invisibleTargets.size();
     if (numVisibleTargets == 0) {
       a->enableStretchMidi(false);
+      a->stretchCounter = 0; 
     }
   }
 }
@@ -601,7 +624,6 @@ void ofApp::createAgents() {
     agent = new Alpha(box2d, alphaAgentProps);
     agents.push_back(agent);
   }
-  
   cout << "Total Agents: " << agents.size() << endl; 
 }
 
@@ -721,13 +743,15 @@ void ofApp::contactEnd(ofxBox2dContactArgs &e) {
 void ofApp::evaluateBonding(b2Body *bodyA, b2Body *bodyB, Agent *agentA, Agent *agentB) {
   collidingBodies.clear();
   
-  // Vertex level checks. Is this vertex bonded to anything except itself?
-  bool a = canVertexBond(bodyA, agentA);
-  bool b = canVertexBond(bodyB, agentB);
-  if (a && b) {
-    // Prepare for bond.
-    collidingBodies.push_back(bodyA);
-    collidingBodies.push_back(bodyB);
+  if (agentA->stretchCounter<100 && agentB->stretchCounter<100) {
+    // Vertex level checks. Is this vertex bonded to anything except itself?
+    bool a = canVertexBond(bodyA, agentA);
+    bool b = canVertexBond(bodyB, agentB);
+    if (a && b) {
+      // Prepare for bond.
+      collidingBodies.push_back(bodyA);
+      collidingBodies.push_back(bodyB);
+    }
   }
 }
 
@@ -788,16 +812,15 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
     data->jointMeshIdx = SuperAgent::curMeshIdx + 1;
     bodyB->SetUserData(data);
   
-    // Increment by 2 because it just served 2 bodies. 
-    SuperAgent::curMeshIdx += 2;
-  
     // Insert these into mesh for the interAgent joints.
     auto posA = getBodyPosition(bodyA); auto posB = getBodyPosition(bodyB);
     SuperAgent::insertJointMesh(glm::vec3(posA.x, posA.y, 0), glm::vec3(posB.x, posB.y, 0));
   
+    // Increment by 2 because it just served 2 bodies.
+    SuperAgent::curMeshIdx += 2;
+  
     return j;
 }
-
 
 // Unused code. Don't need this for now.
 //          // Desire state is ATTRACTION!

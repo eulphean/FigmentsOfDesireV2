@@ -2,7 +2,6 @@
 
 
 // ------------------------------ Message --------------------------------------- //
-
 Message::Message(glm::vec2 loc, ofColor col, float s) {
   location = loc;
   color = col;
@@ -45,6 +44,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   attractionWeight = 0;
   coolDown = 0;
   maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
+  stretchCounter = 0;
   
   // By default no midi note is playing. 
   isMidiOn = false;
@@ -62,7 +62,11 @@ void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProp
     }
   }
   
+  // Agent behaviors
   handleBehaviors();
+  
+  // Agent explosion
+  handleExplosion(); 
 }
 
 void Agent::draw(bool showVisibilityRadius, bool showTexture) {
@@ -99,6 +103,17 @@ void Agent::draw(bool showVisibilityRadius, bool showTexture) {
       ofSetColor(ofColor::yellow);
       ofDrawCircle(getCentroid(), visibilityRadius);
     ofPopStyle();
+  }
+}
+
+void Agent::handleExplosion() {
+  if (stretchCounter > 100) {
+//    cout << "Exploding the agent" << endl;
+    // Explode the agent
+    //
+    // Delete this agent.
+    // Reset everything about it
+    // Remove this agent from the list. 
   }
 }
 
@@ -307,7 +322,6 @@ void Agent::handleAttraction() {
 void Agent::handleStretch() {
   // Check for counter.
   if (currentBehavior==Behavior::Stretch) { // Time to apply a stretch.
-    // Sound Hook
     stretchWeight = ofLerp(stretchWeight, maxStretchWeight, 0.005);
     for (auto &v : vertices) {
       v->addRepulsionForce(mesh.getCentroid().x, mesh.getCentroid().y, stretchWeight);
@@ -317,6 +331,8 @@ void Agent::handleStretch() {
       stretchWeight = 0;
     }
     currentBehavior = Behavior::None;
+    
+    stretchCounter++; // Stretched. 
   }
 }
 

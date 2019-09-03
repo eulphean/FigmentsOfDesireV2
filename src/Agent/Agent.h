@@ -77,6 +77,7 @@ class Agent {
     void handleShock();
     void handleVertexBehaviors();
     void enableStretchMidi(bool on);
+    void handleExplosion(); 
   
     // Enabling behaviors
     void repulseBondedVertices();
@@ -102,7 +103,10 @@ class Agent {
     Behavior currentBehavior;
   
     // Visibility Radius
-    float visibilityRadius; 
+    float visibilityRadius;
+  
+    // Counter to keep track of the time spent on each agent when interacting with it. 
+    float stretchCounter;
 
   protected:
     // Derived class needs to have access to these. 

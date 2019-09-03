@@ -8,8 +8,12 @@ void SuperAgent::setup(Agent *agent1, Agent *agent2, std::shared_ptr<ofxBox2dJoi
   curExchangeCounter = 20; // Note: Currently diabling the exchange of the body texture. Set it 0 to enable it. 
 }
 
-void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool shouldBond) {
-  // Max Force based on which the joint breaks.
+void SuperAgent::update(ofxBox2d &box2d,
+                          std::vector<Memory> &memories,
+                            std::vector<int> &removeVertices, bool shouldBond) {
+  auto cleanJoint = !shouldBond || agentA->stretchCounter>100 || agentB->stretchCounter>100;
+
+  // Go through all the joints and delete them if shouldn't bond.
   ofRemove(joints, [&](std::shared_ptr<ofxBox2dJoint> j) {
     // Body A data.
     auto bodyA = j->joint->GetBodyA();
@@ -21,16 +25,18 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
     auto dataB = reinterpret_cast<VertexData*>(bodyB->GetUserData());
     glm::vec2 locB = getBodyPosition(bodyB);
     
-    if (!shouldBond) {
+    if (cleanJoint) {
       box2d.getWorld()->DestroyJoint(j->joint);
 
       // Update bodyA's data.
       dataA->hasInterAgentJoint = false;
       bodyA->SetUserData(dataA);
+      removeVertices.push_back(dataA->jointMeshIdx);
 
       // Update bodyB's data.
       dataB->hasInterAgentJoint = false;
       bodyB->SetUserData(dataB);
+      removeVertices.push_back(dataB->jointMeshIdx); 
       
       // Create a new memory object for each interAgentJoint and populate the vector.
       glm::vec2 avgLoc = (locA + locB)/2;
@@ -59,46 +65,32 @@ void SuperAgent::update(ofxBox2d &box2d, std::vector<Memory> &memories, bool sho
   });
   
   if (joints.size() == 0) {
+    cout << "Removing this Super Agent" << endl; 
     shouldRemove = true;
-  } else {
-    // When it's a super agent, that means it's bonded.
-    // Check if it's ready to swap messages.
-    if (curExchangeCounter <= 0) {
-      std::vector<Message>::iterator aMessage = agentA -> curMsg;
-      std::vector<Message>::iterator bMessage = agentB -> curMsg;
-      
-      // Save the temp message.
-      Message swap = Message(aMessage->location, aMessage->color, aMessage->size);
-      
-      // Assign A message
-      aMessage->color = bMessage->color;
-      aMessage->size = bMessage->size;
-      
-      // Assign B message
-      bMessage->color = swap.color;
-      bMessage->size = swap.size;
-      
-      // Change the iteretor to point to a unique message now
-      aMessage = agentA->messages.begin() + (int) ofRandom(0, agentA -> messages.size() - 1);
-      bMessage = agentB->messages.begin() + (int) ofRandom(0, agentB -> messages.size() - 1);
-      
-      // Update iterators for the swap.
-      agentA -> curMsg = aMessage;
-      agentB -> curMsg = bMessage;
-      
-      // Create new textures the two agents as they have just gone through a swap.
-      agentA->createTexture(agentA->getTextureSize());
-      agentB->createTexture(agentB->getTextureSize());
-      
-      // Reset exchange counter since
-      curExchangeCounter = maxExchangeCounter;
-    } else {
-      // curExchangeCounter -= 0.8;
-      // Note: Disabling the exchange counter for now. Evaluate if and when this feature is really required.
-      // Is it really required?
-      // This is a good question. 
-    }
   }
+}
+
+void SuperAgent::updateMeshIdx() {
+   // For all the joints
+   // Readd the vertices in the mesh
+   // Update the vertex joint mesh idx.
+   for (auto &j : joints) {
+     auto bodyA = j->joint->GetBodyA();
+     auto dataA = reinterpret_cast<VertexData*>(bodyA->GetUserData());
+     glm::vec2 locA = getBodyPosition(bodyA);
+     dataA->jointMeshIdx = curMeshIdx;
+     bodyA->SetUserData(dataA);
+
+     // Body B data.
+     auto bodyB = j->joint->GetBodyB();
+     auto dataB = reinterpret_cast<VertexData*>(bodyB->GetUserData());
+     glm::vec2 locB = getBodyPosition(bodyB);
+     dataB->jointMeshIdx = curMeshIdx + 1;
+     bodyB->SetUserData(dataB);
+     
+     SuperAgent::insertJointMesh(glm::vec3(locA.x, locA.y, 0), glm::vec3(locB.x, locB.y, 0));
+     SuperAgent::curMeshIdx += 2;
+   }
 }
 
 // Check if super body already exists. 
@@ -143,12 +135,19 @@ void SuperAgent::initJointMesh() {
   SuperAgent::jointMesh.clear();
   SuperAgent::curMeshIdx = 0; 
   SuperAgent::jointMesh.setMode(OF_PRIMITIVE_LINES);
+  SuperAgent::jointMesh.enableIndices();
+  SuperAgent::jointMesh.setupIndicesAuto();
 }
 
 void SuperAgent::insertJointMesh(glm::vec3 v1, glm::vec3 v2) {
   // Get the bodies from the joint and add them in the mesh
   SuperAgent::jointMesh.addVertex(v1);
   SuperAgent::jointMesh.addVertex(v2);
+}
+
+void SuperAgent::insertIndices(int idx1, int idx2) {
+  SuperAgent::jointMesh.addIndex(idx1);
+  SuperAgent::jointMesh.addIndex(idx2); 
 }
 
 void SuperAgent::drawJointMesh() {

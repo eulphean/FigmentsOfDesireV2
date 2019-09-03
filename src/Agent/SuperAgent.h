@@ -11,7 +11,8 @@
 class SuperAgent {
   public:
     void setup(Agent *agentA, Agent *agentB, std::shared_ptr<ofxBox2dJoint>);
-    void update(ofxBox2d &box2d, std::vector<Memory> &memories, bool shouldBond);
+    void update(ofxBox2d &box2d, std::vector<Memory> &memories, std::vector<int> &removeVertices, bool shouldBond);
+    void updateMeshIdx(); 
     bool contains(Agent *agentA, Agent *agentB);
     void clean(ofxBox2d &box2d);
     glm::vec2 getBodyPosition(b2Body *body);
@@ -22,6 +23,7 @@ class SuperAgent {
     static int curMeshIdx;
     static void initJointMesh(); 
     static void insertJointMesh(glm::vec3 v1, glm::vec3 v2);
+    static void insertIndices(int idx1, int idx2); 
     static void drawJointMesh();
   
     Agent *agentA;
