@@ -3,10 +3,9 @@
 void Midi::setup() {
   // MIDI setup.
   midiOut.openVirtualPort("ofxMidiOut"); // open a virtual port
-  entryExitChannel = 2;
+  agentExplodeChannel = 2;
   agentStretchChannel = 1;
-  bondBreakChannel = 1;
-  
+
   // Midi notes
   stretchMidiNotes = { 36, 39, 40, 41, 43, 47,
                        48, 51, 52, 53, 55, 58,
@@ -14,9 +13,9 @@ void Midi::setup() {
   assignedMidiNotes = { }; 
 } 
 
-void Midi::sendEntryExitMidi(bool hasEntered) {
-  int midiNote = hasEntered ? 48 : 60;
-  midiOut.sendNoteOn(entryExitChannel, midiNote, 30);
+void Midi::sendAgentExplosionMidi() {
+  int midiNote = 60;
+  midiOut.sendNoteOn(agentExplodeChannel, midiNote, 30);
 }
 
 // Every agent will get a unique midi note.

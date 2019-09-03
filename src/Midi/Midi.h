@@ -14,7 +14,7 @@ class Midi {
     int assignMidiNote();
   
     // Midi calls. 
-    void sendEntryExitMidi(bool isEntering);
+    void sendAgentExplosionMidi();
     void sendAgentStretchMidi(int midiNote, bool isOn);
     
     static Midi &instance();
@@ -22,9 +22,8 @@ class Midi {
   private:
     ofxMidiOut midiOut;
     static Midi m;
-    int entryExitChannel;
+    int agentExplodeChannel;
     int agentStretchChannel;
-    int bondBreakChannel;
     
     std::vector<int> stretchMidiNotes;
     std::vector<int> assignedMidiNotes;

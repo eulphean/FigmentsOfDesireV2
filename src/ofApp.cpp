@@ -62,14 +62,40 @@ void ofApp::update(){
   
   // Update agents and remove them if their stretch
   // counter goes crazy.
+  auto numAgentsDeleted = 0;
+  box2d.disableEvents();
   ofRemove(agents, [&](Agent *a) {
     a->update(alphaAgentProps, betaAgentProps);
     if (a->canExplode()) {
+      // Fill exploded agents
+      for (int i = 0; i < a->vertices.size()/4; i++) {
+        Memory m (box2d, a->getCentroid(), true);
+        explodedAgent.push_back(m);
+      }
+      
       a->clean(box2d); // Clean all the vertices and joints.
+      
+      // Midi hook
+      a->enableStretchMidi(false);
+      Midi::instance().sendAgentExplosionMidi();
+      
+      numAgentsDeleted++;
       return true;
     }
     return false;
   });
+  box2d.enableEvents();
+  
+  // Create agents.
+  for (auto i =0; i < numAgentsDeleted; i++) {
+      // Create an agent
+      ofPoint origin = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
+      Agent *agent;
+      alphaAgentProps.meshOrigin = origin;
+      agent = new Alpha(box2d, alphaAgentProps);
+      agents.push_back(agent);
+      cout << "Total Agents: " << agents.size() << endl;
+  }
   
   if (removeIndices.size() > 0) {
     // If I have removed something, update the mesh.
@@ -102,6 +128,18 @@ void ofApp::update(){
   // Update broken bonds.
   ofRemove(brokenBonds, [&](Memory &m) {
     m.update();
+    if (m.shouldRemove) {
+      m.destroy();
+    }
+    return m.shouldRemove;
+  });
+  
+  // Update explodedAgents
+  ofRemove(explodedAgent, [&](Memory &m) {
+    m.update();
+    if (m.shouldRemove) {
+      m.destroy();
+    }
     return m.shouldRemove;
   });
   
@@ -138,6 +176,11 @@ void ofApp::drawSequence() {
 
   // Draw broken bonds
   for (auto m : brokenBonds) {
+    m.draw();
+  }
+  
+  // Draw exploded agents
+  for (auto m : explodedAgent) {
     m.draw();
   }
   
@@ -265,13 +308,13 @@ void ofApp::handleInteraction() {
 }
 
 void ofApp::evaluateEntryExit(int curPeopleSize) {
-    if (prevPeopleSize < curPeopleSize) {
-      // Somebody entered
-      Midi::instance().sendEntryExitMidi(true);
-    } else if (prevPeopleSize > curPeopleSize) {
-      // Somebody left
-      Midi::instance().sendEntryExitMidi(false);
-    }
+//    if (prevPeopleSize < curPeopleSize) {
+//      // Somebody entered
+//      Midi::instance().sendEntryExitMidi(true);
+//    } else if (prevPeopleSize > curPeopleSize) {
+//      // Somebody left
+//      Midi::instance().sendEntryExitMidi(false);
+//    }
   
     prevPeopleSize = curPeopleSize; 
 }

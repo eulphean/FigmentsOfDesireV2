@@ -45,7 +45,7 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   coolDown = 0;
   maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
   stretchCounter = 0;
-  maxStretchCounter = ofRandom(75, 175); 
+  maxStretchCounter = ofRandom(75, 125); 
   
   // By default no midi note is playing. 
   isMidiOn = false;
@@ -121,6 +121,13 @@ void Agent::clean(ofxBox2d &box2d) {
   
   // Remove vertices
   ofRemove(vertices, [&](std::shared_ptr<ofxBox2dCircle> c){
+    auto data = reinterpret_cast<VertexData*>(c->body->GetUserData());
+    if (data != NULL) {
+      delete data;
+      c->body->SetUserData(NULL);
+    }
+    
+    c->destroy(); 
     return true;
   });
 
@@ -262,7 +269,7 @@ void Agent::handleRepulsion() {
 void Agent::handleSpecialRepulsion() {
   if (currentBehavior==Behavior::SpecialRepel && coolDown == 0) {
     for (auto targetPos : targetPositions) {
-      float newMaxWeight = maxRepulsionWeight/70;
+      float newMaxWeight = maxRepulsionWeight/90;
       repulsionWeight = ofLerp(repulsionWeight, newMaxWeight, 0.01);
       for (auto &v : vertices) {
         auto data = reinterpret_cast<VertexData*>(v->getData());
@@ -322,7 +329,6 @@ void Agent::handleStretch() {
       stretchWeight = 0;
     }
     currentBehavior = Behavior::None;
-    
     stretchCounter++; // Stretched. 
   }
 }

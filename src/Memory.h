@@ -5,9 +5,10 @@
 
 class Memory {
   public:
-    Memory(ofxBox2d &box2d, glm::vec2 location);
+    Memory(ofxBox2d &box2d, glm::vec2 location, bool isAgent = false);
     void update();
     void draw();
+    void destroy();
     bool shouldRemove;
     ofColor finalColor;
     ofColor color; 
