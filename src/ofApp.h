@@ -150,7 +150,8 @@ class ofApp : public ofBaseApp{
   
   
     int specialRepelTimer; // Keeps track of the repelling.
-    std::vector<Memory> memories;
+    std::vector<Memory> brokenBonds;
+    std::vector<Memory> explodedAgent; 
     std::vector<b2Body *> collidingBodies;
   
     // Super Agents (Inter Agent Bonding Logic)

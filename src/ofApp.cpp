@@ -56,7 +56,7 @@ void ofApp::update(){
   // Update super agents
   std::vector<int> removeIndices;
   ofRemove(superAgents, [&](SuperAgent &sa){
-    sa.update(box2d, memories, removeIndices, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
+    sa.update(box2d, brokenBonds, removeIndices, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
     return sa.shouldRemove;
   });
   
@@ -86,7 +86,6 @@ void ofApp::update(){
   // All the interaction logic.
   handleInteraction();
   
-  
   // Update agents.
   for (auto &a : agents) {
     a->update(alphaAgentProps, betaAgentProps);
@@ -100,8 +99,8 @@ void ofApp::update(){
     bg.update(skipBgUpdate, isOccupied);
   }
 
-  // Update memories.
-  ofRemove(memories, [&](Memory &m) {
+  // Update broken bonds.
+  ofRemove(brokenBonds, [&](Memory &m) {
     m.update();
     return m.shouldRemove;
   });
@@ -137,8 +136,8 @@ void ofApp::drawSequence() {
     a->draw(showVisibilityRadius, showTexture);
   }
 
-  // Draw memories
-  for (auto m : memories) {
+  // Draw broken bonds
+  for (auto m : brokenBonds) {
     m.draw();
   }
   
