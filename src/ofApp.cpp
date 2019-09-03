@@ -54,10 +54,20 @@ void ofApp::update(){
   kinect.update();
   
   // Update super agents
+  std::vector<int> removeIndices;
   ofRemove(superAgents, [&](SuperAgent &sa){
-    sa.update(box2d, memories, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
+    sa.update(box2d, memories, removeIndices, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
     return sa.shouldRemove;
   });
+  
+  if (removeIndices.size() > 0) {
+    // If I have removed something, update the mesh.
+    SuperAgent::jointMesh.clear();
+    SuperAgent::curMeshIdx = 0;
+    for (auto &sa : superAgents) {
+      sa.updateMeshIdx(); 
+    }
+  }
   
   // GUI props.
   updateAgentProps();
@@ -801,16 +811,15 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
     data->jointMeshIdx = SuperAgent::curMeshIdx + 1;
     bodyB->SetUserData(data);
   
-    // Increment by 2 because it just served 2 bodies. 
-    SuperAgent::curMeshIdx += 2;
-  
     // Insert these into mesh for the interAgent joints.
     auto posA = getBodyPosition(bodyA); auto posB = getBodyPosition(bodyB);
     SuperAgent::insertJointMesh(glm::vec3(posA.x, posA.y, 0), glm::vec3(posB.x, posB.y, 0));
   
+    // Increment by 2 because it just served 2 bodies.
+    SuperAgent::curMeshIdx += 2;
+  
     return j;
 }
-
 
 // Unused code. Don't need this for now.
 //          // Desire state is ATTRACTION!
