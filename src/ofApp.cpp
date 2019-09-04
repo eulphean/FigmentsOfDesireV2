@@ -89,7 +89,7 @@ void ofApp::update(){
   // Create agents.
   for (auto i =0; i < numAgentsDeleted; i++) {
       // Create an agent
-      ofPoint origin = ofPoint(ofGetWidth()/2, ofGetHeight()/2);
+      ofPoint origin = ofPoint(ofRandom(50, ofGetWidth()-200), ofRandom(50, ofGetHeight()-200));
       Agent *agent;
       alphaAgentProps.meshOrigin = origin;
       agent = new Alpha(box2d, alphaAgentProps);
