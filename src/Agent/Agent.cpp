@@ -43,9 +43,9 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   stretchWeight = 0;
   attractionWeight = 0;
   coolDown = 0;
-  maxCoolDown = ofRandom(75, 150); // Wait time before the agent actually is ready to take more forces.
+  maxCoolDown = ofRandom(85, 175); // Wait time before the agent actually is ready to take more forces.
   stretchCounter = 0;
-  maxStretchCounter = ofRandom(75, 125); 
+  maxStretchCounter = ofRandom(75, 125);
   
   // By default no midi note is playing. 
   isMidiOn = false;

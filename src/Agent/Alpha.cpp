@@ -8,7 +8,12 @@ Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
               ofColor::fromHex(0x3BCEAC),
               ofColor::fromHex(0x0EAD69),
               ofColor::fromHex(0xFF8080),
-              ofColor::fromHex(0x0BF6CD)
+              ofColor::fromHex(0x0BF6CD),
+              ofColor::fromHex(0xE775EE),
+              ofColor::fromHex(0x934879),
+              ofColor::fromHex(0xE8F03A),
+              ofColor::fromHex(0xFE200A),
+              ofColor::fromHex(0x042B9D)
   };
   
   // Visibility range around the agent

@@ -31,7 +31,7 @@ void ofApp::setup(){
   drawFbo = false;
   shouldBond = false;
   hideKinectGui = false;
-  skipBgUpdate = true; 
+  skipBgUpdate = true;
   
   // Instantiate Midi.
   Midi::instance().setup();
@@ -94,7 +94,6 @@ void ofApp::update(){
       alphaAgentProps.meshOrigin = origin;
       agent = new Alpha(box2d, alphaAgentProps);
       agents.push_back(agent);
-      cout << "Total Agents: " << agents.size() << endl;
   }
   
   if (removeIndices.size() > 0) {
@@ -266,7 +265,7 @@ void ofApp::handleInteraction() {
     // Is the area occupied?
     auto people = kinect.getBodyCentroids();
     isOccupied = people.size() > 0;
-    evaluateEntryExit(people.size()); // Hook for sound.
+    //evaluateEntryExit(people.size()); // Hook for sound.
     
     if (isOccupied) {
       // Agents can bond now.
@@ -286,7 +285,7 @@ void ofApp::handleInteraction() {
     }
   } else { // Test Routine
     isOccupied = testPeople.size() > 0;
-    evaluateEntryExit(testPeople.size()); // Hook for sound.
+    //evaluateEntryExit(testPeople.size()); // Hook for sound.
     
     if (isOccupied) {
       shouldBond = true;
@@ -335,13 +334,15 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
   // to attract or repel from the people.
   for (auto &a : agents) {
     auto invisibleTargets = getInvisibleTargets(people, a);
-    if (ofRandom(1) < 0.5) {
+    if (ofRandom(1) < 0.85) {
       a->setBehavior(Behavior::Attract, invisibleTargets);
     } else {
       a->setBehavior(Behavior::Repel, invisibleTargets);
     }
     
-    // If no visible targets, turn off the midi. 
+    // How do I test if an agent is in the nest or nest or not. 
+    
+    // If no visible targets, turn off the midi.
     auto numVisibleTargets = people.size() - invisibleTargets.size();
     if (numVisibleTargets == 0) {
       a->enableStretchMidi(false);
