@@ -65,9 +65,3 @@ void main(void)
 	   gl_FragColor = vec4(emptyColor,1.0);
 	}
 }
-
-// baseColor = mix(baseColor, topColor, f);
-// Pure blue
-// emptyColor.x = 0.27 + 0.73*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
-// emptyColor.y = 0.72 + 0.28*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
-// emptyColor.z = 0.94 + 0.06*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
