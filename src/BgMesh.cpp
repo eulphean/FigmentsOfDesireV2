@@ -41,7 +41,7 @@ void BgMesh::update(bool skipBgUpdate, bool isOccupied) {
       shader.begin();
         // Shader needs a fbo (a screen buffer to use the vertices and draw the pixels for)
          shader.setUniform1f("time", (float) ofGetElapsedTimeMillis());
-        shader.setUniform1f("isOccupied", isOccupied); 
+        shader.setUniform1f("isOccupied", false); 
         bgFbo.draw(0, 0);
       shader.end();
     mainFbo.end();

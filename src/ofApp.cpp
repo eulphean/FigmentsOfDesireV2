@@ -31,7 +31,7 @@ void ofApp::setup(){
   drawFbo = false;
   shouldBond = false;
   hideKinectGui = false;
-  skipBgUpdate = false; 
+  skipBgUpdate = true; 
   
   // Instantiate Midi.
   Midi::instance().setup();
