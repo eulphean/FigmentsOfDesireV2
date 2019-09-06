@@ -4,16 +4,22 @@ Alpha::Alpha(ofxBox2d &box2d, AlphaAgentProperties agentProps) {
   // Assign a color palette
   palette = { ofColor::fromHex(0xB141DA),
               ofColor::fromHex(0x45E645),
-              ofColor::fromHex(0xFFEEB9),
+              ofColor::fromHex(0xFDE9AC),
               ofColor::fromHex(0x3BCEAC),
-              ofColor::fromHex(0x0EAD69),
               ofColor::fromHex(0xFF8080),
-              ofColor::fromHex(0x0BF6CD),
-              ofColor::fromHex(0xE775EE),
               ofColor::fromHex(0x934879),
               ofColor::fromHex(0xE8F03A),
               ofColor::fromHex(0xFE200A),
-              ofColor::fromHex(0x042B9D)
+              ofColor::fromHex(0x042B9D),
+              ofColor::fromHex(0xA5B3E2),
+              ofColor::fromHex(0x00C4FF),
+              ofColor::fromHex(0x6DF927),
+              ofColor::fromHex(0xF7B635),
+              ofColor::fromHex(0xFF61D0),
+              ofColor::fromHex(0x588E8B),
+              ofColor::fromHex(0x90ECE7),
+              ofColor::fromHex(0xFCB475),
+              ofColor::fromHex(0xD375A8)
   };
   
   // Visibility range around the agent

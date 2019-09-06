@@ -59,9 +59,14 @@ void main(void)
 	   occupiedColor.z = 0.12 + 0.88*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
 	   gl_FragColor = vec4(occupiedColor,1.0);
 	} else {
-               emptyColor.x = 0.10 + 0.90*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
-	   emptyColor.y = 0.43 + 0.57*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
-	   emptyColor.z = 0.75 + 0.25*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
-	   gl_FragColor = vec4(emptyColor,1.0);
+          	   occupiedColor.x = 0.08 + 0.964*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
+	   occupiedColor.y = 0.39 + 0.917*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
+	   occupiedColor.z = 0.70 + 0.552*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
+	   gl_FragColor = vec4(occupiedColor,1.0);
 	}
 }
+
+// Blue Sky
+// emptyColor.x = 0.10 + 0.90*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
+// emptyColor.y = 0.43 + 0.57*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
+// emptyColor.z = 0.75 + 0.25*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
