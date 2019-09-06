@@ -33,6 +33,10 @@ void ofApp::setup(){
   hideKinectGui = false;
   skipBgUpdate = true;
   
+  // Pending deleted agents.
+  pendingAgentsNum = 0;
+  pendingAgentTime = 0;
+  
   // Instantiate Midi.
   Midi::instance().setup();
   
@@ -62,7 +66,6 @@ void ofApp::update(){
   
   // Update agents and remove them if their stretch
   // counter goes crazy.
-  auto numAgentsDeleted = 0;
   box2d.disableEvents();
   ofRemove(agents, [&](Agent *a) {
     a->update(alphaAgentProps, betaAgentProps);
@@ -73,27 +76,35 @@ void ofApp::update(){
         explodedAgent.push_back(m);
       }
       
+      // Remove any colliding bodies if they belong to this agent.
+      ofRemove(collidingBodies, [&](b2Body *b) {
+         auto agentA = reinterpret_cast<VertexData*>(collidingBodies[0]->GetUserData())->agent;
+         return agentA == a;
+      });
+      
       a->clean(box2d); // Clean all the vertices and joints.
       
       // Midi hook
       a->enableStretchMidi(false);
       Midi::instance().sendAgentExplosionMidi();
       
-      numAgentsDeleted++;
+      if (pendingAgentsNum == 0) {
+          pendingAgentTime = ofGetElapsedTimeMillis(); // Reset time if it's the first time a new agent is deleted.
+      }
+
+      pendingAgentsNum++;
+    
       return true;
     }
     return false;
   });
   box2d.enableEvents();
   
-  // Create agents.
-  for (auto i =0; i < numAgentsDeleted; i++) {
-      // Create an agent
-      ofPoint origin = ofPoint(ofRandom(50, ofGetWidth()-200), ofRandom(50, ofGetHeight()-200));
-      Agent *agent;
-      alphaAgentProps.meshOrigin = origin;
-      agent = new Alpha(box2d, alphaAgentProps);
-      agents.push_back(agent);
+  // Track time
+  if (ofGetElapsedTimeMillis() - pendingAgentTime > 45000 && pendingAgentsNum > 0) { // 30 seconds.
+    cout << "Time elaped: Creating Agents: " << pendingAgentsNum << endl;
+    createAgents(pendingAgentsNum);
+    pendingAgentsNum = 0;
   }
   
   if (removeIndices.size() > 0) {
@@ -453,7 +464,7 @@ void ofApp::keyPressed(int key){
   }
   
   if (key == 'n') {
-    createAgents(); 
+    createAgents(numAgentsToCreate);
   }
   
   if (key == 'c') {
@@ -644,7 +655,7 @@ void ofApp::processOsc() {
     
     if(m.getAddress() == "/new"){
       float val = m.getArgAsFloat(0);
-      createAgents();
+      createAgents(numAgentsToCreate);
     }
   }
 }
@@ -659,9 +670,9 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 
 // ------------------------------ Interactive Routines --------------------------------------- //
 
-void ofApp::createAgents() {
-  for (int i = 0; i < numAgentsToCreate; i++) {
-    ofPoint origin = ofPoint(ofRandom(50, ofGetWidth()-200), ofRandom(50, ofGetHeight()-200));
+void ofApp::createAgents(int numAgents) {
+  for (int i = 0; i < numAgents; i++) {
+    ofPoint origin = ofPoint(ofRandom(ofGetWidth()-500, ofGetWidth()), ofRandom(ofGetHeight()-300, ofGetHeight()));
     Agent *agent;
     alphaAgentProps.meshOrigin = origin;
     agent = new Alpha(box2d, alphaAgentProps);

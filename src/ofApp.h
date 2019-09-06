@@ -30,7 +30,7 @@ class ofApp : public ofBaseApp{
   
     // Public helpers.
     void setupGui();
-    void createAgents();
+    void createAgents(int numAgents);
     void clearAgents();
     void updateAgentProps();
     void handleInteraction(); 
@@ -148,7 +148,6 @@ class ofApp : public ofBaseApp{
     void enableRepelBeforeBreak();
     void evaluateEntryExit(int peopleNum);
   
-  
     int specialRepelTimer; // Keeps track of the repelling.
     std::vector<Memory> brokenBonds;
     std::vector<Memory> explodedAgent; 
@@ -180,7 +179,11 @@ class ofApp : public ofBaseApp{
   
     // Occupied
     bool isOccupied;
-    int prevPeopleSize; 
+    int prevPeopleSize;
+  
+    // Pending time to track agents killed.
+    int pendingAgentsNum;
+    long pendingAgentTime; 
   
     std::vector<glm::vec2> testPeople; 
 };
