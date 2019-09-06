@@ -820,27 +820,32 @@ void ofApp::createSuperAgents() {
   // Joint creation based on when two bodies collide at certain vertices.
   if (collidingBodies.size()>0) {
       // Find the agent of this body.
-      auto agentA = reinterpret_cast<VertexData*>(collidingBodies[0]->GetUserData())->agent;
-      auto agentB = reinterpret_cast<VertexData*>(collidingBodies[1]->GetUserData())->agent;
-    
-      // If both the agents have that state, then they'll bond.
-      SuperAgent superAgent; bool found = false;
-      std::shared_ptr<ofxBox2dJoint> j;
-      // Check for existing joints.
-      for (auto &sa : superAgents) {
-        // Is there a SuperAgent that already exists?
-        if (sa.contains(agentA, agentB)) {
-          j = createInterAgentJoint(collidingBodies[0], collidingBodies[1]);
-          sa.joints.push_back(j);
-          found = true;
-        }
-      }
-    
-      // Create a new Super Agent. 
-      if (!found) {
-        j = createInterAgentJoint(collidingBodies[0], collidingBodies[1]);
-        superAgent.setup(agentA, agentB, j); // Create a new super agent.
-        superAgents.push_back(superAgent);
+        auto bodyA = reinterpret_cast<VertexData*>(collidingBodies[0]);
+        auto bodyB = reinterpret_cast<VertexData*>(collidingBodies[1]);
+        
+        if (bodyA && bodyB) {
+          auto agentA = reinterpret_cast<VertexData*>(collidingBodies[0]->GetUserData())->agent;
+          auto agentB = reinterpret_cast<VertexData*>(collidingBodies[1]->GetUserData())->agent;
+        
+          // If both the agents have that state, then they'll bond.
+          SuperAgent superAgent; bool found = false;
+          std::shared_ptr<ofxBox2dJoint> j;
+          // Check for existing joints.
+          for (auto &sa : superAgents) {
+            // Is there a SuperAgent that already exists?
+            if (sa.contains(agentA, agentB)) {
+              j = createInterAgentJoint(collidingBodies[0], collidingBodies[1]);
+              sa.joints.push_back(j);
+              found = true;
+            }
+          }
+        
+          // Create a new Super Agent.
+          if (!found) {
+            j = createInterAgentJoint(collidingBodies[0], collidingBodies[1]);
+            superAgent.setup(agentA, agentB, j); // Create a new super agent.
+            superAgents.push_back(superAgent);
+          }
       }
     
       collidingBodies.clear();
