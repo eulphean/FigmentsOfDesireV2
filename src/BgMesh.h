@@ -10,6 +10,7 @@ class BgMesh {
     // Core methods. 
     void setup();
     void update(bool skipBgUpdate, bool isOccupied);
+    void updateBackground();
     void draw(bool debug);
     bool isAllocated();
     void destroy();
@@ -21,4 +22,6 @@ class BgMesh {
     ofTexture bgTex;
   
     ofParameterGroup bgParams;
+    long bgTimer;
+    float bgState;
 };

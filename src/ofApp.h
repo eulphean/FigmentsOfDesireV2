@@ -185,5 +185,5 @@ class ofApp : public ofBaseApp{
     int pendingAgentsNum;
     long pendingAgentTime; 
   
-    std::vector<glm::vec2> testPeople; 
+    std::vector<glm::vec2> testPeople;
 };

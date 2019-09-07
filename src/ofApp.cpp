@@ -116,7 +116,7 @@ void ofApp::update(){
   box2d.enableEvents();
   
   // Track time
-  if (ofGetElapsedTimeMillis() - pendingAgentTime > 45000 && pendingAgentsNum > 0) { // 30 seconds.
+  if (ofGetElapsedTimeMillis() - pendingAgentTime > 40000 && pendingAgentsNum > 0) { // 30 seconds.
     cout << "Time elaped: Creating Agents: " << pendingAgentsNum << endl;
     createAgents(pendingAgentsNum);
     pendingAgentsNum = 0;
@@ -147,7 +147,8 @@ void ofApp::update(){
   
   // Update background
   if (bg.isAllocated()) {
-    bg.update(skipBgUpdate, isOccupied);
+//    bg.update(skipBgUpdate, isOccupied);
+      bg.updateBackground(); 
   }
 
   // Update broken bonds.
