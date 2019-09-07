@@ -78,8 +78,22 @@ void ofApp::update(){
       
       // Go through colliding bodies and see if this agent's body is one
       // of the colliding bodies => If it is, clear that colliding body
+      bool found = false;
+      for (auto b : collidingBodies) {
+         auto agent = reinterpret_cast<VertexData*>(b->GetUserData())->agent;
+         if (agent == a) {
+          found = true;
+          break;
+         }
+      }
+      
+      // Clear
+      if (found) {
+        collidingBodies.clear();
+      }
+      
       ofRemove(collidingBodies, [&](b2Body *b) {
-         auto agentA = reinterpret_cast<VertexData*>(collidingBodies[0]->GetUserData())->agent;
+         auto agentA = reinterpret_cast<VertexData*>(b->GetUserData())->agent;
          return agentA == a;
       });
       
