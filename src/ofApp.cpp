@@ -687,7 +687,7 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 
 void ofApp::createAgents(int numAgents) {
   for (int i = 0; i < numAgents; i++) {
-    ofPoint origin = ofPoint(ofRandom(ofGetWidth()-500, ofGetWidth()), ofRandom(ofGetHeight()-300, ofGetHeight()));
+    ofPoint origin = ofPoint(ofRandom(50, 500), ofRandom(50, ofGetHeight()-100));
     Agent *agent;
     alphaAgentProps.meshOrigin = origin;
     agent = new Alpha(box2d, alphaAgentProps);
