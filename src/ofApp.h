@@ -178,4 +178,7 @@ class ofApp : public ofBaseApp{
     long pendingAgentTime; 
   
     std::vector<glm::vec2> testPeople;
+  
+    // Sound player to play the pop
+    ofSoundPlayer popPlayer; 
 };

@@ -43,6 +43,9 @@ void ofApp::setup(){
   
   // Variable to keep track of who enters/exits the sapce
   prevPeopleSize = 0;
+  
+  // Load sound
+  popPlayer.load("pop.wav");
 }
 
 void ofApp::update(){
@@ -61,7 +64,7 @@ void ofApp::update(){
   box2d.disableEvents();
   ofRemove(agents, [&](Agent *a) {
     a->update(alphaAgentProps, betaAgentProps);
-    if (a->canExplode()) {
+    if (a->canExplode()) { // Do everything when agent will explode!
       // Fill exploded agents
       for (int i = 0; i < a->vertices.size()/4; i++) {
         Memory m (box2d, a->getCentroid(), true);
@@ -78,21 +81,20 @@ void ofApp::update(){
           break;
          }
       }
-      
-      // Clear
       if (found) {
         collidingBodies.clear();
       }
-      
       ofRemove(collidingBodies, [&](b2Body *b) {
          auto agentA = reinterpret_cast<VertexData*>(b->GetUserData())->agent;
          return agentA == a;
       });
-      
       a->clean(box2d); // Clean all the vertices and joints.
       
-      // Midi hook
+      // Stop playing the stretch sound for the agent
       a->enableStretchMidi(false);
+      
+      // Play the pop sound for the agent.
+      popPlayer.play();
       
       if (pendingAgentsNum == 0) {
           pendingAgentTime = ofGetElapsedTimeMillis(); // Reset time if it's the first time a new agent is deleted.
