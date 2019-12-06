@@ -22,9 +22,6 @@ void Message::draw() {
 // ------------------------------ Agent --------------------------------------- //
 
 void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
-  // Get a midi note from the Midi instance.
-  midiNote = Midi::instance().assignMidiNote();
-
   // ACTIVE filter
   filter = new PerlinPixellationFilter(textureSize.x, textureSize.y, 15.f);
   
@@ -46,9 +43,6 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   maxCoolDown = ofRandom(85, 175); // Wait time before the agent actually is ready to take more forces.
   stretchCounter = 0;
   maxStretchCounter = ofRandom(75, 125);
-  
-  // By default no midi note is playing. 
-  isMidiOn = false;
 }
 
 void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
@@ -172,26 +166,6 @@ void Agent::createTexture(ofPoint textureSize) {
 
   firstFbo.end();
   
-  // Turn off the text fbo feature for now.
-  
-//  textFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
-//  // Retrieve a slogan and center it.
-//  auto slogan = SloganFactory::instance().getSlogan();
-//  string msg = slogan.msg;
-//  int fontSize = slogan.size;
-//  // Load the font.
-//  font.load("fonts/perfect.otf", fontSize);
-//  font.setLetterSpacing(2);
-//  auto sw = font.stringWidth(msg); auto sh = font.stringHeight(msg);
-//  auto xPos = (textureSize.x - sw)/2;
-//  auto yPos = (textureSize.y/2);
-  
-//  textFbo.begin();
-//    ofClear(0, 0, 0, 0);
-//    ofSetColor(ofColor::black);
-//    font.drawString(msg, xPos, yPos);
-//  textFbo.end();
-  
   if (firstFbo.isAllocated()) {
     // Create 2nd fbo and draw with filter and postProcessing
     secondFbo.allocate(textureSize.x, textureSize.y, GL_RGBA);
@@ -200,8 +174,6 @@ void Agent::createTexture(ofPoint textureSize) {
       filter->begin();
         firstFbo.getTexture().drawSubsection(0, 0, textureSize.x, textureSize.y, 0, 0);
       filter->end();
-//      ofSetColor(255, 255);
-//      textFbo.draw(0, 0);
     secondFbo.end();
   }
 }
@@ -368,15 +340,15 @@ void Agent::setBehavior(Behavior newBehavior, std::vector<glm::vec2> newTargets,
 }
 
 void Agent::enableStretchMidi(bool on) {
-  if (on) {
-    if (!isMidiOn) {
-        Midi::instance().sendAgentStretchMidi(midiNote, true);
-        isMidiOn = true;
-    }
-  } else {
-    if (isMidiOn) {
-      Midi::instance().sendAgentStretchMidi(midiNote, false);
-      isMidiOn = false;
-    }
-  }
+//  if (on) {
+//    if (!isMidiOn) {
+//        Midi::instance().sendAgentStretchMidi(midiNote, true);
+//        isMidiOn = true;
+//    }
+//  } else {
+//    if (isMidiOn) {
+//      Midi::instance().sendAgentStretchMidi(midiNote, false);
+//      isMidiOn = false;
+//    }
+//  }
 }

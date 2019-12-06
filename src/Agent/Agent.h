@@ -2,8 +2,6 @@
 #include "ofMain.h"
 #include "ofxBox2d.h"
 #include "ofxFilterLibrary.h"
-#include "Midi.h"
-#include "SloganFactory.h"
 
 // Current behavior of the agent.
 enum Behavior {
@@ -140,7 +138,6 @@ class Agent {
     ofFbo secondFbo;
     ofFbo textFbo;
     ofTrueTypeFont font;
-    int midiNote; 
   
     // Figment's corner indices
     int cornerIndices[4];
@@ -152,7 +149,6 @@ class Agent {
     // Wait time before being able to be applied with another force. 
     int coolDown;
     int maxCoolDown;
-    bool isMidiOn; 
 };
 
 // Data Structure to hold a pointer to the agent instance

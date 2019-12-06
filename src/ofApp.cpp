@@ -2,10 +2,6 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-  // Setup OSC
-  receiver.setup(PORT);
-//  ofHideCursor();
-  
   ofBackground(ofColor::fromHex(0x2E2F2D));
   ofSetCircleResolution(20);
   ofDisableArbTex();
@@ -37,9 +33,6 @@ void ofApp::setup(){
   pendingAgentsNum = 0;
   pendingAgentTime = 0;
   
-  // Instantiate Midi.
-  Midi::instance().setup();
-  
   // Setup Kinect.
   kinect.setup();
   
@@ -53,7 +46,6 @@ void ofApp::setup(){
 }
 
 void ofApp::update(){
-  //  processOsc();
   box2d.update();
   kinect.update();
   
@@ -101,7 +93,6 @@ void ofApp::update(){
       
       // Midi hook
       a->enableStretchMidi(false);
-      Midi::instance().sendAgentExplosionMidi();
       
       if (pendingAgentsNum == 0) {
           pendingAgentTime = ofGetElapsedTimeMillis(); // Reset time if it's the first time a new agent is deleted.
@@ -115,7 +106,7 @@ void ofApp::update(){
   });
   box2d.enableEvents();
   
-  // Track time
+  // NOTE: New creates are born right here. 
   if (ofGetElapsedTimeMillis() - pendingAgentTime > 40000 && pendingAgentsNum > 0) { // 30 seconds.
     cout << "Time elaped: Creating Agents: " << pendingAgentsNum << endl;
     createAgents(pendingAgentsNum);
@@ -147,7 +138,6 @@ void ofApp::update(){
   
   // Update background
   if (bg.isAllocated()) {
-//    bg.update(skipBgUpdate, isOccupied);
       bg.updateBackground(); 
   }
 
@@ -272,7 +262,6 @@ void ofApp::drawSequence() {
 }
 
 // ------------------ Activate Agent Behaviors With Audience Interaction --------------------- //
-
 void ofApp::mousePressed(int x, int y, int button) {
   if (button == 2) { // Right click.
     if (testPeople.size() > 0) {
@@ -292,7 +281,6 @@ void ofApp::handleInteraction() {
     // Is the area occupied?
     auto people = kinect.getBodyCentroids();
     isOccupied = people.size() > 0;
-    //evaluateEntryExit(people.size()); // Hook for sound.
     
     if (isOccupied) {
       // Agents can bond now.
@@ -312,7 +300,6 @@ void ofApp::handleInteraction() {
     }
   } else { // Test Routine
     isOccupied = testPeople.size() > 0;
-    //evaluateEntryExit(testPeople.size()); // Hook for sound.
     
     if (isOccupied) {
       shouldBond = true;
@@ -657,25 +644,6 @@ void ofApp::updateAgentProps() {
   betaAgentProps.visibilityRadiusFactor = bVisibilityRadiusFactor;
 }
 
-void ofApp::processOsc() {
-  while(receiver.hasWaitingMessages()){
-    // get the next message
-    ofxOscMessage m;
-    receiver.getNextMessage(m);
-    
-    // ------------------ PIPES/GUI OSC Messages -----------------------
-    if(m.getAddress() == "/clear"){
-      float val = m.getArgAsFloat(0);
-      clearScreen();
-    }
-    
-    if(m.getAddress() == "/new"){
-      float val = m.getArgAsFloat(0);
-      createAgents(numAgentsToCreate);
-    }
-  }
-}
-
 glm::vec2 ofApp::getBodyPosition(b2Body* body) {
   auto xf = body->GetTransform();
   b2Vec2 pos = body->GetLocalCenter();
@@ -720,8 +688,6 @@ void ofApp::removeUnbonded() {
 }
 
 void ofApp::clearScreen() {
-  SloganFactory::instance().clearAllocatedSlogans();
-  
   // [WARNING] For some reason, these events are still fired when trying to clean things as one could be in the
   // middle of a step function. Disabling and renabling the events work as a good solution for now.
   box2d.disableEvents();
@@ -896,61 +862,3 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
   
     return j;
 }
-
-// Unused code. Don't need this for now.
-//          // Desire state is ATTRACTION!
-//          // Repel the other agent.
-//          if (agentA->desireState == Attraction) {
-//             // Attract A's vertices
-//             if (!dataA->hasInterAgentJoint) {
-//               dataA->applyAttraction = true;
-//               e.a->GetBody()->SetUserData(dataA);
-//            }
-//
-//            // Repel B's vertices
-//            if (!dataB->hasInterAgentJoint) {
-//              dataB->applyRepulsion = true;
-//              e.b->GetBody()->SetUserData(dataB);
-//            }
-//          
-//            // Reset agent state to None on collision.
-//            agentA->setDesireState(None); // TODO: Fix this.
-//          }
-//
-//          if (agentB->desireState == Attraction) {
-//            // Attract B's vertice
-//             if (!dataB->hasInterAgentJoint) {
-//              dataB->applyAttraction = true;
-//              e.b->GetBody()->SetUserData(dataB);
-//            }
-//
-//            // Repel A's vertices
-//            if (!dataA->hasInterAgentJoint) {
-//               dataA->applyRepulsion = true;
-//               e.a->GetBody()->SetUserData(dataA);
-//            }
-//
-//            // Reset agent state to None on collision.
-//            agentB->setDesireState(None); // TODO: Fix this.
-//          }
-
-//    for (auto &sa : superAgents) {
-//      auto joints = sa.joints;
-//      for (auto &j : joints) {
-//        auto bodyA = j->joint->GetBodyA();
-//        auto dataA = reinterpret_cast<VertexData*>(j->joint->GetBodyA()->GetUserData());
-//
-//        auto bodyB = j->joint->GetBodyB();
-//        auto dataB = reinterpret_cast<VertexData*>(j->joint->GetBodyB()->GetUserData());
-//
-//        // Enable repulsion on bodyA
-//        dataA->targetPos = getBodyPosition(bodyB);
-//        dataA->applyRepulsion = true;
-//        bodyA->SetUserData(dataA);
-//
-//        // Enable repulsion on bodyB
-//        dataB->targetPos = getBodyPosition(bodyA);
-//        dataB->applyRepulsion = true;
-//        bodyB->SetUserData(dataB);
-//      }
-//    }

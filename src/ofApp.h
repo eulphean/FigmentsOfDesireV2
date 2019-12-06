@@ -3,17 +3,13 @@
 #include "ofMain.h"
 #include "ofxBox2d.h"
 #include "ofxGui.h"
-#include "ofxOsc.h"
-
 #include "Agent.h"
 #include "Alpha.h"
 #include "Beta.h"
 #include "BgMesh.h"
 #include "Kinect.h"
 #include "Memory.h"
-#include "Midi.h"
 #include "SuperAgent.h"
-#include "SloganFactory.h"
 
 #define PORT 8000
 
@@ -133,7 +129,6 @@ class ofApp : public ofBaseApp{
   private:
   
     // Helper methods.
-    void processOsc();
     void clearScreen();
     void removeJoints();
     void removeUnbonded();
@@ -170,9 +165,6 @@ class ofApp : public ofBaseApp{
   
     // Serial
     ofSerial serial;
-  
-    // OSC remote.
-    ofxOscReceiver receiver;
   
     // Kinect handle
     Kinect kinect;

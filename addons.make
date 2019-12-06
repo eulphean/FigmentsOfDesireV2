@@ -1,8 +1,6 @@
 ofxBox2d
+ofxOpenCv
 ofxCv
 ofxFilterLibrary
 ofxGui
 ofxKinectV2
-ofxMidi
-ofxOpenCv
-ofxOsc

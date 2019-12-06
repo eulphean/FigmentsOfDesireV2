@@ -3,7 +3,6 @@
 #include "ofxBox2d.h"
 #include "Agent.h"
 #include "Memory.h"
-#include "Midi.h"
 
 // This class defines the entire BOND structure between two agents.
 // For every two agents that bond with each other, I create a SuperAgent class.
