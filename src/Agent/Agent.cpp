@@ -43,6 +43,9 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   maxCoolDown = ofRandom(85, 175); // Wait time before the agent actually is ready to take more forces.
   stretchCounter = 0;
   maxStretchCounter = ofRandom(75, 125);
+  
+  // Patch gate
+  gate_ctrl >> instrument.in_trig();
 }
 
 void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {
@@ -339,16 +342,12 @@ void Agent::setBehavior(Behavior newBehavior, std::vector<glm::vec2> newTargets,
   }
 }
 
-void Agent::enableStretchMidi(bool on) {
-//  if (on) {
-//    if (!isMidiOn) {
-//        Midi::instance().sendAgentStretchMidi(midiNote, true);
-//        isMidiOn = true;
-//    }
-//  } else {
-//    if (isMidiOn) {
-//      Midi::instance().sendAgentStretchMidi(midiNote, false);
-//      isMidiOn = false;
-//    }
-//  }
+void Agent::agentStretchSound(bool on) {
+  if (on) {
+    // Turn on
+    gate_ctrl.trigger(0.8);
+  } else {
+    // Turn off
+    gate_ctrl.off();
+  }
 }

@@ -3,6 +3,7 @@
 #pragma once
 #include "ofMain.h"
 #include "Agent.h"
+#include "ofxPDSP.h"
 
 class Alpha : public Agent {
   public:

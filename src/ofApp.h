@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxBox2d.h"
 #include "ofxGui.h"
+#include "ofxPDSP.h"
 #include "Agent.h"
 #include "Alpha.h"
 #include "Beta.h"
@@ -62,8 +63,7 @@ class ofApp : public ofBaseApp{
     // Screengrab fbo
     ofFbo screenGrabFbo;
     int screenCaptureIdx = 0;
-
-  
+    
     // GUI
     ofxPanel gui;
     ofParameterGroup settings;
@@ -124,7 +124,28 @@ class ofApp : public ofBaseApp{
     ofParameter<float> iJointFrequency;
     ofParameter<float> iJointDamping;
     ofParameter<int> iMinJointLength;
-    ofParameter<int> iMaxJointLength; 
+    ofParameter<int> iMaxJointLength;
+  
+    // PDSP And Sound Control
+    ofParameterGroup dspParams;
+    pdsp::ParameterGain     gain; // Gain
+    // Filter
+    pdsp::Parameter         filter_cutoff; // Filter
+    pdsp::Parameter         filter_reso; // Resolution
+    // Compressor
+    pdsp::Parameter         compressor_attack;
+    pdsp::Parameter         compressor_release;
+    pdsp::Parameter         compressor_threshold;
+    pdsp::Parameter         compressor_ratio;
+    pdsp::Parameter         compressor_knee;
+    // ADSR
+    pdsp::Parameter         osc_attack;
+    pdsp::Parameter         osc_decay;
+    pdsp::Parameter         osc_sustain;
+    pdsp::Parameter         osc_release;
+    pdsp::Parameter         osc_velocity;
+    // Oscillator
+    pdsp::Parameter         osc_pulseWidth;
   
   private:
   
@@ -180,5 +201,10 @@ class ofApp : public ofBaseApp{
     std::vector<glm::vec2> testPeople;
   
     // Sound player to play the pop
-    ofSoundPlayer popPlayer; 
+    ofSoundPlayer popPlayer;
+  
+    // PDSP
+    pdsp::Engine engine;
+    pdsp::Compressor compressor;
+    pdsp::CombFilter filter;
 };

@@ -46,6 +46,28 @@ void ofApp::setup(){
   
   // Load sound
   popPlayer.load("pop.wav");
+  
+  // Setup for master sound components.
+  
+  gain.enableSmoothing(50);
+
+  // Setup Compressor
+  compressor_attack     >> compressor.in_attack();
+  compressor_release    >> compressor.in_release();
+  compressor_threshold  >> compressor.in_threshold();
+  compressor_knee       >> compressor.in_knee();
+  compressor_ratio      >> compressor.in_ratio();
+  compressor.digital(true);
+  compressor.peak();
+
+  // Setup Filter
+//  filter_cutoff >> filter.in_cutoff();
+//  filter_reso   >> filter.in_reso();
+  
+  // PDSP Audio Control
+  engine.listDevices();
+  engine.setDeviceID(1); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
+  engine.setup( 44100, 1024, 5);
 }
 
 void ofApp::update(){
@@ -91,7 +113,7 @@ void ofApp::update(){
       a->clean(box2d); // Clean all the vertices and joints.
       
       // Stop playing the stretch sound for the agent
-      a->enableStretchMidi(false);
+      a->agentStretchSound(false);
       
       // Play the pop sound for the agent.
       popPlayer.play();
@@ -111,6 +133,7 @@ void ofApp::update(){
   // NOTE: New creates are born right here. 
   if (ofGetElapsedTimeMillis() - pendingAgentTime > 40000 && pendingAgentsNum > 0) { // 30 seconds.
     cout << "Time elaped: Creating Agents: " << pendingAgentsNum << endl;
+    pendingAgentsNum = (pendingAgentsNum >= 30) ? 30 : pendingAgentsNum;
     createAgents(pendingAgentsNum);
     pendingAgentsNum = 0;
   }
@@ -291,7 +314,7 @@ void ofApp::handleInteraction() {
       specialRepelTimer = ofRandom(200, 300);
     } else {
       for (auto &a : agents) {
-        a->enableStretchMidi(false); // It can happen here that targets disappear.
+        a->agentStretchSound(false); // It can happen here that targets disappear.
       }
       if (specialRepelTimer > 0) {
         enableRepelBeforeBreak();
@@ -309,7 +332,7 @@ void ofApp::handleInteraction() {
       specialRepelTimer = ofRandom(200, 300);
     } else {
       for (auto &a : agents) {
-        a->enableStretchMidi(false); // It can happen here that targets disappear.
+        a->agentStretchSound(false); // It can happen here that targets disappear.
       }
       if (specialRepelTimer > 0) {
         enableRepelBeforeBreak();
@@ -322,15 +345,7 @@ void ofApp::handleInteraction() {
   }
 }
 
-void ofApp::evaluateEntryExit(int curPeopleSize) {
-//    if (prevPeopleSize < curPeopleSize) {
-//      // Somebody entered
-//      Midi::instance().sendEntryExitMidi(true);
-//    } else if (prevPeopleSize > curPeopleSize) {
-//      // Somebody left
-//      Midi::instance().sendEntryExitMidi(false);
-//    }
-  
+void ofApp::evaluateEntryExit(int curPeopleSize) {  
     prevPeopleSize = curPeopleSize; 
 }
 
@@ -342,7 +357,7 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
     // Apply stretch on visible agents
     for (auto &a : visibleAgents) {
       a->setBehavior(Behavior::Stretch, {}, true); // All visible agents, turn on the note! They turn it off, as soon as they become invisible
-      a->enableStretchMidi(true); 
+      a->agentStretchSound(true);
     }
   }
   
@@ -361,7 +376,7 @@ void ofApp::setBehavior(std::vector<glm::vec2> people) {
     // If no visible targets, turn off the midi.
     auto numVisibleTargets = people.size() - invisibleTargets.size();
     if (numVisibleTargets == 0) {
-      a->enableStretchMidi(false);
+      a->agentStretchSound(false);
       a->stretchCounter = 0; 
     }
   }
@@ -603,7 +618,25 @@ void ofApp::setupGui() {
     interAgentJointParams.add(iJointDamping.set("Joint Damping", 1, 0, 10));
     interAgentJointParams.add(iMinJointLength.set("Min Joint Length", 250, 100, 1000));
     interAgentJointParams.add(iMaxJointLength.set("Max Joint Length", 300, 100, 1000));
+  
+    // DSP Params
+    dspParams.setName("DSP Params");
+    dspParams.add(gain.set("Gain", 5.f, -48.f, 15.f));
+    dspParams.add(filter_cutoff.set("Filter Cutoff", 300, 20, 1000));
+    dspParams.add(filter_reso.set("Filter Reso", 0.5f, 0.f, 1.f));
+    dspParams.add(compressor_attack.set("Compressor Attack (ms)", 0.f, 0.f, 5000.f));
+    dspParams.add(compressor_release.set("Compressor Release (ms)", 150.f, 0.f, 5000.f));
+    dspParams.add(compressor_threshold.set("Compressor Threshold (dB)", -30.f, -40.f, 30.f));
+    dspParams.add(compressor_ratio.set("Compressor Ratio (Ratio)", 4.f, 0.f, 10.f));
+    dspParams.add(compressor_attack.set("Compressor Knee (db)", 0.f, -20.f, 20.f));
+    dspParams.add(osc_attack.set("Osc Attack (ms)", 0, 0, 10000));
+    dspParams.add(osc_decay.set("Osc Decay (ms)", 250, 0, 10000));
+    dspParams.add(osc_release.set("Osc Release (ms)", 1000, 0, 10000));
+    dspParams.add(osc_sustain.set("Osc Sustain (0-1)", 0.f, 0.f, 1.f));
+    dspParams.add(osc_velocity.set("Osc Velocity (0-1)", 1.f, 0.f, 1.f));
+    dspParams.add(osc_pulseWidth.set("Osc PulseWidth (0-1)", 0.f, 0.f, 1.f));
 
+    settings.add(dspParams);
     settings.add(generalParams);
     settings.add(alphaAgentParams);
     settings.add(betaAgentParams);
@@ -657,13 +690,33 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 // ------------------------------ Interactive Routines --------------------------------------- //
 
 void ofApp::createAgents(int numAgents) {
+  
   for (int i = 0; i < numAgents; i++) {
     ofPoint origin = ofPoint(ofRandom(50, 500), ofRandom(50, ofGetHeight()-100));
     Agent *agent;
     alphaAgentProps.meshOrigin = origin;
+    // Create new agent.
     agent = new Alpha(box2d, alphaAgentProps);
+   
+    // Instrument patching
+    osc_attack >> agent->instrument.in_attack();
+    osc_decay >> agent->instrument.in_decay();
+    osc_release >> agent->instrument.in_release();
+    osc_sustain >> agent->instrument.in_sustain();
+    osc_velocity >> agent->instrument.in_velocity();
+    osc_pulseWidth >> agent->instrument.in_pw();
+    
+    // Signal -> Filter -> Gain
+    agent->instrument.out_signal() >> filter.ch(i) >> gain.ch(i);
+    
+    // Feed it to the engine vi
+    gain.ch(i) >> compressor.ch(0) >> engine.audio_out(0);
+    gain.ch(i) >> compressor.ch(1) >> engine.audio_out(1);
     agents.push_back(agent);
   }
+  
+  // Setup compressor.
+  
   cout << "Total Agents: " << agents.size() << endl; 
 }
 

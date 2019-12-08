@@ -2,6 +2,7 @@
 #include "ofMain.h"
 #include "ofxBox2d.h"
 #include "ofxFilterLibrary.h"
+#include "Instrument.h"
 
 // Current behavior of the agent.
 enum Behavior {
@@ -74,7 +75,7 @@ class Agent {
     void handleStretch();
     void handleShock();
     void handleVertexBehaviors();
-    void enableStretchMidi(bool on);
+    void agentStretchSound(bool on);
     void handleExplosion();
   
     // Helpers
@@ -104,6 +105,10 @@ class Agent {
     // Counter to keep track of the time spent on each agent when interacting with it. 
     int stretchCounter;
     int maxStretchCounter;
+  
+    // Instrument control.
+    Instrument instrument;
+    pdsp::TriggerControl gate_ctrl;
 
   protected:
     // Derived class needs to have access to these. 

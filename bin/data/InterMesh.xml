@@ -15,7 +15,7 @@
 		<Texture_Height>300</Texture_Height>
 		<Vertex_Density>0.986607</Vertex_Density>
 		<Vertex_Bounce>0.1</Vertex_Bounce>
-		<Vertex_Friction>1</Vertex_Friction>
+		<Vertex_Friction>0.964286</Vertex_Friction>
 		<Vertex_Radius>4</Vertex_Radius>
 		<Joint_Frequency>0.7</Joint_Frequency>
 		<Joint_Damping>1</Joint_Damping>
@@ -58,4 +58,20 @@
 		<Audience_Visibility_Radius>104.337</Audience_Visibility_Radius>
 		<Num_Agents_To_Create>5</Num_Agents_To_Create>
 	</General_Parameters>
+	<DSP_Params>
+		<LFO_Freq>0</LFO_Freq>
+		<Gain>1.5</Gain>
+		<Filter_Cutoff>1000</Filter_Cutoff>
+		<Filter_Reso>0.229911</Filter_Reso>
+		<Compressor_Knee__db_>0</Compressor_Knee__db_>
+		<Compressor_Release__ms_>494.26</Compressor_Release__ms_>
+		<Compressor_Threshold__dB_>-25</Compressor_Threshold__dB_>
+		<Compressor_Ratio__Ratio_>0.6</Compressor_Ratio__Ratio_>
+		<Osc_Attack__ms_>325</Osc_Attack__ms_>
+		<Osc_Decay__ms_>835</Osc_Decay__ms_>
+		<Osc_Release__ms_>4336</Osc_Release__ms_>
+		<Osc_Sustain__0-1_>0.353954</Osc_Sustain__0-1_>
+		<Osc_Velocity__0-1_>1</Osc_Velocity__0-1_>
+		<Osc_PulseWidth__0-1_>0.285714</Osc_PulseWidth__0-1_>
+	</DSP_Params>
 </The_Nest_GUI>
