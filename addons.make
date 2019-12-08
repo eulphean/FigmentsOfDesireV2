@@ -1,6 +1,10 @@
+ofxAudioFile
 ofxBox2d
 ofxOpenCv
 ofxCv
 ofxFilterLibrary
 ofxGui
 ofxKinectV2
+ofxMidi
+ofxOsc
+ofxPDSP
