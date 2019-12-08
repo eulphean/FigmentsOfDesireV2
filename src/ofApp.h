@@ -49,8 +49,8 @@ class ofApp : public ofBaseApp{
     bool drawFbo; // For saving frames.
     bool shouldBond;
     bool showVisibilityRadius;
-    bool skipBgUpdate;
-  
+    bool showFrameRate;
+
     // Box2d world handle.
     ofxBox2d box2d;
   
@@ -72,7 +72,9 @@ class ofApp : public ofBaseApp{
     ofParameterGroup generalParams;
     ofParameter<float> alphaAgentProbability;
     ofParameter<float> audienceVisibilityRadius;
-    ofParameter<int> numAgentsToCreate; 
+    ofParameter<int> numAgentsToCreate;
+    ofParameter<int> maxAgentsInWorld;
+    ofParameter<int> reincarnationWaitTime;
   
     // Alpha Agent Group params. 
     ofParameterGroup alphaAgentParams;
@@ -207,4 +209,9 @@ class ofApp : public ofBaseApp{
     pdsp::Engine engine;
     pdsp::Compressor compressor;
     pdsp::CombFilter filter;
+  
+    // Masker
+    ofFbo masterFbo;
+    ofFbo maskFbo;
+    ofImage maskImage; 
 };

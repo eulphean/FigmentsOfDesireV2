@@ -57,6 +57,8 @@
 		<Alpha_Agent_Probability>0.9</Alpha_Agent_Probability>
 		<Audience_Visibility_Radius>104.337</Audience_Visibility_Radius>
 		<Num_Agents_To_Create>5</Num_Agents_To_Create>
+		<Max_Agents_in_World>30</Max_Agents_in_World>
+		<Reincarnate_Agents_Wait_Time__ms_>40000</Reincarnate_Agents_Wait_Time__ms_>
 	</General_Parameters>
 	<DSP_Params>
 		<LFO_Freq>0</LFO_Freq>

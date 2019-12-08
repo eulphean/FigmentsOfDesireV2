@@ -27,7 +27,7 @@ void ofApp::setup(){
   drawFbo = false;
   shouldBond = false;
   hideKinectGui = false;
-  skipBgUpdate = true;
+  showFrameRate = false; 
   
   // Pending deleted agents.
   pendingAgentsNum = 0;
@@ -47,8 +47,7 @@ void ofApp::setup(){
   // Load sound
   popPlayer.load("pop.wav");
   
-  // Setup for master sound components.
-  
+  // Setup master sound components.
   gain.enableSmoothing(50);
 
   // Setup Compressor
@@ -60,14 +59,25 @@ void ofApp::setup(){
   compressor.digital(true);
   compressor.peak();
 
-  // Setup Filter
-//  filter_cutoff >> filter.in_cutoff();
-//  filter_reso   >> filter.in_reso();
-  
   // PDSP Audio Control
   engine.listDevices();
   engine.setDeviceID(1); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
   engine.setup( 44100, 1024, 5);
+  
+  // Setup FBOs for drawing and masking the works.
+  masterFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+  
+  // Prepare Mask Fbo
+  maskImage.load("mask.png");
+  maskFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+  maskFbo.begin();
+    ofClear(0, 0, 0, 255);
+    ofSetColor(255);
+    maskImage.draw(0, 0, ofGetWidth(), ofGetHeight());
+  maskFbo.end();
+  
+  // Create the world
+  createWorld(true);
 }
 
 void ofApp::update(){
@@ -131,9 +141,11 @@ void ofApp::update(){
   box2d.enableEvents();
   
   // NOTE: New creates are born right here. 
-  if (ofGetElapsedTimeMillis() - pendingAgentTime > 40000 && pendingAgentsNum > 0) { // 30 seconds.
+  if (ofGetElapsedTimeMillis() - pendingAgentTime > reincarnationWaitTime && pendingAgentsNum > 0) { // 30 seconds.
     cout << "Time elaped: Creating Agents: " << pendingAgentsNum << endl;
-    pendingAgentsNum = (pendingAgentsNum >= 30) ? 30 : pendingAgentsNum;
+    if (pendingAgentsNum >= maxAgentsInWorld) {
+      pendingAgentsNum = maxAgentsInWorld;
+    }
     createAgents(pendingAgentsNum);
     pendingAgentsNum = 0;
   }
@@ -184,20 +196,52 @@ void ofApp::update(){
     return m.shouldRemove;
   });
   
-  // Draw in the fbo if I'm screen capturing.
-  if (drawFbo) {
-    screenGrabFbo.begin();
-      ofClear(ofColor::black);
-      drawSequence();
-    screenGrabFbo.end();
+  // Screen Grab logic
+  //  if (drawFbo) {
+  //    screenGrabFbo.begin();
+  //      ofClear(ofColor::black);
+  //      drawSequence();
+  //    screenGrabFbo.end();
+  //  }
+  
+  masterFbo.begin();
+    ofClear(0, 0, 0, 0);
+    drawSequence();
+  masterFbo.end();
+  
+  // Only mask when in debug mode.
+  if (debug) {
+    ofShowCursor();
+    masterFbo.getTexture().disableAlphaMask();
+  } else {
+    ofHideCursor(); 
+    masterFbo.getTexture().setAlphaMask(maskFbo.getTexture());
   }
 }
 
 void ofApp::draw(){
-  if (drawFbo) {
-    screenGrabFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
-  } else {
-    drawSequence();
+//  if (drawFbo) {
+//    screenGrabFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+//  } else {
+//    drawSequence();
+//  }
+  masterFbo.draw(0, 0, ofGetWidth(), ofGetHeight());
+  
+  if (showFrameRate || debug) {
+    // Show the current frame rate.
+    ofPushMatrix();
+      ofScale(2, 2);
+      ofPushStyle();
+        ofSetColor(ofColor::black);
+        ofDrawBitmapString(ofGetFrameRate(), 50, 50);
+      ofPopStyle();
+    ofPopMatrix();
+  }
+  
+  // Health parameters
+  if (showGui) {
+    ofShowCursor();
+    gui.draw();
   }
 }
 
@@ -224,15 +268,6 @@ void ofApp::drawSequence() {
   for (auto m : explodedAgent) {
     m.draw();
   }
-  
-  // Show the current frame rate.
-  ofPushMatrix();
-    ofScale(2, 2);
-    ofPushStyle();
-      ofSetColor(ofColor::black);
-      ofDrawBitmapString(ofGetFrameRate(), 50, 50);
-    ofPopStyle();
-  ofPopMatrix();
   
   // All debug logic.
   if (debug) {
@@ -277,12 +312,6 @@ void ofApp::drawSequence() {
         }
       }
     ofPopStyle();
-  }
-  
-  
-  // Health parameters
-  if (showGui) {
-    gui.draw();
   }
 }
 
@@ -471,10 +500,6 @@ std::vector<Agent*> ofApp::getInvisibleAgents(glm::vec2 target) {
 
 void ofApp::keyPressed(int key){
   // ------------------ Interactive Gestures --------------------- //
-  if (key == 's') {
-    skipBgUpdate = !skipBgUpdate;
-  }
-  
   if (key == 'v') {
     showVisibilityRadius = !showVisibilityRadius;
   }
@@ -566,7 +591,9 @@ void ofApp::setupGui() {
     generalParams.setName("General Parameters");
     generalParams.add(alphaAgentProbability.set("Alpha Agent Probability", 0.1, 0, 0.9));
     generalParams.add(audienceVisibilityRadius.set("Audience Visibility Radius", 100, 50, 200)); 
-    generalParams.add(numAgentsToCreate.set("Num Agents To Create", 1, 1, 10));
+    generalParams.add(numAgentsToCreate.set("Num Agents To Create", 1, 1, 35));
+    generalParams.add(maxAgentsInWorld.set("Max Agents in World", 30, 0, 50));
+    generalParams.add(reincarnationWaitTime.set("Reincarnate Agents Wait Time (ms)", 40000, 0, 60000));
   
     // Alpha Agent GUI parameters
     alphaAgentParams.setName("Alpha Agent Params");
