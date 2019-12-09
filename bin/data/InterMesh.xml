@@ -75,5 +75,6 @@
 		<Osc_Sustain__0-1_>0.353954</Osc_Sustain__0-1_>
 		<Osc_Velocity__0-1_>1</Osc_Velocity__0-1_>
 		<Osc_PulseWidth__0-1_>0.285714</Osc_PulseWidth__0-1_>
+		<Compressor_Attack__ms_>0</Compressor_Attack__ms_>
 	</DSP_Params>
 </The_Nest_GUI>

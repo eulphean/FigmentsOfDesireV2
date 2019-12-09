@@ -46,6 +46,8 @@ void Agent::setup(ofxBox2d &box2d, ofPoint textureSize) {
   
   // Patch gate
   gate_ctrl >> instrument.in_trig();
+
+  id = ofRandom(0, 100);
 }
 
 void Agent::update(AlphaAgentProperties alphaProps, BetaAgentProperties betaProps) {

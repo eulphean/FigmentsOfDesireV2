@@ -109,6 +109,7 @@ class Agent {
     // Instrument control.
     Instrument instrument;
     pdsp::TriggerControl gate_ctrl;
+	int id;
 
   protected:
     // Derived class needs to have access to these. 

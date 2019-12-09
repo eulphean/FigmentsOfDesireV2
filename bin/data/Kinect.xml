@@ -3,6 +3,7 @@
 	<Distance_Thresholds>
 		<minDistance>734.694</minDistance>
 		<maxDistance>2326.53</maxDistance>
+		<irExposure>1</irExposure>
 	</Distance_Thresholds>
 	<Image_Params>
 		<Blur>2.95918</Blur>

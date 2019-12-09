@@ -139,7 +139,6 @@ class ofApp : public ofBaseApp{
     pdsp::Parameter         compressor_release;
     pdsp::Parameter         compressor_threshold;
     pdsp::Parameter         compressor_ratio;
-    pdsp::Parameter         compressor_knee;
     // ADSR
     pdsp::Parameter         osc_attack;
     pdsp::Parameter         osc_decay;
@@ -213,5 +212,7 @@ class ofApp : public ofBaseApp{
     // Masker
     ofFbo masterFbo;
     ofFbo maskFbo;
-    ofImage maskImage; 
+    ofImage maskImage;
+
+	bool resetMesh = false; 
 };

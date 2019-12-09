@@ -10,12 +10,13 @@
 class SuperAgent {
   public:
     void setup(Agent *agentA, Agent *agentB, std::shared_ptr<ofxBox2dJoint>);
-    void update(ofxBox2d &box2d, std::vector<Memory> &memories, std::vector<int> &removeVertices, bool shouldBond);
+    void update(ofxBox2d &box2d, std::vector<Memory> &memories, bool &resetMesh, bool shouldBond);
     void updateMeshIdx(); 
     bool contains(Agent *agentA, Agent *agentB);
+	bool contains(Agent * agent);
     void clean(ofxBox2d &box2d);
+	void markClean(ofxBox2d &box2d, std::vector<Memory> &memories);
     glm::vec2 getBodyPosition(b2Body *body);
-    void createMemory();
   
     // This is shared between all the SuperAgent instances to maintain.
     static ofMesh jointMesh;

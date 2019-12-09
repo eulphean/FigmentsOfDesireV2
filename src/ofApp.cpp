@@ -47,22 +47,21 @@ void ofApp::setup(){
   // Load sound
   popPlayer.load("pop.wav");
   
-  // Setup master sound components.
-  gain.enableSmoothing(50);
+  //// Setup master sound components.
+  //gain.enableSmoothing(50);
 
-  // Setup Compressor
-  compressor_attack     >> compressor.in_attack();
-  compressor_release    >> compressor.in_release();
-  compressor_threshold  >> compressor.in_threshold();
-  compressor_knee       >> compressor.in_knee();
-  compressor_ratio      >> compressor.in_ratio();
-  compressor.digital(true);
-  compressor.peak();
+  //// Setup Compressor
+  //compressor_attack     >> compressor.in_attack();
+  //compressor_release    >> compressor.in_release();
+  //compressor_threshold  >> compressor.in_threshold();
+  //compressor_ratio      >> compressor.in_ratio();
+  //compressor.digital(true);
+  //compressor.peak();
 
-  // PDSP Audio Control
-  engine.listDevices();
-  engine.setDeviceID(0); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
-  engine.setup(44100, 512, 3);
+  //// PDSP Audio Control
+  //engine.listDevices();
+  //engine.setDeviceID(0); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
+  //engine.setup(44100, 512, 2);
   
   // Setup FBOs for drawing and masking the works.
   masterFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
@@ -77,19 +76,29 @@ void ofApp::setup(){
   maskFbo.end();
   
   // Create the world
-  createWorld(true);
+  //createWorld(true);
 }
 
 void ofApp::update(){
-  box2d.update();
+  // box2d.update();
   kinect.update();
   
   // Update super agents
-  std::vector<int> removeIndices;
   ofRemove(superAgents, [&](SuperAgent &sa){
-    sa.update(box2d, brokenBonds, removeIndices, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
+    sa.update(box2d, brokenBonds, resetMesh, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
     return sa.shouldRemove;
   });
+
+  if (resetMesh) {
+	  ofLog() << "Update mesh" << endl; 
+	  // If I have removed something, update the mesh.
+	  SuperAgent::jointMesh.clear();
+	  SuperAgent::curMeshIdx = 0;
+	  for (auto &sa : superAgents) {
+		  sa.updateMeshIdx();
+	  }
+	  resetMesh = false; 
+  }
   
   // Update agents and remove them if their stretch
   // counter goes crazy.
@@ -97,6 +106,7 @@ void ofApp::update(){
   ofRemove(agents, [&](Agent *a) {
     a->update(alphaAgentProps, betaAgentProps);
     if (a->canExplode()) { // Do everything when agent will explode!
+	
       // Fill exploded agents
       for (int i = 0; i < a->vertices.size()/4; i++) {
         Memory m (box2d, a->getCentroid(), true);
@@ -120,8 +130,15 @@ void ofApp::update(){
          auto agentA = reinterpret_cast<VertexData*>(b->GetUserData())->agent;
          return agentA == a;
       });
-      a->clean(box2d); // Clean all the vertices and joints.
-      
+
+
+	  /*for (auto &sa : superAgents) {
+		  if (sa.contains(a)) {
+			  sa.markClean(box2d, brokenBonds); 
+		  }
+	  }*/
+
+
       // Stop playing the stretch sound for the agent
       a->agentStretchSound(false);
       
@@ -133,7 +150,23 @@ void ofApp::update(){
       }
 
       pendingAgentsNum++;
-    
+
+	  //// Remove any super agent that might need to be removed.
+	  //ofRemove(superAgents, [&](SuperAgent &sa) {
+		 // sa.update(box2d, brokenBonds, resetMesh, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
+		 // if (sa.shouldRemove) {
+			//  ofLog(OF_LOG_NOTICE, "Removing Super Agent for agent that is getting removed.");
+		 // }
+		 // return sa.shouldRemove;
+	  //});
+
+	  ofLog() << "Removing agent: " << a->id << endl;
+
+	  // Does this agent belong to a super agent? If yes, find the super agent
+	  // Clear all the joints in that super agent
+	  // Mark this super agent to be removed from the 
+	  a->clean(box2d); // Clean all the vertices and joints.
+   
       return true;
     }
     return false;
@@ -142,21 +175,12 @@ void ofApp::update(){
   
   // NOTE: New creates are born right here. 
   if (ofGetElapsedTimeMillis() - pendingAgentTime > reincarnationWaitTime && pendingAgentsNum > 0) { // 30 seconds.
-    cout << "Time elaped: Creating Agents: " << pendingAgentsNum << endl;
+    ofLog() << "Time elaped: Creating Agents: " << pendingAgentsNum << endl;
     if (pendingAgentsNum >= maxAgentsInWorld) {
       pendingAgentsNum = maxAgentsInWorld;
     }
     createAgents(pendingAgentsNum);
     pendingAgentsNum = 0;
-  }
-  
-  if (removeIndices.size() > 0) {
-	  // If I have removed something, update the mesh.
-	  SuperAgent::jointMesh.clear();
-	  SuperAgent::curMeshIdx = 0;
-	  for (auto &sa : superAgents) {
-		  sa.updateMeshIdx();
-	  }
   }
   
   // GUI props.
@@ -560,12 +584,12 @@ void ofApp::exit() {
 
 void ofApp::createWorld(bool createBounds) {
   if (bg.isAllocated()) {
-    cout << "Destroying the background." << endl;
+    ofLog() << "Destroying the background." << endl;
     bg.destroy();
   }
   
   if (createBounds) {
-    cout << "Creating new bounds." << endl;
+    ofLog() << "Creating new bounds." << endl;
     // Bounds
     bounds.x = -150; bounds.y = -150;
     bounds.width = ofGetWidth() + (-1) * bounds.x * 2; bounds.height = ofGetHeight() + (-1) * 2 * bounds.y;
@@ -578,7 +602,7 @@ void ofApp::createWorld(bool createBounds) {
     }
   }
   
-  cout << "Create new background." << endl;
+  ofLog() << "Create new background." << endl;
   // Create background
   bg.setup();
 }
@@ -655,7 +679,6 @@ void ofApp::setupGui() {
     dspParams.add(compressor_release.set("Compressor Release (ms)", 150.f, 0.f, 5000.f));
     dspParams.add(compressor_threshold.set("Compressor Threshold (dB)", -30.f, -40.f, 30.f));
     dspParams.add(compressor_ratio.set("Compressor Ratio (Ratio)", 4.f, 0.f, 10.f));
-    dspParams.add(compressor_attack.set("Compressor Knee (db)", 0.f, -20.f, 20.f));
     dspParams.add(osc_attack.set("Osc Attack (ms)", 0, 0, 10000));
     dspParams.add(osc_decay.set("Osc Decay (ms)", 250, 0, 10000));
     dspParams.add(osc_release.set("Osc Release (ms)", 1000, 0, 10000));
@@ -744,7 +767,7 @@ void ofApp::createAgents(int numAgents) {
   
   // Setup compressor.
   
-  cout << "Total Agents: " << agents.size() << endl; 
+  ofLog() << "Total Agents: " << agents.size() << endl; 
 }
 
 
@@ -908,6 +931,7 @@ void ofApp::createSuperAgents() {
             j = createInterAgentJoint(collidingBodies[0], collidingBodies[1]);
             superAgent.setup(agentA, agentB, j); // Create a new super agent.
             superAgents.push_back(superAgent);
+			ofLog() << "Creating New Super Agent: " << superAgents.size() << endl;
           }
       }
     

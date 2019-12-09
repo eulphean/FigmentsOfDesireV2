@@ -10,8 +10,9 @@ void SuperAgent::setup(Agent *agent1, Agent *agent2, std::shared_ptr<ofxBox2dJoi
 
 void SuperAgent::update(ofxBox2d &box2d,
                           std::vector<Memory> &memories,
-                            std::vector<int> &removeVertices, bool shouldBond) {
+							 bool &resetMesh, bool shouldBond) {
   auto cleanJoint = !shouldBond || agentA->canExplode() || agentB->canExplode();
+  ofLog() << "Super Agent Update: " << agentA->id << ", " << agentB->id << endl;
 
   // Go through all the joints and delete them if shouldn't bond.
   ofRemove(joints, [&](std::shared_ptr<ofxBox2dJoint> j) {
@@ -25,24 +26,26 @@ void SuperAgent::update(ofxBox2d &box2d,
     auto dataB = reinterpret_cast<VertexData*>(bodyB->GetUserData());
     glm::vec2 locB = getBodyPosition(bodyB);
     
+	// I'm making an assumption here that the bodies connected to these joints are not 
+	// cleared first. 
     if (cleanJoint) {
       box2d.getWorld()->DestroyJoint(j->joint);
 
       // Update bodyA's data.
       dataA->hasInterAgentJoint = false;
       bodyA->SetUserData(dataA);
-      removeVertices.push_back(dataA->jointMeshIdx);
 
       // Update bodyB's data.
       dataB->hasInterAgentJoint = false;
       bodyB->SetUserData(dataB);
-      removeVertices.push_back(dataB->jointMeshIdx); 
       
       // Create a new memory object for each interAgentJoint and populate the vector.
       glm::vec2 avgLoc = (locA + locB)/2;
       
       Memory mem(box2d, avgLoc);
       memories.push_back(mem);
+
+	  resetMesh = true; 
 
       return true;
     } else {
@@ -100,13 +103,21 @@ bool SuperAgent::contains(Agent *agent1, Agent *agent2) {
     } else {
       return false;
     }
-  } else if (agent2 == agentB) {
-    if (agent1 == agentA) {
+  } else if (agent1 == agentB) {
+    if (agent2 == agentA) {
       return true;
     } else {
       return false;
     }
   }
+}
+
+bool SuperAgent::contains(Agent *agent) {
+	return (agent == agentA || agent == agentB); 
+}
+
+void SuperAgent::markClean(ofxBox2d &box2d, std::vector<Memory> &memories) {
+	// Clear all joints
 }
 
 void SuperAgent::clean(ofxBox2d &box2d) {
