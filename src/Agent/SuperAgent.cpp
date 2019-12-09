@@ -12,7 +12,6 @@ void SuperAgent::update(ofxBox2d &box2d,
                           std::vector<Memory> &memories,
 							 bool &resetMesh, bool shouldBond) {
   auto cleanJoint = !shouldBond || agentA->canExplode() || agentB->canExplode();
-  ofLog() << "Super Agent Update: " << agentA->id << ", " << agentB->id << endl;
 
   // Go through all the joints and delete them if shouldn't bond.
   ofRemove(joints, [&](std::shared_ptr<ofxBox2dJoint> j) {
@@ -97,27 +96,13 @@ void SuperAgent::updateMeshIdx() {
 
 // Check if super body already exists. 
 bool SuperAgent::contains(Agent *agent1, Agent *agent2) {
-  if (agent1 == agentA) {
-    if (agent2 == agentB) {
-      return true;
-    } else {
-      return false;
-    }
-  } else if (agent1 == agentB) {
-    if (agent2 == agentA) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
-
-bool SuperAgent::contains(Agent *agent) {
-	return (agent == agentA || agent == agentB); 
-}
-
-void SuperAgent::markClean(ofxBox2d &box2d, std::vector<Memory> &memories) {
-	// Clear all joints
+	if (agent1 == agentA && agent2 == agentB) {
+		return true;
+	}
+	else if (agent1 == agentB && agent2 == agentA) {
+		return true;
+	}
+	return false;
 }
 
 void SuperAgent::clean(ofxBox2d &box2d) {

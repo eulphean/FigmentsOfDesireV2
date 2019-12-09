@@ -213,4 +213,5 @@ class ofApp : public ofBaseApp{
     ofImage maskImage;
 
 	bool resetMesh = false; 
+	int agentIdx = 0; 
 };

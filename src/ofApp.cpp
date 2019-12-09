@@ -45,7 +45,7 @@ void ofApp::setup(){
   prevPeopleSize = 0;
   
   // Load sound
-  this->popPlayer.load("pop.wav");
+  popPlayer.load("pop.wav");
   
   // Setup master sound components.
   gain.enableSmoothing(50);
@@ -84,21 +84,20 @@ void ofApp::update(){
   kinect.update();
   
   // Update super agents
-  //ofRemove(superAgents, [&](SuperAgent &sa){
-  //  sa.update(box2d, brokenBonds, resetMesh, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
-  //  return sa.shouldRemove;
-  //});
+  ofRemove(superAgents, [&](SuperAgent &sa){
+    sa.update(box2d, brokenBonds, resetMesh, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
+    return sa.shouldRemove;
+  });
 
-  //if (resetMesh) {
-	 // ofLog() << "Update mesh" << endl; 
-	 // // If I have removed something, update the mesh.
-	 // SuperAgent::jointMesh.clear();
-	 // SuperAgent::curMeshIdx = 0;
-	 // for (auto &sa : superAgents) {
-		//  sa.updateMeshIdx();
-	 // }
-	 // resetMesh = false; 
-  //}
+  if (resetMesh) {
+	  // If I have removed something, update the mesh.
+	  SuperAgent::jointMesh.clear();
+	  SuperAgent::curMeshIdx = 0;
+	  for (auto &sa : superAgents) {
+		  sa.updateMeshIdx();
+	  }
+	  resetMesh = false; 
+  }
   
   // Update agents and remove them if their stretch
   // counter goes crazy.
@@ -136,7 +135,7 @@ void ofApp::update(){
       a->agentStretchSound(false);
       
       // Play the pop sound for the agent.
-      /* popPlayer.play();*/
+       popPlayer.play();
       
       if (pendingAgentsNum == 0) {
           pendingAgentTime = ofGetElapsedTimeMillis(); // Reset time if it's the first time a new agent is deleted.
@@ -144,20 +143,7 @@ void ofApp::update(){
 
       pendingAgentsNum++;
 
-	  //// Remove any super agent that might need to be removed.
-	  //ofRemove(superAgents, [&](SuperAgent &sa) {
-		 // sa.update(box2d, brokenBonds, resetMesh, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
-		 // if (sa.shouldRemove) {
-			//  ofLog(OF_LOG_NOTICE, "Removing Super Agent for agent that is getting removed.");
-		 // }
-		 // return sa.shouldRemove;
-	  //});
-
 	  ofLog() << "Removing agent: " << a->id << endl;
-
-	  // Does this agent belong to a super agent? If yes, find the super agent
-	  // Clear all the joints in that super agent
-	  // Mark this super agent to be removed from the 
 	  a->clean(box2d); // Clean all the vertices and joints.
    
       return true;
@@ -188,7 +174,7 @@ void ofApp::update(){
   }
 
   // Create super agents based on collision bodies.
-  //createSuperAgents();
+  createSuperAgents();
   
   // Update background
   if (bg.isAllocated()) {
@@ -753,10 +739,12 @@ void ofApp::createAgents(int numAgents) {
     // Feed it to the engine vi
     gain.ch(i) >> compressor.ch(0) >> engine.audio_out(0);
     gain.ch(i) >> compressor.ch(1) >> engine.audio_out(1);
+
+	agent->id = agentIdx; 
     agents.push_back(agent);
+
+	agentIdx++;
   }
-  
-  // Setup compressor.
   
   ofLog() << "Total Agents: " << agents.size() << endl; 
 }
@@ -922,7 +910,6 @@ void ofApp::createSuperAgents() {
             j = createInterAgentJoint(collidingBodies[0], collidingBodies[1]);
             superAgent.setup(agentA, agentB, j); // Create a new super agent.
             superAgents.push_back(superAgent);
-			ofLog() << "Creating New Super Agent: " << superAgents.size() << endl;
           }
       }
     
