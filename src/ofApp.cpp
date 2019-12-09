@@ -45,23 +45,23 @@ void ofApp::setup(){
   prevPeopleSize = 0;
   
   // Load sound
-  popPlayer.load("pop.wav");
+  this->popPlayer.load("pop.wav");
   
-  //// Setup master sound components.
-  //gain.enableSmoothing(50);
+  // Setup master sound components.
+  gain.enableSmoothing(50);
 
-  //// Setup Compressor
-  //compressor_attack     >> compressor.in_attack();
-  //compressor_release    >> compressor.in_release();
-  //compressor_threshold  >> compressor.in_threshold();
-  //compressor_ratio      >> compressor.in_ratio();
-  //compressor.digital(true);
-  //compressor.peak();
+  // Setup Compressor
+  compressor_attack     >> compressor.in_attack();
+  compressor_release    >> compressor.in_release();
+  compressor_threshold  >> compressor.in_threshold();
+  compressor_ratio      >> compressor.in_ratio();
+  compressor.digital(true);
+  compressor.peak();
 
-  //// PDSP Audio Control
-  //engine.listDevices();
-  //engine.setDeviceID(0); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
-  //engine.setup(44100, 512, 2);
+  // PDSP Audio Control
+  engine.listDevices();
+  engine.setDeviceID(0); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
+  engine.setup(44100, 512, 2);
   
   // Setup FBOs for drawing and masking the works.
   masterFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
@@ -76,29 +76,29 @@ void ofApp::setup(){
   maskFbo.end();
   
   // Create the world
-  //createWorld(true);
+  createWorld(true);
 }
 
 void ofApp::update(){
-  // box2d.update();
+  box2d.update();
   kinect.update();
   
   // Update super agents
-  ofRemove(superAgents, [&](SuperAgent &sa){
-    sa.update(box2d, brokenBonds, resetMesh, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
-    return sa.shouldRemove;
-  });
+  //ofRemove(superAgents, [&](SuperAgent &sa){
+  //  sa.update(box2d, brokenBonds, resetMesh, shouldBond); // Possibly update the mesh here as well (for the interAgentJoints)
+  //  return sa.shouldRemove;
+  //});
 
-  if (resetMesh) {
-	  ofLog() << "Update mesh" << endl; 
-	  // If I have removed something, update the mesh.
-	  SuperAgent::jointMesh.clear();
-	  SuperAgent::curMeshIdx = 0;
-	  for (auto &sa : superAgents) {
-		  sa.updateMeshIdx();
-	  }
-	  resetMesh = false; 
-  }
+  //if (resetMesh) {
+	 // ofLog() << "Update mesh" << endl; 
+	 // // If I have removed something, update the mesh.
+	 // SuperAgent::jointMesh.clear();
+	 // SuperAgent::curMeshIdx = 0;
+	 // for (auto &sa : superAgents) {
+		//  sa.updateMeshIdx();
+	 // }
+	 // resetMesh = false; 
+  //}
   
   // Update agents and remove them if their stretch
   // counter goes crazy.
@@ -132,18 +132,11 @@ void ofApp::update(){
       });
 
 
-	  /*for (auto &sa : superAgents) {
-		  if (sa.contains(a)) {
-			  sa.markClean(box2d, brokenBonds); 
-		  }
-	  }*/
-
-
       // Stop playing the stretch sound for the agent
       a->agentStretchSound(false);
       
       // Play the pop sound for the agent.
-      popPlayer.play();
+      /* popPlayer.play();*/
       
       if (pendingAgentsNum == 0) {
           pendingAgentTime = ofGetElapsedTimeMillis(); // Reset time if it's the first time a new agent is deleted.
@@ -195,7 +188,7 @@ void ofApp::update(){
   }
 
   // Create super agents based on collision bodies.
-  createSuperAgents();
+  //createSuperAgents();
   
   // Update background
   if (bg.isAllocated()) {
@@ -684,7 +677,6 @@ void ofApp::setupGui() {
     dspParams.add(osc_release.set("Osc Release (ms)", 1000, 0, 10000));
     dspParams.add(osc_sustain.set("Osc Sustain (0-1)", 0.f, 0.f, 1.f));
     dspParams.add(osc_velocity.set("Osc Velocity (0-1)", 1.f, 0.f, 1.f));
-    dspParams.add(osc_pulseWidth.set("Osc PulseWidth (0-1)", 0.f, 0.f, 1.f));
 
     settings.add(dspParams);
     settings.add(generalParams);
@@ -754,7 +746,6 @@ void ofApp::createAgents(int numAgents) {
     osc_release >> agent->instrument.in_release();
     osc_sustain >> agent->instrument.in_sustain();
     osc_velocity >> agent->instrument.in_velocity();
-    osc_pulseWidth >> agent->instrument.in_pw();
     
     // Signal -> Filter -> Gain
     agent->instrument.out_signal() >> filter.ch(i) >> gain.ch(i);

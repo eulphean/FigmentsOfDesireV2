@@ -145,8 +145,6 @@ class ofApp : public ofBaseApp{
     pdsp::Parameter         osc_sustain;
     pdsp::Parameter         osc_release;
     pdsp::Parameter         osc_velocity;
-    // Oscillator
-    pdsp::Parameter         osc_pulseWidth;
   
   private:
   
