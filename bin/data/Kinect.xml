@@ -6,9 +6,9 @@
 		<irExposure>1</irExposure>
 	</Distance_Thresholds>
 	<Image_Params>
-		<Blur>2.95918</Blur>
+		<Blur>1.93878</Blur>
 		<Threshold>0</Threshold>
-		<Erode>23</Erode>
+		<Erode>24</Erode>
 		<Dilate>21</Dilate>
 	</Image_Params>
 	<Contour_Finder>
