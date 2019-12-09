@@ -88,6 +88,12 @@ local.properties
 Thumbs.db
 # Folder config file
 Desktop.ini
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+icon.rc
+.vs/
 
 # Android
 .csettings

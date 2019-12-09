@@ -61,8 +61,8 @@ void ofApp::setup(){
 
   // PDSP Audio Control
   engine.listDevices();
-  engine.setDeviceID(1); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
-  engine.setup( 44100, 1024, 5);
+  engine.setDeviceID(0); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
+  engine.setup(44100, 512, 3);
   
   // Setup FBOs for drawing and masking the works.
   masterFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
@@ -151,12 +151,12 @@ void ofApp::update(){
   }
   
   if (removeIndices.size() > 0) {
-    // If I have removed something, update the mesh.
-    SuperAgent::jointMesh.clear();
-    SuperAgent::curMeshIdx = 0;
-    for (auto &sa : superAgents) {
-      sa.updateMeshIdx(); 
-    }
+	  // If I have removed something, update the mesh.
+	  SuperAgent::jointMesh.clear();
+	  SuperAgent::curMeshIdx = 0;
+	  for (auto &sa : superAgents) {
+		  sa.updateMeshIdx();
+	  }
   }
   
   // GUI props.
@@ -214,8 +214,8 @@ void ofApp::update(){
     ofShowCursor();
     masterFbo.getTexture().disableAlphaMask();
   } else {
-    ofHideCursor(); 
-    masterFbo.getTexture().setAlphaMask(maskFbo.getTexture());
+    // ofHideCursor(); 
+    // masterFbo.getTexture().setAlphaMask(maskFbo.getTexture());
   }
 }
 
