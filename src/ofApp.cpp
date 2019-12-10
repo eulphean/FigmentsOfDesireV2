@@ -47,6 +47,8 @@ void ofApp::setup(){
   // Pending deleted agents.
   pendingAgentsNum = 0;
   pendingAgentTime = 0;
+
+  engine.listDevices();
   
   // Setup Kinect.
   kinect.setup();
@@ -74,7 +76,7 @@ void ofApp::setup(){
   compressor.peak();
 
   // PDSP Audio Control
-  engine.listDevices();
+
   // Setup in the call. 
   
   // Create the world

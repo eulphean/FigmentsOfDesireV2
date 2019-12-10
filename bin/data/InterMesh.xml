@@ -77,6 +77,6 @@
 		<Osc_Velocity__0-1_>1</Osc_Velocity__0-1_>
 		<Osc_PulseWidth__0-1_>0.285714</Osc_PulseWidth__0-1_>
 		<Compressor_Attack__ms_>0</Compressor_Attack__ms_>
-		<Device_ID>1</Device_ID>
+		<Device_ID>0</Device_ID>
 	</DSP_Params>
 </The_Nest_GUI>

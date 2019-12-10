@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <Kinect_Params>
 	<Distance_Thresholds>
-		<minDistance>734.694</minDistance>
-		<maxDistance>2326.53</maxDistance>
-		<irExposure>1</irExposure>
+		<minDistance>1591.84</minDistance>
+		<maxDistance>5142.86</maxDistance>
+		<irExposure>3.42495</irExposure>
 	</Distance_Thresholds>
 	<Image_Params>
 		<Blur>1.93878</Blur>
@@ -12,9 +12,9 @@
 		<Dilate>21</Dilate>
 	</Image_Params>
 	<Contour_Finder>
-		<Min_Area>22.2143</Min_Area>
-		<Max_Area>242.862</Max_Area>
-		<Threshold>209</Threshold>
+		<Min_Area>8.07143</Min_Area>
+		<Max_Area>100.291</Max_Area>
+		<Threshold>217</Threshold>
 	</Contour_Finder>
 </Kinect_Params>
 <group />
