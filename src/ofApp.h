@@ -40,6 +40,11 @@ class ofApp : public ofBaseApp{
     void contactStart(ofxBox2dContactArgs &e);
     void contactEnd(ofxBox2dContactArgs &e);
   
+    // GUI Callbacks
+    void onDeviceIdUpdate(int &newVal);
+    void onMaskImgUpdate(int &newVal);
+  
+  
     // Flags to turn/turn off certain features
     bool showGui;
     bool debug;
@@ -50,6 +55,8 @@ class ofApp : public ofBaseApp{
     bool shouldBond;
     bool showVisibilityRadius;
     bool showFrameRate;
+    bool resetMesh;
+    bool showMask; 
 
     // Box2d world handle.
     ofxBox2d box2d;
@@ -75,6 +82,7 @@ class ofApp : public ofBaseApp{
     ofParameter<int> numAgentsToCreate;
     ofParameter<int> maxAgentsInWorld;
     ofParameter<int> reincarnationWaitTime;
+    ofParameter<int> maskImage; 
   
     // Alpha Agent Group params. 
     ofParameterGroup alphaAgentParams;
@@ -130,6 +138,7 @@ class ofApp : public ofBaseApp{
   
     // PDSP And Sound Control
     ofParameterGroup dspParams;
+    ofParameter<int> deviceId; 
     pdsp::ParameterGain     gain; // Gain
     // Filter
     pdsp::Parameter         filter_cutoff; // Filter
@@ -162,6 +171,7 @@ class ofApp : public ofBaseApp{
     void wasteTime();
     void enableRepelBeforeBreak();
     void evaluateEntryExit(int peopleNum);
+    void updateMaskFbo(ofImage maskImage);
   
     int specialRepelTimer; // Keeps track of the repelling.
     std::vector<Memory> brokenBonds;
@@ -210,8 +220,8 @@ class ofApp : public ofBaseApp{
     // Masker
     ofFbo masterFbo;
     ofFbo maskFbo;
-    ofImage maskImage;
-
-	bool resetMesh = false; 
-	int agentIdx = 0; 
+    std::vector<ofImage> maskImages;
+  
+    // Agent idx
+    int agentIdx;
 };

@@ -59,6 +59,7 @@
 		<Num_Agents_To_Create>5</Num_Agents_To_Create>
 		<Max_Agents_in_World>30</Max_Agents_in_World>
 		<Reincarnate_Agents_Wait_Time__ms_>40000</Reincarnate_Agents_Wait_Time__ms_>
+		<Mask_Image_Index__1-4_>3</Mask_Image_Index__1-4_>
 	</General_Parameters>
 	<DSP_Params>
 		<LFO_Freq>0</LFO_Freq>
@@ -67,8 +68,8 @@
 		<Filter_Reso>0.229911</Filter_Reso>
 		<Compressor_Knee__db_>0</Compressor_Knee__db_>
 		<Compressor_Release__ms_>494.26</Compressor_Release__ms_>
-		<Compressor_Threshold__dB_>-25</Compressor_Threshold__dB_>
-		<Compressor_Ratio__Ratio_>0.6</Compressor_Ratio__Ratio_>
+		<Compressor_Threshold__dB_>-29.2857</Compressor_Threshold__dB_>
+		<Compressor_Ratio__Ratio_>0.8</Compressor_Ratio__Ratio_>
 		<Osc_Attack__ms_>325</Osc_Attack__ms_>
 		<Osc_Decay__ms_>835</Osc_Decay__ms_>
 		<Osc_Release__ms_>4336</Osc_Release__ms_>
@@ -76,5 +77,6 @@
 		<Osc_Velocity__0-1_>1</Osc_Velocity__0-1_>
 		<Osc_PulseWidth__0-1_>0.285714</Osc_PulseWidth__0-1_>
 		<Compressor_Attack__ms_>0</Compressor_Attack__ms_>
+		<Device_ID>1</Device_ID>
 	</DSP_Params>
 </The_Nest_GUI>

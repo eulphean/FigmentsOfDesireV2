@@ -97,9 +97,9 @@ void Kinect::draw() {
         ofPopStyle();
       
         drawContent();
+      
+        gui.draw();
     }
-  
-    gui.draw();
 }
 
 void Kinect::initialize() {

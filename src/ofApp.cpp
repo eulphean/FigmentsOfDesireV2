@@ -17,6 +17,20 @@ void ofApp::setup(){
   ofAddListener(box2d.contactStartEvents, this, &ofApp::contactStart);
   ofAddListener(box2d.contactEndEvents, this, &ofApp::contactEnd);
   
+  // Setup FBOs for drawing and masking the works.
+  masterFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+  
+  // Load
+  ofImage img;
+  std::stringstream ss;
+  for (int i = 0; i < 4; i++) {
+    ss << "m" << i+1 << ".png";
+    img.load(ss.str());
+    maskImages.push_back(img);
+    ss.str(""); // Clear string
+  }
+  maskFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+  
   // Setup gui.
   setupGui();
   
@@ -27,7 +41,8 @@ void ofApp::setup(){
   drawFbo = false;
   shouldBond = false;
   hideKinectGui = false;
-  showFrameRate = false; 
+  showFrameRate = false;
+  showMask = true;
   
   // Pending deleted agents.
   pendingAgentsNum = 0;
@@ -60,23 +75,13 @@ void ofApp::setup(){
 
   // PDSP Audio Control
   engine.listDevices();
-  engine.setDeviceID(0); // REMEMBER TO SET THIS AT THE RIGHT INDEX!!!!
-  engine.setup(44100, 512, 2);
-  
-  // Setup FBOs for drawing and masking the works.
-  masterFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
-  
-  // Prepare Mask Fbo
-  maskImage.load("mask.png");
-  maskFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
-  maskFbo.begin();
-    ofClear(0, 0, 0, 255);
-    ofSetColor(255);
-    maskImage.draw(0, 0, ofGetWidth(), ofGetHeight());
-  maskFbo.end();
+  // Setup in the call. 
   
   // Create the world
   createWorld(true);
+  
+  resetMesh = false;
+  agentIdx = 0;
 }
 
 void ofApp::update(){
@@ -142,9 +147,7 @@ void ofApp::update(){
       }
 
       pendingAgentsNum++;
-
-	  ofLog() << "Removing agent: " << a->id << endl;
-	  a->clean(box2d); // Clean all the vertices and joints.
+	    a->clean(box2d); // Clean all the vertices and joints.
    
       return true;
     }
@@ -213,12 +216,10 @@ void ofApp::update(){
   masterFbo.end();
   
   // Only mask when in debug mode.
-  if (debug) {
-    ofShowCursor();
+  if (debug || !showMask) {
     masterFbo.getTexture().disableAlphaMask();
   } else {
-    // ofHideCursor(); 
-    // masterFbo.getTexture().setAlphaMask(maskFbo.getTexture());
+    masterFbo.getTexture().setAlphaMask(maskFbo.getTexture());
   }
 }
 
@@ -233,12 +234,18 @@ void ofApp::draw(){
   if (showFrameRate || debug) {
     // Show the current frame rate.
     ofPushMatrix();
-      ofScale(2, 2);
+      ofScale(4, 4);
       ofPushStyle();
-        ofSetColor(ofColor::black);
-        ofDrawBitmapString(ofGetFrameRate(), 50, 50);
+        ofSetColor(ofColor::red);
+        ofDrawBitmapString(ofGetFrameRate(), 200, 50);
       ofPopStyle();
     ofPopMatrix();
+  }
+  
+  if (debug) {
+    ofShowCursor();
+  } else {
+    ofHideCursor();
   }
   
   // Health parameters
@@ -503,6 +510,10 @@ std::vector<Agent*> ofApp::getInvisibleAgents(glm::vec2 target) {
 
 void ofApp::keyPressed(int key){
   // ------------------ Interactive Gestures --------------------- //
+  if (key == 'f') {
+    showFrameRate = !showFrameRate;
+  }
+  
   if (key == 'v') {
     showVisibilityRadius = !showVisibilityRadius;
   }
@@ -541,6 +552,10 @@ void ofApp::keyPressed(int key){
   
   if (key == 'k') {
     hideKinectGui = !hideKinectGui;
+  }
+  
+  if (key == 'm') {
+    showMask = !showMask;
   }
   
   // Save a screen grab of the high quality fbo that is getting drawn currently. 
@@ -597,6 +612,8 @@ void ofApp::setupGui() {
     generalParams.add(numAgentsToCreate.set("Num Agents To Create", 1, 1, 35));
     generalParams.add(maxAgentsInWorld.set("Max Agents in World", 30, 0, 50));
     generalParams.add(reincarnationWaitTime.set("Reincarnate Agents Wait Time (ms)", 40000, 0, 60000));
+    generalParams.add(maskImage.set("Mask Image Index (1-4)", 1, 1, 4));
+    maskImage.addListener(this, &ofApp::onMaskImgUpdate);
   
     // Alpha Agent GUI parameters
     alphaAgentParams.setName("Alpha Agent Params");
@@ -651,6 +668,8 @@ void ofApp::setupGui() {
   
     // DSP Params
     dspParams.setName("DSP Params");
+    dspParams.add(deviceId.set("Device ID", 0, 0, 6));
+    deviceId.addListener(this, &ofApp::onDeviceIdUpdate);
     dspParams.add(gain.set("Gain", 5.f, -48.f, 15.f));
     dspParams.add(filter_cutoff.set("Filter Cutoff", 300, 20, 1000));
     dspParams.add(filter_reso.set("Filter Reso", 0.5f, 0.f, 1.f));
@@ -720,7 +739,7 @@ glm::vec2 ofApp::getBodyPosition(b2Body* body) {
 void ofApp::createAgents(int numAgents) {
   
   for (int i = 0; i < numAgents; i++) {
-    ofPoint origin = ofPoint(ofRandom(50, 500), ofRandom(50, ofGetHeight()-100));
+    ofPoint origin = ofPoint(ofRandom(100, ofGetWidth()-100), ofRandom(100, ofGetHeight()-100));
     Agent *agent;
     alphaAgentProps.meshOrigin = origin;
     // Create new agent.
@@ -740,10 +759,9 @@ void ofApp::createAgents(int numAgents) {
     gain.ch(i) >> compressor.ch(0) >> engine.audio_out(0);
     gain.ch(i) >> compressor.ch(1) >> engine.audio_out(1);
 
-	agent->id = agentIdx; 
+	  agent->id = agentIdx;
     agents.push_back(agent);
-
-	agentIdx++;
+	  agentIdx++;
   }
   
   ofLog() << "Total Agents: " << agents.size() << endl; 
@@ -945,4 +963,23 @@ std::shared_ptr<ofxBox2dJoint> ofApp::createInterAgentJoint(b2Body *bodyA, b2Bod
     SuperAgent::curMeshIdx += 2;
   
     return j;
+}
+
+void ofApp::updateMaskFbo(ofImage img) {
+  maskFbo.begin();
+    ofClear(0, 0, 0, 255);
+    ofSetColor(255);
+    img.draw(0, 0, ofGetWidth(), ofGetHeight());
+  maskFbo.end();
+}
+
+void ofApp::onMaskImgUpdate(int &newVal) {
+  updateMaskFbo(maskImages[newVal-1]);
+  cout << "New Mask Image set: " << newVal - 1 << endl;
+}
+
+void ofApp::onDeviceIdUpdate(int &newVal) {
+  cout << "New Device Id set: " << newVal << endl;
+  engine.setDeviceID(newVal);
+  engine.setup(44100, 512, 3);
 }

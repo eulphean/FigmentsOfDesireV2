@@ -58,27 +58,27 @@ void main(void)
 	  // oneColor.z = 0.75 + 0.25*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
 	  // gl_FragColor = vec4(oneColor,1.0);
 	
-	if (bgState == 1) {
+	if (bgState == 3) {
 	   color.x = 0.10 + 0.90*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
 	   color.y = 0.43 + 0.57*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
 	   color.z = 0.75 + 0.25*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
 	   gl_FragColor = vec4(color,1.0);
-	} else if (bgState == 2) {
+	} else if (bgState == 4) {
 	   color.x = 0.08 + 0.964*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
 	   color.y = 0.39 + 0.917*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
 	   color.z = 0.70 + 0.552*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
 	   gl_FragColor = vec4(color,1.0);
-	} else if (bgState == 3) {
+	} else if (bgState == 5) {
 	   color.x = 0.06 + 0.964*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
 	   color.y = 0.30 + 0.85*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
 	   color.z = 0.68 + 0.45*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
 	   gl_FragColor = vec4(color,1.0);
-	} else if (bgState == 4) {
+	} else if (bgState == 1) {
 	  color.x = 0.91 + 0.09*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
 	  color.y = 0.18 + 0.82*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
 	  color.z = 0.12 + 0.88*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
 	  gl_FragColor = vec4(color,1.0);
-	} else if (bgState == 5) {
+	} else if (bgState == 2) {
 	  color.x = 0.87 + 0.09*fbm(2.0*p + vec2(newTime*0.4, newTime*0.1));
 	  color.y = 0.16 + 0.78*fbm(1.5*p + vec2(newTime*0.1, newTime*0.2));
 	  color.z = 0.08 + 0.75*fbm(1.0*p + vec2(newTime*0.3, newTime*0.1));
